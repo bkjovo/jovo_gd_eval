@@ -61,8 +61,13 @@ says so in an amber banner.
 
 ## Next session, in order
 
-1. **Put this under version control.** Not a git repo. A day of work with no undo.
-   `git init && git add -A && git commit -m "Soundcheck eval tool"`.
+1. ~~Put this under version control.~~ Done. Single repo at the Gradium root, 86 files.
+   `gradbot/`, `.venv/`, `node_modules/` and every `.env` are excluded. Note that
+   `create-next-app` had made its own repo inside `web/`, which meant the outer repo
+   was tracking an empty gitlink instead of the site source; that nested `.git` was
+   moved to the session scratchpad and can be deleted. Commit identity is set
+   repo-locally to Joseph Vosburgh <vosburgh.joseph@gmail.com>; change it with
+   `git config user.name "..."` then `git commit --amend --reset-author` if wrong.
 2. **Create the Supabase project**, run `web/supabase/schema.sql`, put the two values in
    `web/.env.local`. Then ask Claude to submit a rating locally against real Supabase to
    confirm the write path before deploying. The `on_conflict` upsert has never been
