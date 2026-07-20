@@ -1,0 +1,58 @@
+{
+  "_comment": [
+    "Voice roster for the evaluation corpus, one per language.",
+    "",
+    "IMPORTANT — these are NOT currently persona-matched, which confounds any",
+    "cross-language prosody comparison. Jules (fr) is tagged 'Enthusiastic, Expressive'",
+    "while es/de are 'Helpful, Attentive' and en is 'Confident'. An expressive persona",
+    "raises F0 variance for reasons unrelated to model quality, so the monotone detector",
+    "(f0_semitone_std) reads differently for French than for the others.",
+    "",
+    "The catalog also contains two tag generations: older voices use",
+    "emotion/gender/age/use-case/region, newer ones use category/country/perceived-*.",
+    "Mixing generations adds a second, less visible confound.",
+    "",
+    "Before the 20x5 parallel corpus run, either (a) re-pick all five voices matched on",
+    "persona and tag generation, or (b) keep these and treat cross-language prosody as",
+    "uncontrolled in the writeup. Option (a) is cheap and strictly better."
+  ],
+  "voices": {
+    "en": {
+      "voice_id": "r2sIQdqqoqgRJuXw",
+      "voice_name": "Marcus",
+      "persona": "Confident",
+      "region": null,
+      "tag_generation": "legacy"
+    },
+    "es": {
+      "voice_id": "sVLgzKMqaptUdaY8",
+      "voice_name": "Mateo",
+      "persona": "Helpful, Attentive",
+      "region": "es",
+      "tag_generation": "legacy"
+    },
+    "fr": {
+      "voice_id": "YKeBw3OV1RgpdhLh",
+      "voice_name": "Jules",
+      "persona": "Enthusiastic, Expressive",
+      "region": "fr",
+      "tag_generation": "legacy",
+      "_warning": "persona outlier — see comment above"
+    },
+    "de": {
+      "voice_id": "Kf5m22mROozoMWj3",
+      "voice_name": "Mats",
+      "persona": "Helpful, Attentive",
+      "region": null,
+      "tag_generation": "legacy"
+    },
+    "pt": {
+      "voice_id": "EzmLkNorEpZG_oNv",
+      "voice_name": "Rodrigo",
+      "persona": "Neutral/Informational",
+      "region": "pt",
+      "tag_generation": "current",
+      "_note": "Portugal (country=pt), not Brazil. The catalog is majority pt-BR; European Portuguese was chosen to match the native-region convention used for es/fr. Neutral persona deliberately avoids inflating F0 variance."
+    }
+  }
+}

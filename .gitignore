@@ -1,0 +1,24 @@
+# Third-party clone with its own git history and 767MB of build output.
+# Not part of this deliverable; track it separately if it ever needs to be.
+gradbot/
+
+# Secrets. The harness and web .gitignore files also cover these; repeated here so a
+# stray .env anywhere in the tree can never be staged by accident.
+.env
+.env.local
+.env.*.local
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node. web/.gitignore covers these for its own subtree; repeated for safety.
+node_modules/
+.next/
+
+# Machine-local Claude Code permissions, not useful to anyone else.
+.claude/settings.local.json
+
+# macOS
+.DS_Store
