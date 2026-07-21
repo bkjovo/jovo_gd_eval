@@ -63,13 +63,13 @@ ITEMS = [
     {
         "id": "bank-02", "use_case": "banking", "stress_category": "alphanumeric_code",
         "difficulty": "medium", "parallel": True,
-        "note": "Spelled-out alphanumeric code; letter names (A, K) are pronounced differently in each language.",
+        "note": "Alphanumeric code written as a production system stores it. The model must DECIDE how to vocalize it (character-by-character vs. chunked as 'A-seven-thirty-nine'); letter names also differ per language. Note WER cannot see that choice — both readings transcribe back to A739K2 — so vocalization is a human-review dimension.",
         "t": {
-            "en": "Your confirmation code is A, 7, 3, 9, K, 2.",
-            "es": "Su código de confirmación es A, 7, 3, 9, K, 2.",
-            "fr": "Votre code de confirmation est A, 7, 3, 9, K, 2.",
-            "de": "Ihr Bestätigungscode lautet A, 7, 3, 9, K, 2.",
-            "pt": "O seu código de confirmação é A, 7, 3, 9, K, 2.",
+            "en": "Your confirmation code is A739K2.",
+            "es": "Su código de confirmación es A739K2.",
+            "fr": "Votre code de confirmation est A739K2.",
+            "de": "Ihr Bestätigungscode lautet A739K2.",
+            "pt": "O seu código de confirmação é A739K2.",
         },
     },
     {
@@ -216,13 +216,13 @@ ITEMS = [
     {
         "id": "cs-02", "use_case": "customer_service", "stress_category": "alphanumeric_code",
         "difficulty": "medium", "parallel": True,
-        "note": "Order number mixing digits, a spoken punctuation word (dash), and a letter.",
+        "note": "Order number in natural form with an embedded hyphen. Tests whether the separator is voiced, dropped, or mispronounced, and how the digit run is chunked.",
         "t": {
-            "en": "Your order number is 6, 2, 9, dash, T, 4.",
-            "es": "Su número de pedido es 6, 2, 9, guion, T, 4.",
-            "fr": "Votre numéro de commande est 6, 2, 9, tiret, T, 4.",
-            "de": "Ihre Bestellnummer ist 6, 2, 9, Bindestrich, T, 4.",
-            "pt": "O seu número de encomenda é 6, 2, 9, hífen, T, 4.",
+            "en": "Your order number is 629-T4.",
+            "es": "Su número de pedido es 629-T4.",
+            "fr": "Votre numéro de commande est 629-T4.",
+            "de": "Ihre Bestellnummer ist 629-T4.",
+            "pt": "O seu número de encomenda é 629-T4.",
         },
     },
     {
@@ -313,13 +313,13 @@ ITEMS = [
     {
         "id": "game-03", "use_case": "gaming_npc", "stress_category": "alphanumeric_code",
         "difficulty": "medium", "parallel": True,
-        "note": "Redemption code; 'skin' is an English loanword in fr/de.",
+        "note": "Redemption code in natural unspaced form; 'skin' is an English loanword in fr/de.",
         "t": {
-            "en": "Enter the code G, 7, X, 4, 9 to unlock the skin.",
-            "es": "Introduce el código G, 7, X, 4, 9 para desbloquear el aspecto.",
-            "fr": "Entre le code G, 7, X, 4, 9 pour débloquer le skin.",
-            "de": "Gib den Code G, 7, X, 4, 9 ein, um den Skin freizuschalten.",
-            "pt": "Introduz o código G, 7, X, 4, 9 para desbloquear o visual.",
+            "en": "Enter the code G7X49 to unlock the skin.",
+            "es": "Introduce el código G7X49 para desbloquear el aspecto.",
+            "fr": "Entre le code G7X49 pour débloquer le skin.",
+            "de": "Gib den Code G7X49 ein, um den Skin freizuschalten.",
+            "pt": "Introduz o código G7X49 para desbloquear o visual.",
         },
     },
     {
