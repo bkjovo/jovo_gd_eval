@@ -95,10 +95,14 @@ def group_metrics(row, text):
 
 def main():
     ap = argparse.ArgumentParser(description="Publish scored clips to the web app")
-    ap.add_argument("--manifest", default="manifest.jsonl")
-    ap.add_argument("--results", default="outputs/results.json")
-    ap.add_argument("--out-dir", default="outputs")
+    # Defaults point at the v2 corpus; the old 7-clip demo is no longer published.
+    ap.add_argument("--manifest", default="corpus/manifest_125.jsonl")
+    ap.add_argument("--results", default="corpus/outputs/results.json")
+    ap.add_argument("--out-dir", default="corpus/outputs")
     ap.add_argument("--web-dir", default="../web")
+    ap.add_argument("--keep-stale-audio", action="store_true",
+                    help="do not delete published .wav files that are absent from this "
+                         "corpus (by default a publish is a clean replace).")
     args = ap.parse_args()
 
     manifest = read_manifest(args.manifest)
@@ -160,8 +164,21 @@ def main():
     with open(dest, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
+    # Clean replace: drop any previously-published audio not in this corpus, so old
+    # samples (e.g. the original 7-clip demo) don't linger alongside the new set.
+    published_ids = {c["id"] for c in clips}
+    pruned = []
+    if not args.keep_stale_audio:
+        for wav in clips_dir.glob("*.wav"):
+            if wav.stem not in published_ids:
+                wav.unlink()
+                pruned.append(wav.name)
+
     print(f"wrote {dest} ({len(clips)} clips) and copied audio to {clips_dir}")
     print(f"  languages: {', '.join(payload['languages'])}")
+    if pruned:
+        print(f"  pruned {len(pruned)} stale audio file(s): "
+              f"{', '.join(sorted(pruned)[:8])}{'...' if len(pruned) > 8 else ''}")
     for cid, why in skipped:
         print(f"  SKIPPED {cid}: {why}")
     if unscored:
