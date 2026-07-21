@@ -115,20 +115,12 @@ async def warm_up(client, items, per_voice, warm_text="Hello."):
     return chars
 
 
-async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id):
-    setup = {
-        "model_name": "default",
-        "voice_id": item["voice_id"],
-        "output_format": "wav",
-        "json_config": {"rewrite_rules": item["lang"]},
-    }
+def score_wav(wav_path, item, asr, utmos, dnsmos, run_id):
+    """
+    All metrics computable from an existing WAV. No API calls, so this is what the
+    offline --rescore path uses to re-apply improved scoring for zero credits.
+    """
     text = item["text"]
-
-    # --- QUALITY: one buffered synthesis, saved and scored ---
-    result = await client.tts(setup=setup, text=text)
-    wav_path = out_dir / f"{item['id']}.wav"
-    wav_path.write_bytes(result.raw_data)
-
     wav, sr = load_mono(str(wav_path))
     sig = signal_sanity(wav, sr)
     intel = intelligibility(str(wav_path), text, asr, language=item["lang"])
@@ -138,24 +130,6 @@ async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id
     mos = predicted_mos(wav, sr, utmos)
     aud = audio_quality(wav, sr, dnsmos)
 
-    # --- LATENCY: N timed trials (warmup is run-level, see warm_up()) ---
-    if trials > 0:
-        latency_trials = [await trial_stream(client, setup, text) for _ in range(trials)]
-        ttfa = summarize([t["ttfa"] for t in latency_trials])
-        total = summarize([t["total"] for t in latency_trials])
-        rtf = summarize([t["rtf"] for t in latency_trials])
-        lat = {
-            "ttfa_p50_ms": round(ttfa["p50"] * 1000, 1),
-            "ttfa_p90_ms": round(ttfa["p90"] * 1000, 1),
-            "ttfa_iqr_ms": round(ttfa["iqr"] * 1000, 1),
-            "total_p50_ms": round(total["p50"] * 1000, 1),
-            "rtf_p50": round(rtf["p50"], 3),
-            "_latency_trials": latency_trials,
-            "_ttfa": ttfa, "_total": total, "_rtf": rtf,
-        }
-    else:
-        lat = dict(_EMPTY_LATENCY)
-
     row = {
         "id": item["id"],
         "lang": item["lang"],
@@ -164,6 +138,10 @@ async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id
         "chars": len(text),
         "audio_s": round(sig["duration_s"], 3),
         "wer_pct": round(intel["wer"] * 100, 2),
+        # Unnormalized WER: how the figure looks before reconciling the recogniser's
+        # writing conventions. A large raw-vs-normalized gap means the item's score was
+        # dominated by transcription formatting, not speech.
+        "wer_raw_pct": round(intel["wer_raw"] * 100, 2),
         "cer_pct": round(intel["cer"] * 100, 2),
         # Needed to micro-average WER across a corpus (sum errors / sum reference
         # words). Averaging per-clip WERs instead over-weights short clips.
@@ -198,13 +176,76 @@ async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id
         "_run_id": run_id,
         "_run_ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
-    row.update(lat)
     return row
+
+
+async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id):
+    """Synthesize (billable), score, then optionally time N latency trials."""
+    setup = {
+        "model_name": "default",
+        "voice_id": item["voice_id"],
+        "output_format": "wav",
+        "json_config": {"rewrite_rules": item["lang"]},
+    }
+    text = item["text"]
+
+    # --- QUALITY: one buffered synthesis, saved and scored ---
+    result = await client.tts(setup=setup, text=text)
+    wav_path = out_dir / f"{item['id']}.wav"
+    wav_path.write_bytes(result.raw_data)
+    row = score_wav(wav_path, item, asr, utmos, dnsmos, run_id)
+
+    # --- LATENCY: N timed trials (warmup is run-level, see warm_up()) ---
+    if trials > 0:
+        latency_trials = [await trial_stream(client, setup, text) for _ in range(trials)]
+        ttfa = summarize([t["ttfa"] for t in latency_trials])
+        total = summarize([t["total"] for t in latency_trials])
+        rtf = summarize([t["rtf"] for t in latency_trials])
+        row.update({
+            "ttfa_p50_ms": round(ttfa["p50"] * 1000, 1),
+            "ttfa_p90_ms": round(ttfa["p90"] * 1000, 1),
+            "ttfa_iqr_ms": round(ttfa["iqr"] * 1000, 1),
+            "total_p50_ms": round(total["p50"] * 1000, 1),
+            "rtf_p50": round(rtf["p50"], 3),
+            "_latency_trials": latency_trials,
+            "_ttfa": ttfa, "_total": total, "_rtf": rtf,
+        })
+    else:
+        row.update(dict(_EMPTY_LATENCY))
+    return row
+
+
+LATENCY_KEYS = list(_EMPTY_LATENCY.keys())
+
+
+def rescore_existing(items, existing, asr, utmos, dnsmos, out_dir, run_id):
+    """
+    Re-apply scoring to WAVs already on disk. Zero API calls, zero credits.
+
+    Latency cannot be recomputed offline, so prior latency measurements are carried
+    forward verbatim from the existing results (along with the _run_id that produced
+    them, so the provenance of a timing is never misattributed to this rescore).
+    """
+    rescored, missing = {}, []
+    for it in items:
+        wav_path = out_dir / f"{it['id']}.wav"
+        if not wav_path.exists():
+            missing.append(it["id"])
+            continue
+        row = score_wav(wav_path, it, asr, utmos, dnsmos, run_id)
+        prior = existing.get(it["id"], {})
+        for k in LATENCY_KEYS:
+            row[k] = prior.get(k, _EMPTY_LATENCY[k])
+        # Timings belong to the run that measured them, not to this rescore.
+        row["_run_id"] = prior.get("_run_id", run_id)
+        row["_rescored_ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        rescored[it["id"]] = row
+    return rescored, missing
 
 
 CSV_FIELDS = [
     "id", "lang", "voice_name", "chars", "audio_s",
-    "wer_pct", "cer_pct", "sub", "ins", "del",
+    "wer_pct", "wer_raw_pct", "cer_pct", "sub", "ins", "del",
     "trailing_del", "dur_expected_ratio", "truncated",
     "f0_semitone_std", "f0_mean_hz", "n_pauses", "speaking_rate_wps",
     "dnsmos_ovrl", "dnsmos_sig", "dnsmos_bak", "utmos",
@@ -261,6 +302,10 @@ async def main():
                     help="reprocess (and re-bill) items even if already scored.")
     ap.add_argument("--prune", action="store_true",
                     help="drop result rows whose id is no longer in the manifest.")
+    ap.add_argument("--rescore", action="store_true",
+                    help="re-apply scoring to WAVs already on disk. NO API CALLS, NO CREDITS. "
+                         "Prior latency measurements are carried forward unchanged. Use after "
+                         "changing metrics or normalization.")
     ap.add_argument("--dry-run", action="store_true",
                     help="print what would be processed and the cost estimate, then exit.")
     args = ap.parse_args()
@@ -273,6 +318,31 @@ async def main():
     existing = load_existing(results_path)
 
     only = id_set(args.only)
+
+    # --- OFFLINE RESCORE: no synthesis, no latency, no credits ---
+    if args.rescore:
+        targets = [it for it in items
+                   if not only or it["id"] in only or it.get("base_id") in only]
+        print(f"RESCORE: {len(targets)} item(s) from existing audio in {out_dir} "
+              f"— no API calls, 0 credits\n")
+        if args.dry_run:
+            print("dry run — nothing scored.")
+            return 0
+        print("loading models (Whisper + UTMOS + DNSMOS)...", flush=True)
+        asr, utmos, dnsmos = load_asr(args.asr_model), load_utmos(), load_dnsmos()
+        run_id = uuid.uuid4().hex[:8]
+        rescored, missing = rescore_existing(targets, existing, asr, utmos, dnsmos,
+                                             out_dir, run_id)
+        merged = dict(existing)
+        merged.update(rescored)
+        if args.prune:
+            merged = {i: r for i, r in merged.items() if i in manifest_ids}
+        n = write_outputs(out_dir, merged, manifest_ids)
+        print(f"rescored {len(rescored)} item(s); results.json now holds {n} rows")
+        if missing:
+            print(f"  no audio on disk for {len(missing)}: "
+                  f"{', '.join(missing[:8])}{'...' if len(missing) > 8 else ''}")
+        return 0
 
     # --- decide what to process ---
     def already_done(it):

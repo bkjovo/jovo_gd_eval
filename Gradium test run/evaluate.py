@@ -164,6 +164,62 @@ def _trailing_deletions(alignment):
     return total
 
 
+# --- WER text normalization -------------------------------------------------
+#
+# Raw WER over formatted text measures the RECOGNISER'S WRITING CONVENTIONS as much
+# as the model's speech. Observed on this corpus: a spelled-out code "A, 7, 3, 9, K, 2"
+# (6 reference tokens) comes back from Whisper as "A739K2" (1 token) -> 5 deletions +
+# 1 substitution = 60% WER on audio that is very likely perfect. The identical artifact
+# appeared in all five languages, which is the tell that it is transcription, not speech.
+#
+# These two normalizations put both sides in the same shape before alignment. They
+# cannot hide a genuine error: characters are preserved, so a misread digit
+# (4021 -> 8021) still aligns as a substitution.
+
+_ALNUM_TOKEN = re.compile(r"^[^\W_]+$", re.UNICODE)
+
+
+def _split_alnum_tokens(tokens):
+    """Explode digit-bearing alphanumeric tokens into characters.
+
+    'a739k2' -> a 7 3 9 k 2, matching a source written 'A, 7, 3, 9, K, 2'. Also
+    reconciles digit grouping ('4.021' vs '4021') and keeps error granularity
+    proportionate: one wrong digit is one substitution, not a whole-token miss.
+    """
+    out = []
+    for t in tokens:
+        if len(t) > 1 and _ALNUM_TOKEN.match(t) and any(c.isdigit() for c in t):
+            out.extend(list(t))
+        else:
+            out.append(t)
+    return out
+
+
+# Deliberately tiny and unambiguous: only units this corpus actually uses, where the
+# recogniser abbreviates what the source spells out. German "Uhr" (o'clock) is NOT
+# mapped to hour — that would be a different word, not an abbreviation.
+_UNIT_ALIASES = {
+    "mg": "milligram", "milligram": "milligram", "milligrams": "milligram",
+    "milligramme": "milligram", "milligrammes": "milligram",
+    "miligrama": "milligram", "miligramas": "milligram",
+    "milligramm": "milligram",
+    "h": "hour", "hour": "hour", "hours": "hour",
+    "heure": "hour", "heures": "hour",
+    "hora": "hour", "horas": "hour",
+    "stunde": "hour", "stunden": "hour",
+    "euro": "euro", "euros": "euro",
+    "dollar": "dollar", "dollars": "dollar",
+}
+
+
+def normalize_for_wer(text):
+    """Lowercase, drop punctuation, split alphanumeric runs, canonicalize units."""
+    t = strip_ssml(text).lower()
+    t = re.sub(r"[^\w\s]", " ", t, flags=re.UNICODE)
+    toks = _split_alnum_tokens(t.split())
+    return " ".join(_UNIT_ALIASES.get(x, x) for x in toks)
+
+
 def intelligibility(path, reference_text, model, language=None):
     import jiwer
 
@@ -178,7 +234,13 @@ def intelligibility(path, reference_text, model, language=None):
         jiwer.ReduceToListOfListOfWords(),
     ])
     ref = strip_ssml(reference_text)
-    out = jiwer.process_words(ref, hypothesis, reference_transform=norm, hypothesis_transform=norm)
+
+    # Raw: kept and reported so the size of the normalization effect stays visible.
+    raw = jiwer.process_words(ref, hypothesis, reference_transform=norm, hypothesis_transform=norm)
+
+    # Normalized: the headline figure, aligned on comparable text.
+    out = jiwer.process_words(normalize_for_wer(ref), normalize_for_wer(hypothesis),
+                              reference_transform=norm, hypothesis_transform=norm)
     cer = jiwer.cer(ref.lower(), hypothesis.lower())
 
     ref_words = out.substitutions + out.deletions + out.hits
@@ -186,6 +248,9 @@ def intelligibility(path, reference_text, model, language=None):
         "detected_lang": info.language,
         "hypothesis": hypothesis,
         "wer": out.wer,
+        # Unnormalized WER, for transparency about how much of the raw figure was
+        # transcription convention rather than speech.
+        "wer_raw": raw.wer,
         "cer": cer,
         # D-INT-3 (omission/insertion) + D-INT-6 (hallucination = large insertions):
         "ref_words": ref_words,
