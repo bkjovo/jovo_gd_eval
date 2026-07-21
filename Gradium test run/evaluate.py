@@ -195,6 +195,36 @@ def _split_alnum_tokens(tokens):
     return out
 
 
+# --- base layer: OpenAI's Whisper text normalizers -------------------------
+#
+# These are the normalizers used to report WER in the Whisper paper, written by the
+# authors of the recogniser we score against — the most defensible baseline available.
+#
+# MEASURED LIMITATION: EnglishTextNormalizer fully resolves the alphanumeric
+# tokenization problem, but it is English-only. The multilingual BasicTextNormalizer
+# only lowercases and strips punctuation, which leaves the artifact untouched:
+#     SRC -> your confirmation code is a739k2
+#     ASR -> your confirmation code is a 739k2      (still 2 tokens vs 1)
+# On this corpus it moved bank-02-es 33.3% -> 33.3%, bank-02-pt 28.6% -> 28.6%,
+# bank-05-fr 44.4% -> 44.4%. Hence the single extra rule below for non-English.
+_ENGLISH_NORM = None
+_BASIC_NORM = None
+
+
+def _whisper_normalizer(lang):
+    """Lazily construct the appropriate Whisper normalizer for a language."""
+    global _ENGLISH_NORM, _BASIC_NORM
+    if lang == "en":
+        if _ENGLISH_NORM is None:
+            from whisper_normalizer.english import EnglishTextNormalizer
+            _ENGLISH_NORM = EnglishTextNormalizer()
+        return _ENGLISH_NORM
+    if _BASIC_NORM is None:
+        from whisper_normalizer.basic import BasicTextNormalizer
+        _BASIC_NORM = BasicTextNormalizer()
+    return _BASIC_NORM
+
+
 # Deliberately tiny and unambiguous: only units this corpus actually uses, where the
 # recogniser abbreviates what the source spells out. German "Uhr" (o'clock) is NOT
 # mapped to hour — that would be a different word, not an abbreviation.
@@ -212,9 +242,21 @@ _UNIT_ALIASES = {
 }
 
 
-def normalize_for_wer(text):
-    """Lowercase, drop punctuation, split alphanumeric runs, canonicalize units."""
-    t = strip_ssml(text).lower()
+def normalize_for_wer(text, lang="en"):
+    """
+    Whisper's own normalizer, plus one documented rule it does not cover.
+
+    Layer 1 (standard): EnglishTextNormalizer for English, BasicTextNormalizer
+    otherwise — straight from the Whisper authors.
+    Layer 2 (ours, one rule): split digit-bearing alphanumeric tokens into
+    characters so 'a739k2' and 'a 739k2' compare equal. Required because
+    BasicTextNormalizer leaves that mismatch in place for the four non-English
+    languages (measured above). Applied to both sides, so it cannot hide a real
+    error — a misread digit still aligns as a substitution.
+    Layer 3 (ours, small): canonicalize a handful of unit abbreviations the
+    recogniser writes short ('mg' for 'milligrammes').
+    """
+    t = _whisper_normalizer(lang)(strip_ssml(text))
     t = re.sub(r"[^\w\s]", " ", t, flags=re.UNICODE)
     toks = _split_alnum_tokens(t.split())
     return " ".join(_UNIT_ALIASES.get(x, x) for x in toks)
@@ -239,7 +281,9 @@ def intelligibility(path, reference_text, model, language=None):
     raw = jiwer.process_words(ref, hypothesis, reference_transform=norm, hypothesis_transform=norm)
 
     # Normalized: the headline figure, aligned on comparable text.
-    out = jiwer.process_words(normalize_for_wer(ref), normalize_for_wer(hypothesis),
+    lang = (language or "en").lower()[:2]
+    out = jiwer.process_words(normalize_for_wer(ref, lang),
+                              normalize_for_wer(hypothesis, lang),
                               reference_transform=norm, hypothesis_transform=norm)
     cer = jiwer.cer(ref.lower(), hypothesis.lower())
 
