@@ -363,6 +363,55 @@ ITEMS = [
             "pt": "O guerreiro tem sede de vitória nesta batalha.",
         },
     },
+    # ---------------- LONG-FORM (sustained prosody, ~13-18 s) ----------------
+    {
+        "id": "health-07", "use_case": "healthcare", "stress_category": "long_prosody_instructions",
+        "difficulty": "hard", "parallel": True,
+        "note": "Long multi-step discharge instruction: imperative sequence, numbers, a unit, a duration, and a conditional; tests sustained prosody and breath planning.",
+        "t": {
+            "en": "Before you leave, take one tablet each morning with food and two at night, avoid driving for 48 hours, and if the swelling gets worse or your fever rises above 38 degrees, call the clinic right away.",
+            "es": "Antes de irse, tome una pastilla cada mañana con la comida y dos por la noche, evite conducir durante 48 horas y, si la hinchazón empeora o la fiebre supera los 38 grados, llame de inmediato a la clínica.",
+            "fr": "Avant de partir, prenez un comprimé chaque matin au repas et deux le soir, évitez de conduire pendant 48 heures, et si l'enflure s'aggrave ou que la fièvre dépasse 38 degrés, appelez tout de suite la clinique.",
+            "de": "Bevor Sie gehen, nehmen Sie jeden Morgen eine Tablette zum Essen und zwei am Abend, fahren Sie 48 Stunden nicht Auto, und wenn die Schwellung schlimmer wird oder das Fieber über 38 Grad steigt, rufen Sie sofort die Klinik an.",
+            "pt": "Antes de sair, tome um comprimido de manhã com a comida e dois à noite, evite conduzir durante 48 horas e, se o inchaço piorar ou a febre subir acima dos 38 graus, ligue já para a clínica.",
+        },
+    },
+    {
+        "id": "bank-07", "use_case": "banking", "stress_category": "long_prosody_terms",
+        "difficulty": "hard", "parallel": True,
+        "note": "Long product explanation: currency, an acronym, a date, and a list; tests prosody over an information-dense passage.",
+        "t": {
+            "en": "Your new account includes unlimited transfers, a monthly fee of 4.99 euros, and free withdrawals at any ATM; the changes take effect on the first of next month, and you can cancel anytime from the app without a penalty.",
+            "es": "Su nueva cuenta incluye transferencias ilimitadas, una cuota mensual de 4,99 euros y retiradas gratuitas en cualquier cajero; los cambios entran en vigor el primero del próximo mes y puede cancelar cuando quiera desde la aplicación, sin penalización.",
+            "fr": "Votre nouveau compte comprend des virements illimités, des frais mensuels de 4,99 euros et des retraits gratuits à tout distributeur ; les changements prennent effet le premier du mois prochain et vous pouvez résilier à tout moment depuis l'application, sans pénalité.",
+            "de": "Ihr neues Konto bietet unbegrenzte Überweisungen, eine Monatsgebühr von 4,99 Euro und kostenlose Abhebungen an jedem Geldautomaten; die Änderungen gelten ab dem Ersten des nächsten Monats, und Sie können jederzeit in der App kündigen, ohne Gebühr.",
+            "pt": "A sua nova conta inclui transferências ilimitadas, uma taxa mensal de 4,99 euros e levantamentos gratuitos em qualquer multibanco; as alterações entram em vigor no primeiro dia do próximo mês e pode cancelar quando quiser na aplicação, sem penalização.",
+        },
+    },
+    {
+        "id": "cs-08", "use_case": "customer_service", "stress_category": "long_prosody",
+        "difficulty": "hard", "parallel": True,
+        "note": "Long resolution turn: a colon-led list of three actions with a number, a duration, and an email reference; tests list intonation across a long span.",
+        "t": {
+            "en": "I've looked into your case, and here's what I can do: I'll refund the last payment, extend your warranty by six months at no charge, and send a replacement that should arrive within three business days; you'll get a confirmation email shortly.",
+            "es": "He revisado su caso y esto es lo que puedo hacer: le devolveré el último pago, ampliaré su garantía seis meses sin coste y le enviaré un recambio que debería llegar en tres días hábiles; recibirá un correo de confirmación en breve.",
+            "fr": "J'ai examiné votre dossier, et voici ce que je peux faire : je rembourse le dernier paiement, je prolonge votre garantie de six mois gratuitement et j'envoie un remplacement qui devrait arriver sous trois jours ouvrés ; vous recevrez un e-mail de confirmation sous peu.",
+            "de": "Ich habe Ihren Fall geprüft, und das kann ich tun: Ich erstatte die letzte Zahlung, verlängere Ihre Garantie kostenlos um sechs Monate und schicke einen Ersatz, der in drei Werktagen eintreffen sollte; Sie erhalten in Kürze eine Bestätigungs-E-Mail.",
+            "pt": "Analisei o seu caso e é isto que posso fazer: vou reembolsar o último pagamento, prolongar a sua garantia por seis meses sem custos e enviar um substituto que deverá chegar em três dias úteis; receberá um e-mail de confirmação em breve.",
+        },
+    },
+    {
+        "id": "game-07", "use_case": "gaming_npc", "stress_category": "long_prosody_proper_noun",
+        "difficulty": "hard", "parallel": True,
+        "note": "Long lore monologue with invented proper nouns (Valdoria, Mordath, Sunstone); tests narrative prosody and repeated hard-name pronunciation.",
+        "t": {
+            "en": "Long ago, the kingdom of Valdoria fell to the shadow of Mordath, and its people scattered across the wastes; only the bearer of the Sunstone can pass the sealed gate and bring light back to these broken lands.",
+            "es": "Hace mucho tiempo, el reino de Valdoria cayó ante la sombra de Mordath, y su pueblo se dispersó por los páramos; solo el portador de la Piedra Solar puede cruzar la puerta sellada y devolver la luz a estas tierras rotas.",
+            "fr": "Il y a longtemps, le royaume de Valdoria est tombé sous l'ombre de Mordath, et son peuple s'est dispersé dans les terres désolées ; seul le porteur de la Pierre du Soleil peut franchir la porte scellée et rendre la lumière à ces terres brisées.",
+            "de": "Vor langer Zeit fiel das Königreich Valdoria dem Schatten von Mordath anheim, und sein Volk zerstreute sich in der Ödnis; nur der Träger des Sonnensteins kann das versiegelte Tor durchschreiten und das Licht in diese zerbrochenen Lande zurückbringen.",
+            "pt": "Há muito tempo, o reino de Valdória caiu perante a sombra de Mordath, e o seu povo dispersou-se pelas terras devastadas; só o portador da Pedra do Sol pode atravessar o portão selado e trazer de volta a luz a estas terras quebradas.",
+        },
+    },
 ]
 
 
@@ -420,15 +469,15 @@ def main():
     for name, calls in modes.items():
         print(f"  {total*calls:>7} credits  <- {name}")
 
-    # Stratified latency: quality on all 125, full latency only on a length-balanced
-    # subset (3 short + 3 medium + 3 long per language ~= 45 clips) at 6 extra calls.
+    # Stratified latency: quality on everything, full latency only on a length-balanced
+    # subset (3 short + 3 medium + 3 long per language) at 6 extra calls each.
     subset_ids = {"cs-01", "bank-06", "game-04",      # short
                   "bank-01", "health-01", "game-02",   # medium
-                  "cs-06", "game-06", "health-04"}      # long
+                  "cs-08", "bank-07", "game-07"}        # long
     subset_chars = sum(len(r["text"]) for r in all_rows if r["base_id"] in subset_ids)
     stratified = total * 1 + subset_chars * 6
-    print(f"  {stratified:>7} credits  <- quality on all 125 + latency (5 trials) on a "
-          f"{len(subset_ids)*len(LANGS)}-clip length-stratified subset  [RECOMMENDED]")
+    print(f"  {stratified:>7} credits  <- quality on all {len(all_rows)} + latency (5 trials) "
+          f"on a {len(subset_ids)*len(LANGS)}-clip length-stratified subset  [RECOMMENDED]")
 
 
 if __name__ == "__main__":
