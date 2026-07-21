@@ -113,7 +113,7 @@ ITEMS = [
         "t": {
             "en": "Enter your PIN at any ATM to withdraw cash.",
             "es": "Introduzca su PIN en cualquier cajero para sacar dinero.",
-            "fr": "Saisissez votre code PIN à tout distributeur pour retirer de l'argent.",
+            "fr": "Saisissez votre code PIN à n'importe quel distributeur pour retirer de l'argent.",
             "de": "Geben Sie Ihre PIN an jedem Geldautomaten ein, um Geld abzuheben.",
             "pt": "Introduza o seu PIN em qualquer multibanco para levantar dinheiro.",
         },
@@ -302,7 +302,7 @@ ITEMS = [
         "note": "Gaming acronym XP (kept English across languages), a number, and a percentage.",
         "t": {
             "en": "You earned 250 XP and your health is at 80 percent.",
-            "es": "Ganaste 250 XP y tu salud está al 80 por ciento.",
+            "es": "Has ganado 250 XP y tu salud está al 80 por ciento.",
             "fr": "Tu as gagné 250 XP et ta santé est à 80 pour cent.",
             "de": "Du hast 250 XP erhalten und deine Gesundheit liegt bei 80 Prozent.",
             "pt": "Ganhaste 250 XP e a tua vida está a 80 por cento.",
@@ -327,8 +327,8 @@ ITEMS = [
         "t": {
             "en": "You shall NOT pass without the ancient key!",
             "es": "¡NO pasarás sin la llave antigua!",
-            "fr": "Tu ne passeras PAS sans la clé ancienne !",
-            "de": "Du wirst OHNE den alten Schlüssel NICHT vorbeikommen!",
+            "fr": "Tu ne passeras PAS sans la clé antique !",
+            "de": "Ohne den alten Schlüssel kommst du hier NICHT vorbei!",
             "pt": "Tu NÃO passarás sem a chave antiga!",
         },
     },
@@ -372,7 +372,7 @@ ITEMS = [
             "en": "Before you leave, take one tablet each morning with food and two at night, avoid driving for 48 hours, and if the swelling gets worse or your fever rises above 38 degrees, call the clinic right away.",
             "es": "Antes de irse, tome una pastilla cada mañana con la comida y dos por la noche, evite conducir durante 48 horas y, si la hinchazón empeora o la fiebre supera los 38 grados, llame de inmediato a la clínica.",
             "fr": "Avant de partir, prenez un comprimé chaque matin au repas et deux le soir, évitez de conduire pendant 48 heures, et si l'enflure s'aggrave ou que la fièvre dépasse 38 degrés, appelez tout de suite la clinique.",
-            "de": "Bevor Sie gehen, nehmen Sie jeden Morgen eine Tablette zum Essen und zwei am Abend, fahren Sie 48 Stunden nicht Auto, und wenn die Schwellung schlimmer wird oder das Fieber über 38 Grad steigt, rufen Sie sofort die Klinik an.",
+            "de": "Bevor Sie gehen, nehmen Sie jeden Morgen eine Tablette zum Essen und zwei am Abend, verzichten Sie 48 Stunden aufs Autofahren, und wenn die Schwellung schlimmer wird oder das Fieber über 38 Grad steigt, rufen Sie sofort die Klinik an.",
             "pt": "Antes de sair, tome um comprimido de manhã com a comida e dois à noite, evite conduzir durante 48 horas e, se o inchaço piorar ou a febre subir acima dos 38 graus, ligue já para a clínica.",
         },
     },
@@ -383,7 +383,7 @@ ITEMS = [
         "t": {
             "en": "Your new account includes unlimited transfers, a monthly fee of 4.99 euros, and free withdrawals at any ATM; the changes take effect on the first of next month, and you can cancel anytime from the app without a penalty.",
             "es": "Su nueva cuenta incluye transferencias ilimitadas, una cuota mensual de 4,99 euros y retiradas gratuitas en cualquier cajero; los cambios entran en vigor el primero del próximo mes y puede cancelar cuando quiera desde la aplicación, sin penalización.",
-            "fr": "Votre nouveau compte comprend des virements illimités, des frais mensuels de 4,99 euros et des retraits gratuits à tout distributeur ; les changements prennent effet le premier du mois prochain et vous pouvez résilier à tout moment depuis l'application, sans pénalité.",
+            "fr": "Votre nouveau compte comprend des virements illimités, des frais mensuels de 4,99 euros et des retraits gratuits à n'importe quel distributeur ; les changements prennent effet le premier du mois prochain et vous pouvez résilier à tout moment depuis l'application, sans pénalité.",
             "de": "Ihr neues Konto bietet unbegrenzte Überweisungen, eine Monatsgebühr von 4,99 Euro und kostenlose Abhebungen an jedem Geldautomaten; die Änderungen gelten ab dem Ersten des nächsten Monats, und Sie können jederzeit in der App kündigen, ohne Gebühr.",
             "pt": "A sua nova conta inclui transferências ilimitadas, uma taxa mensal de 4,99 euros e levantamentos gratuitos em qualquer multibanco; as alterações entram em vigor no primeiro dia do próximo mês e pode cancelar quando quiser na aplicação, sem penalização.",
         },
