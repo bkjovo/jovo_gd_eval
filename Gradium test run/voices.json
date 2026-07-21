@@ -1,58 +1,63 @@
 {
   "_comment": [
-    "Voice roster for the evaluation corpus, one per language.",
+    "Voice roster for the v2 evaluation corpus (corpus/manifest_125.jsonl).",
     "",
-    "IMPORTANT — these are NOT currently persona-matched, which confounds any",
-    "cross-language prosody comparison. Jules (fr) is tagged 'Enthusiastic, Expressive'",
-    "while es/de are 'Helpful, Attentive' and en is 'Confident'. An expressive persona",
-    "raises F0 variance for reasons unrelated to model quality, so the monotone detector",
-    "(f0_semitone_std) reads differently for French than for the others.",
+    "PERSONA-MATCHED SET, chosen 2026-07-20 to remove the cross-language prosody",
+    "confound in the original roster. All five share: current tag generation,",
+    "masculine, adult, native region, and primary persona 'Neutral/Informational'.",
+    "Because a Neutral/Informational voice is low-expressiveness by design, the",
+    "f0_semitone_std (monotone) metric is now comparable across languages instead of",
+    "being inflated for whichever language got an expressive voice.",
     "",
-    "The catalog also contains two tag generations: older voices use",
-    "emotion/gender/age/use-case/region, newer ones use category/country/perceived-*.",
-    "Mixing generations adds a second, less visible confound.",
+    "Residual, catalog-constrained mismatches (all minor vs the expressiveness gap",
+    "we removed): secondary register varies (Conversational for en/de/pt, Customer",
+    "Service for es/fr); Rodrigo (pt) is 'Young Adult' while the rest are 'Adult'",
+    "(no Adult neutral masculine exists for European Portuguese); Romain (fr) carries",
+    "a mild 'Positive (Warm/Kind)' tag alongside Neutral/Informational.",
     "",
-    "Before the 20x5 parallel corpus run, either (a) re-pick all five voices matched on",
-    "persona and tag generation, or (b) keep these and treat cross-language prosody as",
-    "uncontrolled in the writeup. Option (a) is cheap and strictly better."
+    "VALIDATE AFTER GENERATION: the tag-based match is a proxy. Once the corpus is",
+    "synthesized, confirm f0_semitone_std is in a similar range across the five",
+    "languages; a large outlier would mean the tags did not translate to matched",
+    "delivery and that voice should be swapped."
   ],
   "voices": {
     "en": {
-      "voice_id": "r2sIQdqqoqgRJuXw",
-      "voice_name": "Marcus",
-      "persona": "Confident",
-      "region": null,
-      "tag_generation": "legacy"
+      "voice_id": "zyLIanWKViHkc6Wp", "voice_name": "Steven",
+      "region": "gb", "persona": "Neutral/Informational Conversational",
+      "age": "Adult", "tag_generation": "current"
     },
     "es": {
-      "voice_id": "sVLgzKMqaptUdaY8",
-      "voice_name": "Mateo",
-      "persona": "Helpful, Attentive",
-      "region": "es",
-      "tag_generation": "legacy"
+      "voice_id": "Gijj_GPBfJVcP-FZ", "voice_name": "Miguel",
+      "region": "es", "persona": "Neutral/Informational Customer Service",
+      "age": "Adult", "tag_generation": "current",
+      "_note": "Only Spain-native masculine voice tagged Neutral/Informational in the current generation."
     },
     "fr": {
-      "voice_id": "YKeBw3OV1RgpdhLh",
-      "voice_name": "Jules",
-      "persona": "Enthusiastic, Expressive",
-      "region": "fr",
-      "tag_generation": "legacy",
-      "_warning": "persona outlier — see comment above"
+      "voice_id": "zpmn3GOfiU_i5QGo", "voice_name": "Romain",
+      "region": "fr", "persona": "Neutral/Informational Customer Service Journalism (mild Warm/Kind)",
+      "age": "Adult", "tag_generation": "current",
+      "_note": "Chosen over Leo/Antoine, which are multi-style flagship voices (incl. Character & Animation); Romain's registers are restrained, closer to a pure neutral read."
     },
     "de": {
-      "voice_id": "Kf5m22mROozoMWj3",
-      "voice_name": "Mats",
-      "persona": "Helpful, Attentive",
-      "region": null,
-      "tag_generation": "legacy"
+      "voice_id": "zyla-_bhVQtNTBdT", "voice_name": "David",
+      "region": "de", "persona": "Neutral/Informational Conversational",
+      "age": "Adult", "tag_generation": "current",
+      "_note": "One of ~15 matched German options; clean Neutral/Informational Conversational."
     },
     "pt": {
-      "voice_id": "EzmLkNorEpZG_oNv",
-      "voice_name": "Rodrigo",
-      "persona": "Neutral/Informational",
-      "region": "pt",
-      "tag_generation": "current",
-      "_note": "Portugal (country=pt), not Brazil. The catalog is majority pt-BR; European Portuguese was chosen to match the native-region convention used for es/fr. Neutral persona deliberately avoids inflating F0 variance."
+      "voice_id": "EzmLkNorEpZG_oNv", "voice_name": "Rodrigo",
+      "region": "pt", "persona": "Neutral/Informational Conversational",
+      "age": "Young Adult", "tag_generation": "current",
+      "_note": "Kept from the original roster; already Neutral/Informational. European Portuguese (not Brazil)."
     }
+  },
+  "_previous_roster_deprecated": {
+    "_why": "Not persona-matched: Marcus=Confident, Mateo/Mats=Helpful+Attentive, Jules=Enthusiastic+Expressive, spread across two tag generations. Jules inflated the monotone metric for French.",
+    "en": {"voice_id": "r2sIQdqqoqgRJuXw", "voice_name": "Marcus"},
+    "es": {"voice_id": "sVLgzKMqaptUdaY8", "voice_name": "Mateo"},
+    "fr": {"voice_id": "YKeBw3OV1RgpdhLh", "voice_name": "Jules"},
+    "de": {"voice_id": "Kf5m22mROozoMWj3", "voice_name": "Mats"},
+    "pt": {"voice_id": "EzmLkNorEpZG_oNv", "voice_name": "Rodrigo"},
+    "_note": "The original 7-clip seed corpus on the deployed site still uses these; not worth regenerating. The v2 145-clip run uses the matched set above."
   }
 }

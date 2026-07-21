@@ -56,9 +56,11 @@ conversational turns, plus one long-form item per domain for sustained prosody.
 - **Translations want a native pass**, especially the homograph substitutions, the medical
   terminology, and idiomatic domain phrasing. They were authored carefully but not
   natively reviewed.
-- **Voices are not persona-matched** (see `../voices.json`): Jules (fr) is an expressive
-  outlier, which inflates the monotone metric. Re-pick before treating cross-language
-  prosody as controlled.
+- **Voices are persona-matched** (see `../voices.json`): all five are current-generation,
+  masculine, adult, native-region, primary persona "Neutral/Informational" — Steven (gb),
+  Miguel (es), Romain (fr), David (de), Rodrigo (pt). Validate `f0_semitone_std` parity
+  across languages after generation; a large outlier means a voice's tags did not match
+  its actual delivery and it should be swapped.
 - **`run_batch.py` is not incremental** — it reprocesses and overwrites everything. Point
   it at this manifest with `--manifest corpus/manifest_125.jsonl`, but note it will re-bill
   the whole set on any re-run.

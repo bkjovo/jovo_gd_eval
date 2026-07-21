@@ -29,14 +29,16 @@ Run:  python corpus/build_corpus.py
 import json
 from pathlib import Path
 
-# Voice roster (see ../voices.json). NOT persona-matched yet — Jules (fr) is an
-# expressive outlier; re-pick before treating cross-language prosody as controlled.
+# Voice roster (see ../voices.json). Persona-matched 2026-07-20: all five are
+# current-generation, masculine, adult, native region, primary persona
+# "Neutral/Informational" — so the monotone metric is comparable across languages.
+# Validate f0_semitone_std parity after generation (a big outlier => swap that voice).
 VOICES = {
-    "en": ("r2sIQdqqoqgRJuXw", "Marcus"),
-    "es": ("sVLgzKMqaptUdaY8", "Mateo"),
-    "fr": ("YKeBw3OV1RgpdhLh", "Jules"),
-    "de": ("Kf5m22mROozoMWj3", "Mats"),
-    "pt": ("EzmLkNorEpZG_oNv", "Rodrigo"),
+    "en": ("zyLIanWKViHkc6Wp", "Steven"),   # gb
+    "es": ("Gijj_GPBfJVcP-FZ", "Miguel"),   # es
+    "fr": ("zpmn3GOfiU_i5QGo", "Romain"),   # fr
+    "de": ("zyla-_bhVQtNTBdT", "David"),    # de
+    "pt": ("EzmLkNorEpZG_oNv", "Rodrigo"),  # pt
 }
 LANGS = ["en", "es", "fr", "de", "pt"]
 
