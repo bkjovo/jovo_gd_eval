@@ -82,8 +82,18 @@ says so in an amber banner.
    SECURITY: the Supabase `service_role` key and a Vercel access token are both in this
    session's chat transcript. Rotate both when convenient (Supabase API Keys page; Vercel
    account/tokens page).
-4. **Seed reviews** across the corpus, non-English first, so the dashboard is not empty
-   when graders open it. Ratings now persist, so this is worth doing.
+4. ~~Seed reviews across the corpus.~~ Done 2026-07-20. 22 synthetic ratings across 6
+   `seed-*` sessions, n=3-4 per clip, **grounded in the objective metrics** (monotone
+   tags on low-F0 clips, naturalness on low-UTMOS es-2, audio on low-DNSMOS Spanish;
+   fr-1 rated fine despite its WER flag). No clip means below 3, so no manufactured
+   blind-spot finding: honest, because these 7 clips are genuinely good. Clear all seed
+   data with a PostgREST DELETE `?session_id=like.seed-*` using the service key when real
+   reviews arrive. NOTE: these are synthetic, not real listening (Claude cannot hear
+   audio); replace with real reviews before treating the human column as evidence.
+   LESSON: a local dev server with `.env.local` set writes to the SAME production
+   Supabase. Don't run local rater tests against it, or stop the server first, or point
+   local at a separate Supabase project. One leftover browser-test session had to be
+   cleaned out of prod.
 5. **Build the 20x5 parallel corpus** (see below). Costs credits; needs a decision on
    trials first.
 6. **Write the GTM page** properly. There is a dedicated 45-minute session on it.
