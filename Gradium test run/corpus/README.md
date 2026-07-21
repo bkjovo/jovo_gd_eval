@@ -61,9 +61,12 @@ conversational turns, plus one long-form item per domain for sustained prosody.
   Miguel (es), Romain (fr), David (de), Rodrigo (pt). Validate `f0_semitone_std` parity
   across languages after generation; a large outlier means a voice's tags did not match
   its actual delivery and it should be swapped.
-- **`run_batch.py` is not incremental** — it reprocesses and overwrites everything. Point
-  it at this manifest with `--manifest corpus/manifest_125.jsonl`, but note it will re-bill
-  the whole set on any re-run.
+- **`run_batch.py` is now incremental.** Point it at this manifest with a fresh out-dir:
+  `--manifest corpus/manifest_125.jsonl --out-dir corpus/outputs`. Already-scored clips are
+  skipped (0 credits), so adding or fixing clips only bills the new ones (`--only <ids>`).
+  Use `--latency-ids <9 stratified base_ids>` for the recommended run (quality on all 145,
+  latency only on the 45-clip subset ≈ 42k credits vs 80k for latency-everywhere).
+  `--dry-run` prints the cost with no synthesis.
 
 ## Fields per row
 
