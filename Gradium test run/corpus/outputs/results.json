@@ -31,7 +31,7 @@
     "snr_db_est": 88.4,
     "_hypothesis": "Your available balance is $4,250.75.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:14:37+00:00",
+    "_run_ts": "2026-07-21T04:56:18+00:00",
     "ttfa_p50_ms": 92.8,
     "ttfa_p90_ms": 92.8,
     "ttfa_iqr_ms": 0.0,
@@ -73,7 +73,7 @@
       "min": 0.3511577194201111,
       "max": 0.3511577194201111
     },
-    "_rescored_ts": "2026-07-21T04:14:37+00:00"
+    "_rescored_ts": "2026-07-21T04:56:18+00:00"
   },
   {
     "id": "bank-01-es",
@@ -107,7 +107,7 @@
     "snr_db_est": 44.4,
     "_hypothesis": "Su saldo disponible es de 4.250,75 euros.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:14:39+00:00",
+    "_run_ts": "2026-07-21T04:56:24+00:00",
     "ttfa_p50_ms": 85.3,
     "ttfa_p90_ms": 85.3,
     "ttfa_iqr_ms": 0.0,
@@ -149,7 +149,7 @@
       "min": 0.3377466417919434,
       "max": 0.3377466417919434
     },
-    "_rescored_ts": "2026-07-21T04:14:39+00:00"
+    "_rescored_ts": "2026-07-21T04:56:24+00:00"
   },
   {
     "id": "bank-01-fr",
@@ -158,15 +158,15 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 45,
     "audio_s": 4.24,
-    "wer_pct": 8.33,
-    "wer_raw_pct": 37.5,
-    "cer_pct": 13.33,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "fr",
     "sub": 0,
     "ins": 0,
-    "del": 1,
-    "trailing_del": 1,
+    "del": 0,
+    "trailing_del": 0,
     "dur_expected_ratio": 0.883,
     "truncated": false,
     "f0_semitone_std": 3.475,
@@ -181,9 +181,9 @@
     "peak_dbfs": -0.7,
     "clipping_pct": 0.0,
     "snr_db_est": 93.7,
-    "_hypothesis": "Votre solde disponible est de 4250,75 €.",
+    "_hypothesis": "Votre solde disponible est de 4 250,75 euros.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:14:42+00:00",
+    "_run_ts": "2026-07-21T04:56:31+00:00",
     "ttfa_p50_ms": 97.8,
     "ttfa_p90_ms": 97.8,
     "ttfa_iqr_ms": 0.0,
@@ -225,7 +225,7 @@
       "min": 0.35804954174818704,
       "max": 0.35804954174818704
     },
-    "_rescored_ts": "2026-07-21T04:14:42+00:00"
+    "_rescored_ts": "2026-07-21T04:56:31+00:00"
   },
   {
     "id": "bank-01-de",
@@ -259,7 +259,7 @@
     "snr_db_est": 70.7,
     "_hypothesis": "Ihr verfügbares Guthaben beträgt 4.250,75 Euro.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:14:44+00:00",
+    "_run_ts": "2026-07-21T04:56:37+00:00",
     "ttfa_p50_ms": 166.6,
     "ttfa_p90_ms": 166.6,
     "ttfa_iqr_ms": 0.0,
@@ -301,7 +301,7 @@
       "min": 0.3515661778846361,
       "max": 0.3515661778846361
     },
-    "_rescored_ts": "2026-07-21T04:14:44+00:00"
+    "_rescored_ts": "2026-07-21T04:56:37+00:00"
   },
   {
     "id": "bank-01-pt",
@@ -335,7 +335,7 @@
     "snr_db_est": 46.7,
     "_hypothesis": "O seu saldo disponível é de 4.250,75 euros.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:14:46+00:00",
+    "_run_ts": "2026-07-21T04:56:44+00:00",
     "ttfa_p50_ms": 84.9,
     "ttfa_p90_ms": 84.9,
     "ttfa_iqr_ms": 0.0,
@@ -377,7 +377,7 @@
       "min": 0.33577353871502663,
       "max": 0.33577353871502663
     },
-    "_rescored_ts": "2026-07-21T04:14:46+00:00"
+    "_rescored_ts": "2026-07-21T04:56:44+00:00"
   },
   {
     "id": "bank-02-en",
@@ -388,7 +388,7 @@
     "audio_s": 4.24,
     "wer_pct": 0.0,
     "wer_raw_pct": 40.0,
-    "cer_pct": 3.03,
+    "cer_pct": 6.06,
     "ref_words": 10,
     "detected_lang": "en",
     "sub": 0,
@@ -409,9 +409,9 @@
     "peak_dbfs": -3.6,
     "clipping_pct": 0.0,
     "snr_db_est": 91.0,
-    "_hypothesis": "Your confirmation code is a 739K2.",
+    "_hypothesis": "Your confirmation code is a 739-K2.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:14:48+00:00",
+    "_run_ts": "2026-07-21T04:56:50+00:00",
     "ttfa_p50_ms": 77.7,
     "ttfa_p90_ms": 77.7,
     "ttfa_iqr_ms": 0.0,
@@ -453,7 +453,7 @@
       "min": 0.3617182409140117,
       "max": 0.3617182409140117
     },
-    "_rescored_ts": "2026-07-21T04:14:48+00:00"
+    "_rescored_ts": "2026-07-21T04:56:50+00:00"
   },
   {
     "id": "bank-02-es",
@@ -463,7 +463,7 @@
     "chars": 36,
     "audio_s": 4.24,
     "wer_pct": 0.0,
-    "wer_raw_pct": 33.33,
+    "wer_raw_pct": 0.0,
     "cer_pct": 2.78,
     "ref_words": 11,
     "detected_lang": "es",
@@ -485,9 +485,9 @@
     "peak_dbfs": -2.74,
     "clipping_pct": 0.0,
     "snr_db_est": 52.1,
-    "_hypothesis": "Su código de confirmación es a 739K2.",
+    "_hypothesis": "Su código de confirmación es A739-K2.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:14:51+00:00",
+    "_run_ts": "2026-07-21T04:56:57+00:00",
     "ttfa_p50_ms": 87.0,
     "ttfa_p90_ms": 87.0,
     "ttfa_iqr_ms": 0.0,
@@ -529,7 +529,7 @@
       "min": 0.3444548464003828,
       "max": 0.3444548464003828
     },
-    "_rescored_ts": "2026-07-21T04:14:51+00:00"
+    "_rescored_ts": "2026-07-21T04:56:57+00:00"
   },
   {
     "id": "bank-02-fr",
@@ -540,7 +540,7 @@
     "audio_s": 3.84,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "cer_pct": 2.63,
     "ref_words": 11,
     "detected_lang": "fr",
     "sub": 0,
@@ -561,9 +561,9 @@
     "peak_dbfs": -1.23,
     "clipping_pct": 0.0,
     "snr_db_est": 96.5,
-    "_hypothesis": "Votre code de confirmation est A739K2.",
+    "_hypothesis": "Votre code de confirmation est A739-K2.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:14:54+00:00",
+    "_run_ts": "2026-07-21T04:57:03+00:00",
     "ttfa_p50_ms": 81.6,
     "ttfa_p90_ms": 81.6,
     "ttfa_iqr_ms": 0.0,
@@ -605,7 +605,7 @@
       "min": 0.3595189583332588,
       "max": 0.3595189583332588
     },
-    "_rescored_ts": "2026-07-21T04:14:54+00:00"
+    "_rescored_ts": "2026-07-21T04:57:03+00:00"
   },
   {
     "id": "bank-02-de",
@@ -616,7 +616,7 @@
     "audio_s": 4.4,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "cer_pct": 2.86,
     "ref_words": 9,
     "detected_lang": "de",
     "sub": 0,
@@ -637,9 +637,9 @@
     "peak_dbfs": -2.39,
     "clipping_pct": 0.0,
     "snr_db_est": 56.6,
-    "_hypothesis": "Ihr Bestätigungscode lautet A739K2.",
+    "_hypothesis": "Ihr Bestätigungscode lautet A739-K2.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:14:56+00:00",
+    "_run_ts": "2026-07-21T04:57:10+00:00",
     "ttfa_p50_ms": 81.8,
     "ttfa_p90_ms": 81.8,
     "ttfa_iqr_ms": 0.0,
@@ -681,7 +681,7 @@
       "min": 0.3484987972677283,
       "max": 0.3484987972677283
     },
-    "_rescored_ts": "2026-07-21T04:14:56+00:00"
+    "_rescored_ts": "2026-07-21T04:57:10+00:00"
   },
   {
     "id": "bank-02-pt",
@@ -691,8 +691,8 @@
     "chars": 37,
     "audio_s": 4.64,
     "wer_pct": 0.0,
-    "wer_raw_pct": 28.57,
-    "cer_pct": 2.7,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "pt",
     "sub": 0,
@@ -713,9 +713,9 @@
     "peak_dbfs": -1.49,
     "clipping_pct": 0.0,
     "snr_db_est": 53.9,
-    "_hypothesis": "O seu código de confirmação é a 739K2.",
+    "_hypothesis": "O seu código de confirmação é A739K2.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:14:58+00:00",
+    "_run_ts": "2026-07-21T04:57:16+00:00",
     "ttfa_p50_ms": 81.3,
     "ttfa_p90_ms": 81.3,
     "ttfa_iqr_ms": 0.0,
@@ -757,7 +757,7 @@
       "min": 0.33640809535946964,
       "max": 0.33640809535946964
     },
-    "_rescored_ts": "2026-07-21T04:14:58+00:00"
+    "_rescored_ts": "2026-07-21T04:57:16+00:00"
   },
   {
     "id": "bank-03-en",
@@ -791,7 +791,7 @@
     "snr_db_est": 92.5,
     "_hypothesis": "To report fraud, go to secure.mybank.com.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:00+00:00",
+    "_run_ts": "2026-07-21T04:57:22+00:00",
     "ttfa_p50_ms": 82.5,
     "ttfa_p90_ms": 82.5,
     "ttfa_iqr_ms": 0.0,
@@ -833,7 +833,7 @@
       "min": 0.34193976942203463,
       "max": 0.34193976942203463
     },
-    "_rescored_ts": "2026-07-21T04:15:00+00:00"
+    "_rescored_ts": "2026-07-21T04:57:22+00:00"
   },
   {
     "id": "bank-03-es",
@@ -842,14 +842,14 @@
     "voice_id": "Gijj_GPBfJVcP-FZ",
     "chars": 62,
     "audio_s": 5.76,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_pct": 10.0,
+    "wer_raw_pct": 37.5,
+    "cer_pct": 12.9,
     "ref_words": 10,
     "detected_lang": "es",
     "sub": 0,
     "ins": 0,
-    "del": 0,
+    "del": 1,
     "trailing_del": 0,
     "dur_expected_ratio": 1.44,
     "truncated": false,
@@ -865,9 +865,9 @@
     "peak_dbfs": -3.57,
     "clipping_pct": 0.0,
     "snr_db_est": 52.8,
-    "_hypothesis": "Para denunciar un fraude, visite Secure.mybank.com barra help.",
+    "_hypothesis": "Para denunciar un fraude, visite secure.mybank.com.help",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:02+00:00",
+    "_run_ts": "2026-07-21T04:57:28+00:00",
     "ttfa_p50_ms": 78.2,
     "ttfa_p90_ms": 78.2,
     "ttfa_iqr_ms": 0.0,
@@ -909,7 +909,7 @@
       "min": 0.3319698118479233,
       "max": 0.3319698118479233
     },
-    "_rescored_ts": "2026-07-21T04:15:02+00:00"
+    "_rescored_ts": "2026-07-21T04:57:28+00:00"
   },
   {
     "id": "bank-03-fr",
@@ -918,15 +918,15 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 65,
     "audio_s": 4.4,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_pct": 18.18,
+    "wer_raw_pct": 22.22,
+    "cer_pct": 16.92,
     "ref_words": 11,
     "detected_lang": "fr",
     "sub": 0,
     "ins": 0,
-    "del": 0,
-    "trailing_del": 0,
+    "del": 2,
+    "trailing_del": 2,
     "dur_expected_ratio": 1.0,
     "truncated": false,
     "f0_semitone_std": 3.102,
@@ -941,9 +941,9 @@
     "peak_dbfs": -0.23,
     "clipping_pct": 0.0,
     "snr_db_est": 92.3,
-    "_hypothesis": "Pour signaler une fraude, allez sur secure.mybank.com slash help.",
+    "_hypothesis": "Pour signaler une fraude, allez sur secure.mybank.com.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:05+00:00",
+    "_run_ts": "2026-07-21T04:57:35+00:00",
     "ttfa_p50_ms": 71.9,
     "ttfa_p90_ms": 71.9,
     "ttfa_iqr_ms": 0.0,
@@ -985,7 +985,7 @@
       "min": 0.33286526988487103,
       "max": 0.33286526988487103
     },
-    "_rescored_ts": "2026-07-21T04:15:05+00:00"
+    "_rescored_ts": "2026-07-21T04:57:35+00:00"
   },
   {
     "id": "bank-03-de",
@@ -994,14 +994,14 @@
     "voice_id": "zyla-_bhVQtNTBdT",
     "chars": 71,
     "audio_s": 5.28,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_pct": 8.33,
+    "wer_raw_pct": 30.0,
+    "cer_pct": 19.72,
     "ref_words": 12,
     "detected_lang": "de",
     "sub": 0,
     "ins": 0,
-    "del": 0,
+    "del": 1,
     "trailing_del": 0,
     "dur_expected_ratio": 1.1,
     "truncated": false,
@@ -1017,9 +1017,9 @@
     "peak_dbfs": -2.99,
     "clipping_pct": 0.0,
     "snr_db_est": 56.6,
-    "_hypothesis": "Um Betrug zu melden, gehen Sie auf secure.mybank.com schrägstrich help.",
+    "_hypothesis": "Um Betrug zu melden, gehen Sie auf secure.mybank.com-help.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:07+00:00",
+    "_run_ts": "2026-07-21T04:57:42+00:00",
     "ttfa_p50_ms": 77.0,
     "ttfa_p90_ms": 77.0,
     "ttfa_iqr_ms": 0.0,
@@ -1061,7 +1061,7 @@
       "min": 0.33566407753665856,
       "max": 0.33566407753665856
     },
-    "_rescored_ts": "2026-07-21T04:15:07+00:00"
+    "_rescored_ts": "2026-07-21T04:57:42+00:00"
   },
   {
     "id": "bank-03-pt",
@@ -1071,14 +1071,14 @@
     "chars": 64,
     "audio_s": 6.56,
     "wer_pct": 18.18,
-    "wer_raw_pct": 22.22,
-    "cer_pct": 4.69,
+    "wer_raw_pct": 33.33,
+    "cer_pct": 15.62,
     "ref_words": 11,
     "detected_lang": "pt",
     "sub": 1,
-    "ins": 1,
-    "del": 0,
-    "trailing_del": 0,
+    "ins": 0,
+    "del": 1,
+    "trailing_del": 1,
     "dur_expected_ratio": 1.491,
     "truncated": false,
     "f0_semitone_std": 3.276,
@@ -1093,9 +1093,9 @@
     "peak_dbfs": -0.33,
     "clipping_pct": 0.0,
     "snr_db_est": 52.1,
-    "_hypothesis": "para denunciar uma fraude, aceda a secure.mybank.com.br a help.",
+    "_hypothesis": "Para denunciar uma fraude, aceda a secure.mybank.com.br",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:11+00:00",
+    "_run_ts": "2026-07-21T04:57:49+00:00",
     "ttfa_p50_ms": 80.7,
     "ttfa_p90_ms": 80.7,
     "ttfa_iqr_ms": 0.0,
@@ -1137,7 +1137,7 @@
       "min": 0.3313359842976728,
       "max": 0.3313359842976728
     },
-    "_rescored_ts": "2026-07-21T04:15:11+00:00"
+    "_rescored_ts": "2026-07-21T04:57:49+00:00"
   },
   {
     "id": "bank-04-en",
@@ -1147,8 +1147,8 @@
     "chars": 48,
     "audio_s": 5.6,
     "wer_pct": 0.0,
-    "wer_raw_pct": 18.18,
-    "cer_pct": 2.08,
+    "wer_raw_pct": 36.36,
+    "cer_pct": 6.25,
     "ref_words": 16,
     "detected_lang": "en",
     "sub": 0,
@@ -1169,9 +1169,9 @@
     "peak_dbfs": -2.48,
     "clipping_pct": 0.0,
     "snr_db_est": 83.7,
-    "_hypothesis": "Call our fraud line at 0800 4577 90 right away.",
+    "_hypothesis": "Call our fraud line at 0800-457790 right away.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:13+00:00",
+    "_run_ts": "2026-07-21T04:57:55+00:00",
     "ttfa_p50_ms": 74.6,
     "ttfa_p90_ms": 74.6,
     "ttfa_iqr_ms": 0.0,
@@ -1213,7 +1213,7 @@
       "min": 0.3317459842419603,
       "max": 0.3317459842419603
     },
-    "_rescored_ts": "2026-07-21T04:15:13+00:00"
+    "_rescored_ts": "2026-07-21T04:57:55+00:00"
   },
   {
     "id": "bank-04-es",
@@ -1222,14 +1222,14 @@
     "voice_id": "Gijj_GPBfJVcP-FZ",
     "chars": 61,
     "audio_s": 6.48,
-    "wer_pct": 11.76,
-    "wer_raw_pct": 36.36,
-    "cer_pct": 9.84,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 18.18,
+    "cer_pct": 3.28,
     "ref_words": 17,
     "detected_lang": "es",
     "sub": 0,
     "ins": 0,
-    "del": 2,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.953,
     "truncated": false,
@@ -1245,9 +1245,9 @@
     "peak_dbfs": -2.56,
     "clipping_pct": 0.0,
     "snr_db_est": 41.2,
-    "_hypothesis": "Llame de inmediato a nuestra línea antifraude 08457790.",
+    "_hypothesis": "Llame de inmediato a nuestra línea antifraude 0800 4577 90.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:15+00:00",
+    "_run_ts": "2026-07-21T04:58:02+00:00",
     "ttfa_p50_ms": 91.0,
     "ttfa_p90_ms": 91.0,
     "ttfa_iqr_ms": 0.0,
@@ -1289,7 +1289,7 @@
       "min": 0.32950366426495536,
       "max": 0.32950366426495536
     },
-    "_rescored_ts": "2026-07-21T04:15:15+00:00"
+    "_rescored_ts": "2026-07-21T04:58:02+00:00"
   },
   {
     "id": "bank-04-fr",
@@ -1298,14 +1298,14 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 64,
     "audio_s": 5.6,
-    "wer_pct": 16.67,
-    "wer_raw_pct": 25.0,
-    "cer_pct": 7.81,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 18,
     "detected_lang": "fr",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
-    "del": 2,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.778,
     "truncated": false,
@@ -1321,9 +1321,9 @@
     "peak_dbfs": -0.99,
     "clipping_pct": 0.0,
     "snr_db_est": 53.2,
-    "_hypothesis": "Appelez tout de suite notre service antifrode au 0845 77 90.",
+    "_hypothesis": "Appelez tout de suite notre service antifraude au 0800 45 77 90.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:17+00:00",
+    "_run_ts": "2026-07-21T04:58:08+00:00",
     "ttfa_p50_ms": 103.1,
     "ttfa_p90_ms": 103.1,
     "ttfa_iqr_ms": 0.0,
@@ -1365,7 +1365,7 @@
       "min": 0.3424242344684017,
       "max": 0.3424242344684017
     },
-    "_rescored_ts": "2026-07-21T04:15:17+00:00"
+    "_rescored_ts": "2026-07-21T04:58:08+00:00"
   },
   {
     "id": "bank-04-de",
@@ -1375,13 +1375,13 @@
     "chars": 58,
     "audio_s": 5.76,
     "wer_pct": 11.76,
-    "wer_raw_pct": 40.0,
-    "cer_pct": 8.62,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 3.45,
     "ref_words": 17,
     "detected_lang": "de",
-    "sub": 0,
+    "sub": 1,
     "ins": 0,
-    "del": 2,
+    "del": 1,
     "trailing_del": 0,
     "dur_expected_ratio": 0.847,
     "truncated": false,
@@ -1397,9 +1397,9 @@
     "peak_dbfs": -2.46,
     "clipping_pct": 0.0,
     "snr_db_est": 53.0,
-    "_hypothesis": "Rufen Sie sofort unsere Betrugs-Hotline an, 0845 7790.",
+    "_hypothesis": "Rufen Sie sofort unsere Betrugshotline an 0800 45 77 90.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:20+00:00",
+    "_run_ts": "2026-07-21T04:58:15+00:00",
     "ttfa_p50_ms": 80.5,
     "ttfa_p90_ms": 80.5,
     "ttfa_iqr_ms": 0.0,
@@ -1441,7 +1441,7 @@
       "min": 0.3287165208312217,
       "max": 0.3287165208312217
     },
-    "_rescored_ts": "2026-07-21T04:15:20+00:00"
+    "_rescored_ts": "2026-07-21T04:58:15+00:00"
   },
   {
     "id": "bank-04-pt",
@@ -1450,14 +1450,14 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 54,
     "audio_s": 6.4,
-    "wer_pct": 11.76,
-    "wer_raw_pct": 36.36,
-    "cer_pct": 11.11,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 18.18,
+    "cer_pct": 3.7,
     "ref_words": 17,
     "detected_lang": "pt",
     "sub": 0,
     "ins": 0,
-    "del": 2,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.941,
     "truncated": false,
@@ -1473,9 +1473,9 @@
     "peak_dbfs": -2.42,
     "clipping_pct": 0.0,
     "snr_db_est": 44.1,
-    "_hypothesis": "Ligue já para a nossa linha antifraude 08457790.",
+    "_hypothesis": "Ligue já para a nossa linha antifraude 0800 4577 90.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:22+00:00",
+    "_run_ts": "2026-07-21T04:58:21+00:00",
     "ttfa_p50_ms": 80.3,
     "ttfa_p90_ms": 80.3,
     "ttfa_iqr_ms": 0.0,
@@ -1517,7 +1517,7 @@
       "min": 0.3337538640226813,
       "max": 0.3337538640226813
     },
-    "_rescored_ts": "2026-07-21T04:15:22+00:00"
+    "_rescored_ts": "2026-07-21T04:58:21+00:00"
   },
   {
     "id": "bank-05-en",
@@ -1551,7 +1551,7 @@
     "snr_db_est": 60.0,
     "_hypothesis": "Send the wire to account 4021-8837-005.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:24+00:00",
+    "_run_ts": "2026-07-21T04:58:27+00:00",
     "ttfa_p50_ms": 75.7,
     "ttfa_p90_ms": 75.7,
     "ttfa_iqr_ms": 0.0,
@@ -1593,7 +1593,7 @@
       "min": 0.3291752995301067,
       "max": 0.3291752995301067
     },
-    "_rescored_ts": "2026-07-21T04:15:24+00:00"
+    "_rescored_ts": "2026-07-21T04:58:27+00:00"
   },
   {
     "id": "bank-05-es",
@@ -1627,7 +1627,7 @@
     "snr_db_est": 60.8,
     "_hypothesis": "Envíe la transferencia a la cuenta 4021-8837-005.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:27+00:00",
+    "_run_ts": "2026-07-21T04:58:34+00:00",
     "ttfa_p50_ms": 79.7,
     "ttfa_p90_ms": 79.7,
     "ttfa_iqr_ms": 0.0,
@@ -1669,7 +1669,7 @@
       "min": 0.32345644836130394,
       "max": 0.32345644836130394
     },
-    "_rescored_ts": "2026-07-21T04:15:27+00:00"
+    "_rescored_ts": "2026-07-21T04:58:34+00:00"
   },
   {
     "id": "bank-05-fr",
@@ -1678,12 +1678,12 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 49,
     "audio_s": 5.68,
-    "wer_pct": 11.11,
-    "wer_raw_pct": 44.44,
-    "cer_pct": 6.12,
+    "wer_pct": 5.56,
+    "wer_raw_pct": 11.11,
+    "cer_pct": 2.04,
     "ref_words": 18,
     "detected_lang": "fr",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 1,
     "trailing_del": 0,
@@ -1701,9 +1701,9 @@
     "peak_dbfs": -1.74,
     "clipping_pct": 0.0,
     "snr_db_est": 85.3,
-    "_hypothesis": "Envoyez le virement sur le compte 8021 8 837 005.",
+    "_hypothesis": "Envoyez le virement sur le compte 4021 8837 005.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:29+00:00",
+    "_run_ts": "2026-07-21T04:58:41+00:00",
     "ttfa_p50_ms": 76.6,
     "ttfa_p90_ms": 76.6,
     "ttfa_iqr_ms": 0.0,
@@ -1745,7 +1745,7 @@
       "min": 0.32837342308893214,
       "max": 0.32837342308893214
     },
-    "_rescored_ts": "2026-07-21T04:15:29+00:00"
+    "_rescored_ts": "2026-07-21T04:58:41+00:00"
   },
   {
     "id": "bank-05-de",
@@ -1754,14 +1754,14 @@
     "voice_id": "zyla-_bhVQtNTBdT",
     "chars": 44,
     "audio_s": 6.48,
-    "wer_pct": 5.88,
-    "wer_raw_pct": 37.5,
-    "cer_pct": 4.55,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 17,
     "detected_lang": "de",
     "sub": 0,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.953,
     "truncated": false,
@@ -1777,9 +1777,9 @@
     "peak_dbfs": -2.66,
     "clipping_pct": 0.0,
     "snr_db_est": 45.7,
-    "_hypothesis": "Überweisen Sie auf das Konto 4021 8 837 005.",
+    "_hypothesis": "Überweisen Sie auf das Konto 4021 8837 0005.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:32+00:00",
+    "_run_ts": "2026-07-21T04:58:47+00:00",
     "ttfa_p50_ms": 71.6,
     "ttfa_p90_ms": 71.6,
     "ttfa_iqr_ms": 0.0,
@@ -1821,7 +1821,7 @@
       "min": 0.33234537584428686,
       "max": 0.33234537584428686
     },
-    "_rescored_ts": "2026-07-21T04:15:32+00:00"
+    "_rescored_ts": "2026-07-21T04:58:47+00:00"
   },
   {
     "id": "bank-05-pt",
@@ -1830,14 +1830,14 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 50,
     "audio_s": 6.96,
-    "wer_pct": 11.11,
-    "wer_raw_pct": 44.44,
-    "cer_pct": 12.0,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 33.33,
+    "cer_pct": 4.0,
     "ref_words": 18,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.967,
     "truncated": false,
@@ -1853,9 +1853,9 @@
     "peak_dbfs": -0.8,
     "clipping_pct": 0.0,
     "snr_db_est": 49.9,
-    "_hypothesis": "Envi a transferência para a conta 4.021.8.837.005.",
+    "_hypothesis": "Envie a transferência para a conta 4021-8837-0005.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:34+00:00",
+    "_run_ts": "2026-07-21T04:58:54+00:00",
     "ttfa_p50_ms": 78.6,
     "ttfa_p90_ms": 78.6,
     "ttfa_iqr_ms": 0.0,
@@ -1897,7 +1897,7 @@
       "min": 0.3243852713684075,
       "max": 0.3243852713684075
     },
-    "_rescored_ts": "2026-07-21T04:15:34+00:00"
+    "_rescored_ts": "2026-07-21T04:58:54+00:00"
   },
   {
     "id": "bank-06-en",
@@ -1931,7 +1931,7 @@
     "snr_db_est": 94.3,
     "_hypothesis": "Enter your PIN at any ATM to withdraw cash.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:37+00:00",
+    "_run_ts": "2026-07-21T04:59:00+00:00",
     "ttfa_p50_ms": 79.4,
     "ttfa_p90_ms": 79.4,
     "ttfa_iqr_ms": 0.0,
@@ -1973,7 +1973,7 @@
       "min": 0.3638997819761307,
       "max": 0.3638997819761307
     },
-    "_rescored_ts": "2026-07-21T04:15:37+00:00"
+    "_rescored_ts": "2026-07-21T04:59:00+00:00"
   },
   {
     "id": "bank-06-es",
@@ -2005,9 +2005,9 @@
     "peak_dbfs": -4.31,
     "clipping_pct": 0.0,
     "snr_db_est": 52.4,
-    "_hypothesis": "Introduzca su pin en cualquier cajero para sacar dinero.",
+    "_hypothesis": "Introduzca su PIN en cualquier cajero para sacar dinero.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:39+00:00",
+    "_run_ts": "2026-07-21T04:59:06+00:00",
     "ttfa_p50_ms": 74.7,
     "ttfa_p90_ms": 74.7,
     "ttfa_iqr_ms": 0.0,
@@ -2049,7 +2049,7 @@
       "min": 0.35184350489740324,
       "max": 0.35184350489740324
     },
-    "_rescored_ts": "2026-07-21T04:15:39+00:00"
+    "_rescored_ts": "2026-07-21T04:59:06+00:00"
   },
   {
     "id": "bank-06-fr",
@@ -2083,7 +2083,7 @@
     "snr_db_est": 90.4,
     "_hypothesis": "Saisissez votre code PIN à n'importe quel distributeur pour retirer de l'argent.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:42+00:00",
+    "_run_ts": "2026-07-21T04:59:14+00:00",
     "ttfa_p50_ms": 73.6,
     "ttfa_p90_ms": 73.6,
     "ttfa_iqr_ms": 0.0,
@@ -2125,7 +2125,7 @@
       "min": 0.34140055803878305,
       "max": 0.34140055803878305
     },
-    "_rescored_ts": "2026-07-21T04:15:42+00:00"
+    "_rescored_ts": "2026-07-21T04:59:14+00:00"
   },
   {
     "id": "bank-06-de",
@@ -2157,9 +2157,9 @@
     "peak_dbfs": -2.23,
     "clipping_pct": 0.0,
     "snr_db_est": 79.0,
-    "_hypothesis": "geben sie ihre Pin an jedem Geldautomaten ein, um Geld abzuheben.",
+    "_hypothesis": "Geben Sie Ihre PIN an jedem Geldautomaten ein, um Geld abzuheben.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:45+00:00",
+    "_run_ts": "2026-07-21T04:59:21+00:00",
     "ttfa_p50_ms": 75.5,
     "ttfa_p90_ms": 75.5,
     "ttfa_iqr_ms": 0.0,
@@ -2201,7 +2201,7 @@
       "min": 0.3414920870630324,
       "max": 0.3414920870630324
     },
-    "_rescored_ts": "2026-07-21T04:15:45+00:00"
+    "_rescored_ts": "2026-07-21T04:59:21+00:00"
   },
   {
     "id": "bank-06-pt",
@@ -2233,9 +2233,9 @@
     "peak_dbfs": -1.78,
     "clipping_pct": 0.0,
     "snr_db_est": 46.4,
-    "_hypothesis": "introduza o seu PIN em qualquer multibanco para levantar dinheiro.",
+    "_hypothesis": "Introduza o seu PIN em qualquer multibanco para levantar dinheiro.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:47+00:00",
+    "_run_ts": "2026-07-21T04:59:27+00:00",
     "ttfa_p50_ms": 79.4,
     "ttfa_p90_ms": 79.4,
     "ttfa_iqr_ms": 0.0,
@@ -2277,7 +2277,7 @@
       "min": 0.3483937397058802,
       "max": 0.3483937397058802
     },
-    "_rescored_ts": "2026-07-21T04:15:47+00:00"
+    "_rescored_ts": "2026-07-21T04:59:27+00:00"
   },
   {
     "id": "health-01-en",
@@ -2311,7 +2311,7 @@
     "snr_db_est": 93.9,
     "_hypothesis": "Take 500 mg of ibuprofen every 8 hours.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:50+00:00",
+    "_run_ts": "2026-07-21T04:59:34+00:00",
     "ttfa_p50_ms": 69.2,
     "ttfa_p90_ms": 69.2,
     "ttfa_iqr_ms": 0.0,
@@ -2353,7 +2353,7 @@
       "min": 0.3515012742006567,
       "max": 0.3515012742006567
     },
-    "_rescored_ts": "2026-07-21T04:15:50+00:00"
+    "_rescored_ts": "2026-07-21T04:59:34+00:00"
   },
   {
     "id": "health-01-es",
@@ -2387,7 +2387,7 @@
     "snr_db_est": 50.6,
     "_hypothesis": "Tome 500 miligramos de ibuprofeno cada 8 horas.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:53+00:00",
+    "_run_ts": "2026-07-21T04:59:41+00:00",
     "ttfa_p50_ms": 72.1,
     "ttfa_p90_ms": 72.1,
     "ttfa_iqr_ms": 0.0,
@@ -2429,7 +2429,7 @@
       "min": 0.35558630319273826,
       "max": 0.35558630319273826
     },
-    "_rescored_ts": "2026-07-21T04:15:53+00:00"
+    "_rescored_ts": "2026-07-21T04:59:41+00:00"
   },
   {
     "id": "health-01-fr",
@@ -2438,12 +2438,12 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 57,
     "audio_s": 3.28,
-    "wer_pct": 9.09,
-    "wer_raw_pct": 50.0,
-    "cer_pct": 31.58,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 12.5,
+    "cer_pct": 17.54,
     "ref_words": 11,
     "detected_lang": "fr",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -2461,9 +2461,9 @@
     "peak_dbfs": -0.29,
     "clipping_pct": 0.0,
     "snr_db_est": 95.4,
-    "_hypothesis": "Prenez 500 mg d'ibuprofen toutes les 8h.",
+    "_hypothesis": "Prenez 500 mg d'ibuprofène toutes les 8 heures.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:55+00:00",
+    "_run_ts": "2026-07-21T04:59:47+00:00",
     "ttfa_p50_ms": 76.9,
     "ttfa_p90_ms": 76.9,
     "ttfa_iqr_ms": 0.0,
@@ -2505,7 +2505,7 @@
       "min": 0.35993733869136557,
       "max": 0.35993733869136557
     },
-    "_rescored_ts": "2026-07-21T04:15:55+00:00"
+    "_rescored_ts": "2026-07-21T04:59:47+00:00"
   },
   {
     "id": "health-01-de",
@@ -2515,8 +2515,8 @@
     "chars": 51,
     "audio_s": 4.0,
     "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_raw_pct": 12.5,
+    "cer_pct": 15.69,
     "ref_words": 10,
     "detected_lang": "de",
     "sub": 0,
@@ -2537,9 +2537,9 @@
     "peak_dbfs": -3.07,
     "clipping_pct": 0.0,
     "snr_db_est": 57.6,
-    "_hypothesis": "Nehmen Sie 500 Milligramm Ibuprofen alle 8 Stunden.",
+    "_hypothesis": "Nehmen Sie 500 mg Ibuprofen alle 8 Stunden.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:15:58+00:00",
+    "_run_ts": "2026-07-21T04:59:54+00:00",
     "ttfa_p50_ms": 79.0,
     "ttfa_p90_ms": 79.0,
     "ttfa_iqr_ms": 0.0,
@@ -2581,7 +2581,7 @@
       "min": 0.35596840277624625,
       "max": 0.35596840277624625
     },
-    "_rescored_ts": "2026-07-21T04:15:58+00:00"
+    "_rescored_ts": "2026-07-21T04:59:54+00:00"
   },
   {
     "id": "health-01-pt",
@@ -2590,14 +2590,14 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 50,
     "audio_s": 4.8,
-    "wer_pct": 50.0,
-    "wer_raw_pct": 50.0,
-    "cer_pct": 34.0,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "pt",
-    "sub": 4,
-    "ins": 1,
-    "del": 1,
+    "sub": 0,
+    "ins": 0,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 1.0,
     "truncated": false,
@@ -2613,9 +2613,9 @@
     "peak_dbfs": -2.33,
     "clipping_pct": 0.0,
     "snr_db_est": 51.3,
-    "_hypothesis": "Tome finquinho dos miligramas de ibo profeno de 8 a 8 horas.",
+    "_hypothesis": "Tome 500 miligramas de ibuprofeno de 8 em 8 horas.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:00+00:00",
+    "_run_ts": "2026-07-21T05:00:00+00:00",
     "ttfa_p50_ms": 78.3,
     "ttfa_p90_ms": 78.3,
     "ttfa_iqr_ms": 0.0,
@@ -2657,7 +2657,7 @@
       "min": 0.3519227395008784,
       "max": 0.3519227395008784
     },
-    "_rescored_ts": "2026-07-21T04:16:00+00:00"
+    "_rescored_ts": "2026-07-21T05:00:00+00:00"
   },
   {
     "id": "health-02-en",
@@ -2666,14 +2666,14 @@
     "voice_id": "zyLIanWKViHkc6Wp",
     "chars": 47,
     "audio_s": 3.68,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 10.0,
-    "cer_pct": 12.77,
+    "wer_pct": 14.29,
+    "wer_raw_pct": 20.0,
+    "cer_pct": 17.02,
     "ref_words": 14,
     "detected_lang": "en",
     "sub": 0,
     "ins": 0,
-    "del": 0,
+    "del": 2,
     "trailing_del": 0,
     "dur_expected_ratio": 0.657,
     "truncated": false,
@@ -2689,9 +2689,9 @@
     "peak_dbfs": -2.91,
     "clipping_pct": 0.0,
     "snr_db_est": 93.0,
-    "_hypothesis": "Dr. Alvarez will see you on May 6th at 9.30.",
+    "_hypothesis": "Dr. Alvarez will see you on May 6 at 9.30.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:02+00:00",
+    "_run_ts": "2026-07-21T05:00:07+00:00",
     "ttfa_p50_ms": 79.1,
     "ttfa_p90_ms": 79.1,
     "ttfa_iqr_ms": 0.0,
@@ -2733,7 +2733,7 @@
       "min": 0.3572616713096398,
       "max": 0.3572616713096398
     },
-    "_rescored_ts": "2026-07-21T04:16:02+00:00"
+    "_rescored_ts": "2026-07-21T05:00:07+00:00"
   },
   {
     "id": "health-02-es",
@@ -2767,7 +2767,7 @@
     "snr_db_est": 49.1,
     "_hypothesis": "El doctor Álvarez le atenderá el 6 de mayo a las 9.30.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:04+00:00",
+    "_run_ts": "2026-07-21T05:00:13+00:00",
     "ttfa_p50_ms": 80.5,
     "ttfa_p90_ms": 80.5,
     "ttfa_iqr_ms": 0.0,
@@ -2809,7 +2809,7 @@
       "min": 0.34820124045257794,
       "max": 0.34820124045257794
     },
-    "_rescored_ts": "2026-07-21T04:16:04+00:00"
+    "_rescored_ts": "2026-07-21T05:00:13+00:00"
   },
   {
     "id": "health-02-fr",
@@ -2818,12 +2818,12 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 50,
     "audio_s": 3.44,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 25.0,
-    "cer_pct": 4.0,
+    "wer_pct": 7.69,
+    "wer_raw_pct": 33.33,
+    "cer_pct": 14.0,
     "ref_words": 13,
     "detected_lang": "fr",
-    "sub": 0,
+    "sub": 1,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -2841,9 +2841,9 @@
     "peak_dbfs": -0.47,
     "clipping_pct": 0.0,
     "snr_db_est": 96.3,
-    "_hypothesis": "Le docteur Alvarez vous recevra le 6 mai à 9h30.",
+    "_hypothesis": "Le Dr Alvarez vous recevra le 6 mai à 9h30.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:06+00:00",
+    "_run_ts": "2026-07-21T05:00:20+00:00",
     "ttfa_p50_ms": 79.0,
     "ttfa_p90_ms": 79.0,
     "ttfa_iqr_ms": 0.0,
@@ -2885,7 +2885,7 @@
       "min": 0.3588565785321407,
       "max": 0.3588565785321407
     },
-    "_rescored_ts": "2026-07-21T04:16:06+00:00"
+    "_rescored_ts": "2026-07-21T05:00:20+00:00"
   },
   {
     "id": "health-02-de",
@@ -2917,9 +2917,9 @@
     "peak_dbfs": -1.22,
     "clipping_pct": 0.0,
     "snr_db_est": 66.3,
-    "_hypothesis": "Dr. Alvarez empfängt sie am 6. Mai um 9.30 Uhr.",
+    "_hypothesis": "Dr. Alvarez empfängt Sie am 6. Mai um 9.30 Uhr.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:09+00:00",
+    "_run_ts": "2026-07-21T05:00:27+00:00",
     "ttfa_p50_ms": 82.0,
     "ttfa_p90_ms": 82.0,
     "ttfa_iqr_ms": 0.0,
@@ -2961,7 +2961,7 @@
       "min": 0.35000614397749474,
       "max": 0.35000614397749474
     },
-    "_rescored_ts": "2026-07-21T04:16:09+00:00"
+    "_rescored_ts": "2026-07-21T05:00:27+00:00"
   },
   {
     "id": "health-02-pt",
@@ -2970,12 +2970,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 56,
     "audio_s": 4.32,
-    "wer_pct": 13.33,
-    "wer_raw_pct": 16.67,
-    "cer_pct": 7.14,
+    "wer_pct": 20.0,
+    "wer_raw_pct": 25.0,
+    "cer_pct": 14.29,
     "ref_words": 15,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 2,
     "ins": 1,
     "del": 0,
     "trailing_del": 0,
@@ -2993,9 +2993,9 @@
     "peak_dbfs": -1.17,
     "clipping_pct": 0.0,
     "snr_db_est": 55.5,
-    "_hypothesis": "O doutor Álvaras vai recebê-lo no dia 6 de maio, às 9h30.",
+    "_hypothesis": "O Dr. Álvares vai recebê-lo no dia 6 de maio, às 9h30.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:12+00:00",
+    "_run_ts": "2026-07-21T05:00:35+00:00",
     "ttfa_p50_ms": 67.4,
     "ttfa_p90_ms": 67.4,
     "ttfa_iqr_ms": 0.0,
@@ -3037,7 +3037,7 @@
       "min": 0.33343471679359027,
       "max": 0.33343471679359027
     },
-    "_rescored_ts": "2026-07-21T04:16:12+00:00"
+    "_rescored_ts": "2026-07-21T05:00:35+00:00"
   },
   {
     "id": "health-03-en",
@@ -3071,7 +3071,7 @@
     "snr_db_est": 88.5,
     "_hypothesis": "The patient needs an MRI, an EKG, and a CT scan.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:14+00:00",
+    "_run_ts": "2026-07-21T05:00:41+00:00",
     "ttfa_p50_ms": 76.6,
     "ttfa_p90_ms": 76.6,
     "ttfa_iqr_ms": 0.0,
@@ -3113,7 +3113,7 @@
       "min": 0.347478216223719,
       "max": 0.347478216223719
     },
-    "_rescored_ts": "2026-07-21T04:16:14+00:00"
+    "_rescored_ts": "2026-07-21T05:00:41+00:00"
   },
   {
     "id": "health-03-es",
@@ -3147,7 +3147,7 @@
     "snr_db_est": 88.7,
     "_hypothesis": "El paciente necesita una RM, un ECG y un TAC.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:17+00:00",
+    "_run_ts": "2026-07-21T05:00:48+00:00",
     "ttfa_p50_ms": 71.1,
     "ttfa_p90_ms": 71.1,
     "ttfa_iqr_ms": 0.0,
@@ -3189,7 +3189,7 @@
       "min": 0.3465921213633423,
       "max": 0.3465921213633423
     },
-    "_rescored_ts": "2026-07-21T04:16:17+00:00"
+    "_rescored_ts": "2026-07-21T05:00:48+00:00"
   },
   {
     "id": "health-03-fr",
@@ -3223,7 +3223,7 @@
     "snr_db_est": 92.6,
     "_hypothesis": "Le patient a besoin d'une IRM, d'un ECG et d'un scanner.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:20+00:00",
+    "_run_ts": "2026-07-21T05:00:55+00:00",
     "ttfa_p50_ms": 83.2,
     "ttfa_p90_ms": 83.2,
     "ttfa_iqr_ms": 0.0,
@@ -3265,7 +3265,7 @@
       "min": 0.3517705779385698,
       "max": 0.3517705779385698
     },
-    "_rescored_ts": "2026-07-21T04:16:20+00:00"
+    "_rescored_ts": "2026-07-21T05:00:55+00:00"
   },
   {
     "id": "health-03-de",
@@ -3299,7 +3299,7 @@
     "snr_db_est": 69.6,
     "_hypothesis": "Der Patient braucht ein MRT, ein EKG und ein CT.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:23+00:00",
+    "_run_ts": "2026-07-21T05:01:02+00:00",
     "ttfa_p50_ms": 81.3,
     "ttfa_p90_ms": 81.3,
     "ttfa_iqr_ms": 0.0,
@@ -3341,7 +3341,7 @@
       "min": 0.3560279323368298,
       "max": 0.3560279323368298
     },
-    "_rescored_ts": "2026-07-21T04:16:23+00:00"
+    "_rescored_ts": "2026-07-21T05:01:02+00:00"
   },
   {
     "id": "health-03-pt",
@@ -3350,13 +3350,13 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 53,
     "audio_s": 4.32,
-    "wer_pct": 38.46,
-    "wer_raw_pct": 23.08,
-    "cer_pct": 15.09,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 13,
     "detected_lang": "pt",
-    "sub": 4,
-    "ins": 1,
+    "sub": 0,
+    "ins": 0,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.831,
@@ -3373,9 +3373,9 @@
     "peak_dbfs": -2.9,
     "clipping_pct": 0.0,
     "snr_db_est": 58.9,
-    "_hypothesis": "O paciente precisa de uma R.M., de um SCG e de um ataque.",
+    "_hypothesis": "O paciente precisa de uma RM, de um ECG e de uma TAC.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:26+00:00",
+    "_run_ts": "2026-07-21T05:01:09+00:00",
     "ttfa_p50_ms": 82.3,
     "ttfa_p90_ms": 82.3,
     "ttfa_iqr_ms": 0.0,
@@ -3417,7 +3417,7 @@
       "min": 0.3646324084096203,
       "max": 0.3646324084096203
     },
-    "_rescored_ts": "2026-07-21T04:16:26+00:00"
+    "_rescored_ts": "2026-07-21T05:01:09+00:00"
   },
   {
     "id": "health-04-en",
@@ -3451,7 +3451,7 @@
     "snr_db_est": 97.1,
     "_hypothesis": "I read the patient's chart before the exam.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:27+00:00",
+    "_run_ts": "2026-07-21T05:01:14+00:00",
     "ttfa_p50_ms": 85.8,
     "ttfa_p90_ms": 85.8,
     "ttfa_iqr_ms": 0.0,
@@ -3493,7 +3493,7 @@
       "min": 0.38715023674189014,
       "max": 0.38715023674189014
     },
-    "_rescored_ts": "2026-07-21T04:16:27+00:00"
+    "_rescored_ts": "2026-07-21T05:01:14+00:00"
   },
   {
     "id": "health-04-es",
@@ -3527,7 +3527,7 @@
     "snr_db_est": 46.5,
     "_hypothesis": "El médico evaluó la disnea paroxística nocturna del paciente.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:29+00:00",
+    "_run_ts": "2026-07-21T05:01:20+00:00",
     "ttfa_p50_ms": 74.0,
     "ttfa_p90_ms": 74.0,
     "ttfa_iqr_ms": 0.0,
@@ -3569,7 +3569,7 @@
       "min": 0.3443107638176707,
       "max": 0.3443107638176707
     },
-    "_rescored_ts": "2026-07-21T04:16:29+00:00"
+    "_rescored_ts": "2026-07-21T05:01:20+00:00"
   },
   {
     "id": "health-04-fr",
@@ -3603,7 +3603,7 @@
     "snr_db_est": 94.4,
     "_hypothesis": "Mes fils ont lu le dossier médical hier soir.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:31+00:00",
+    "_run_ts": "2026-07-21T05:01:26+00:00",
     "ttfa_p50_ms": 79.9,
     "ttfa_p90_ms": 79.9,
     "ttfa_iqr_ms": 0.0,
@@ -3645,7 +3645,7 @@
       "min": 0.38455640795732365,
       "max": 0.38455640795732365
     },
-    "_rescored_ts": "2026-07-21T04:16:31+00:00"
+    "_rescored_ts": "2026-07-21T05:01:26+00:00"
   },
   {
     "id": "health-04-de",
@@ -3679,7 +3679,7 @@
     "snr_db_est": 88.1,
     "_hypothesis": "Die Blutdruckmessung ergab eine deutliche Hypertonie.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:33+00:00",
+    "_run_ts": "2026-07-21T05:01:32+00:00",
     "ttfa_p50_ms": 81.6,
     "ttfa_p90_ms": 81.6,
     "ttfa_iqr_ms": 0.0,
@@ -3721,7 +3721,7 @@
       "min": 0.36546970062772743,
       "max": 0.36546970062772743
     },
-    "_rescored_ts": "2026-07-21T04:16:33+00:00"
+    "_rescored_ts": "2026-07-21T05:01:32+00:00"
   },
   {
     "id": "health-04-pt",
@@ -3730,12 +3730,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 42,
     "audio_s": 2.56,
-    "wer_pct": 50.0,
-    "wer_raw_pct": 50.0,
-    "cer_pct": 23.81,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 8,
     "detected_lang": "pt",
-    "sub": 4,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -3753,9 +3753,9 @@
     "peak_dbfs": -1.58,
     "clipping_pct": 0.0,
     "snr_db_est": 95.3,
-    "_hypothesis": "Toma uma colher de syrup e se dormir.",
+    "_hypothesis": "Tome uma colher de xarope antes de dormir.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:35+00:00",
+    "_run_ts": "2026-07-21T05:01:38+00:00",
     "ttfa_p50_ms": 82.8,
     "ttfa_p90_ms": 82.8,
     "ttfa_iqr_ms": 0.0,
@@ -3797,7 +3797,7 @@
       "min": 0.3814207885755293,
       "max": 0.3814207885755293
     },
-    "_rescored_ts": "2026-07-21T04:16:35+00:00"
+    "_rescored_ts": "2026-07-21T05:01:38+00:00"
   },
   {
     "id": "health-05-en",
@@ -3831,7 +3831,7 @@
     "snr_db_est": 84.8,
     "_hypothesis": "Your temperature is 38.5 degrees and your pulse is 72.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:36+00:00",
+    "_run_ts": "2026-07-21T05:01:44+00:00",
     "ttfa_p50_ms": 80.5,
     "ttfa_p90_ms": 80.5,
     "ttfa_iqr_ms": 0.0,
@@ -3873,7 +3873,7 @@
       "min": 0.34948577659220476,
       "max": 0.34948577659220476
     },
-    "_rescored_ts": "2026-07-21T04:16:36+00:00"
+    "_rescored_ts": "2026-07-21T05:01:44+00:00"
   },
   {
     "id": "health-05-es",
@@ -3907,7 +3907,7 @@
     "snr_db_est": 50.8,
     "_hypothesis": "Su temperatura es de 38,5 grados y su pulso es de 72.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:39+00:00",
+    "_run_ts": "2026-07-21T05:01:50+00:00",
     "ttfa_p50_ms": 85.4,
     "ttfa_p90_ms": 85.4,
     "ttfa_iqr_ms": 0.0,
@@ -3949,7 +3949,7 @@
       "min": 0.3401332386353963,
       "max": 0.3401332386353963
     },
-    "_rescored_ts": "2026-07-21T04:16:39+00:00"
+    "_rescored_ts": "2026-07-21T05:01:50+00:00"
   },
   {
     "id": "health-05-fr",
@@ -3958,13 +3958,13 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 62,
     "audio_s": 4.48,
-    "wer_pct": 20.0,
-    "wer_raw_pct": 33.33,
-    "cer_pct": 16.13,
+    "wer_pct": 6.67,
+    "wer_raw_pct": 8.33,
+    "cer_pct": 1.61,
     "ref_words": 15,
     "detected_lang": "fr",
-    "sub": 2,
-    "ins": 1,
+    "sub": 1,
+    "ins": 0,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.747,
@@ -3981,9 +3981,9 @@
     "peak_dbfs": -0.94,
     "clipping_pct": 0.0,
     "snr_db_est": 81.0,
-    "_hypothesis": "Votre température est de 38,5°C et votre poule est de 72°C.",
+    "_hypothesis": "Votre température est de 38,5 degrés et votre poule est de 72.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:42+00:00",
+    "_run_ts": "2026-07-21T05:01:58+00:00",
     "ttfa_p50_ms": 80.8,
     "ttfa_p90_ms": 80.8,
     "ttfa_iqr_ms": 0.0,
@@ -4025,7 +4025,7 @@
       "min": 0.3493448113212647,
       "max": 0.3493448113212647
     },
-    "_rescored_ts": "2026-07-21T04:16:42+00:00"
+    "_rescored_ts": "2026-07-21T05:01:58+00:00"
   },
   {
     "id": "health-05-de",
@@ -4059,7 +4059,7 @@
     "snr_db_est": 52.9,
     "_hypothesis": "Ihre Temperatur beträgt 38,5 Grad und ihr Puls liegt bei 72.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:44+00:00",
+    "_run_ts": "2026-07-21T05:02:04+00:00",
     "ttfa_p50_ms": 72.7,
     "ttfa_p90_ms": 72.7,
     "ttfa_iqr_ms": 0.0,
@@ -4101,7 +4101,7 @@
       "min": 0.3374224121102998,
       "max": 0.3374224121102998
     },
-    "_rescored_ts": "2026-07-21T04:16:44+00:00"
+    "_rescored_ts": "2026-07-21T05:02:04+00:00"
   },
   {
     "id": "health-05-pt",
@@ -4135,7 +4135,7 @@
     "snr_db_est": 46.6,
     "_hypothesis": "A sua temperatura é de 38,5 graus e a pulsação é de 72.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:46+00:00",
+    "_run_ts": "2026-07-21T05:02:10+00:00",
     "ttfa_p50_ms": 71.7,
     "ttfa_p90_ms": 71.7,
     "ttfa_iqr_ms": 0.0,
@@ -4177,7 +4177,7 @@
       "min": 0.3319466875012343,
       "max": 0.3319466875012343
     },
-    "_rescored_ts": "2026-07-21T04:16:46+00:00"
+    "_rescored_ts": "2026-07-21T05:02:10+00:00"
   },
   {
     "id": "health-06-en",
@@ -4211,7 +4211,7 @@
     "snr_db_est": 93.1,
     "_hypothesis": "Refill your prescription at care.example.org.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:49+00:00",
+    "_run_ts": "2026-07-21T05:02:17+00:00",
     "ttfa_p50_ms": 79.5,
     "ttfa_p90_ms": 79.5,
     "ttfa_iqr_ms": 0.0,
@@ -4253,7 +4253,7 @@
       "min": 0.35109752358073576,
       "max": 0.35109752358073576
     },
-    "_rescored_ts": "2026-07-21T04:16:49+00:00"
+    "_rescored_ts": "2026-07-21T05:02:17+00:00"
   },
   {
     "id": "health-06-es",
@@ -4262,14 +4262,14 @@
     "voice_id": "Gijj_GPBfJVcP-FZ",
     "chars": 51,
     "audio_s": 4.72,
-    "wer_pct": 11.11,
-    "wer_raw_pct": 42.86,
-    "cer_pct": 13.73,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 9,
     "detected_lang": "es",
     "sub": 0,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 1.311,
     "truncated": false,
@@ -4285,9 +4285,9 @@
     "peak_dbfs": -3.86,
     "clipping_pct": 0.0,
     "snr_db_est": 55.9,
-    "_hypothesis": "Renueve su receta en care.example.org-refill.",
+    "_hypothesis": "Renueve su receta en care.example.org barra refill.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:51+00:00",
+    "_run_ts": "2026-07-21T05:02:23+00:00",
     "ttfa_p50_ms": 82.7,
     "ttfa_p90_ms": 82.7,
     "ttfa_iqr_ms": 0.0,
@@ -4329,7 +4329,7 @@
       "min": 0.3403718480606993,
       "max": 0.3403718480606993
     },
-    "_rescored_ts": "2026-07-21T04:16:51+00:00"
+    "_rescored_ts": "2026-07-21T05:02:23+00:00"
   },
   {
     "id": "health-06-fr",
@@ -4338,12 +4338,12 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 62,
     "audio_s": 4.48,
-    "wer_pct": 44.44,
-    "wer_raw_pct": 57.14,
-    "cer_pct": 25.81,
+    "wer_pct": 33.33,
+    "wer_raw_pct": 42.86,
+    "cer_pct": 22.58,
     "ref_words": 9,
     "detected_lang": "fr",
-    "sub": 2,
+    "sub": 1,
     "ins": 0,
     "del": 2,
     "trailing_del": 2,
@@ -4361,9 +4361,9 @@
     "peak_dbfs": -0.86,
     "clipping_pct": 0.0,
     "snr_db_est": 88.9,
-    "_hypothesis": "Renouveler votre ordonnance sur care.exemple.org-",
+    "_hypothesis": "Renouvelez votre ordonnance sur care.exemple.org.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:54+00:00",
+    "_run_ts": "2026-07-21T05:02:30+00:00",
     "ttfa_p50_ms": 79.6,
     "ttfa_p90_ms": 79.6,
     "ttfa_iqr_ms": 0.0,
@@ -4405,7 +4405,7 @@
       "min": 0.3450270537696098,
       "max": 0.3450270537696098
     },
-    "_rescored_ts": "2026-07-21T04:16:54+00:00"
+    "_rescored_ts": "2026-07-21T05:02:30+00:00"
   },
   {
     "id": "health-06-de",
@@ -4439,7 +4439,7 @@
     "snr_db_est": 50.8,
     "_hypothesis": "Erneuern Sie Ihr Rezept auf care.example.org-refill.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:57+00:00",
+    "_run_ts": "2026-07-21T05:02:38+00:00",
     "ttfa_p50_ms": 81.2,
     "ttfa_p90_ms": 81.2,
     "ttfa_iqr_ms": 0.0,
@@ -4481,7 +4481,7 @@
       "min": 0.3303131919632766,
       "max": 0.3303131919632766
     },
-    "_rescored_ts": "2026-07-21T04:16:57+00:00"
+    "_rescored_ts": "2026-07-21T05:02:38+00:00"
   },
   {
     "id": "health-06-pt",
@@ -4490,14 +4490,14 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 54,
     "audio_s": 4.88,
-    "wer_pct": 50.0,
-    "wer_raw_pct": 75.0,
-    "cer_pct": 31.48,
+    "wer_pct": 20.0,
+    "wer_raw_pct": 37.5,
+    "cer_pct": 16.67,
     "ref_words": 10,
     "detected_lang": "pt",
-    "sub": 3,
+    "sub": 1,
     "ins": 0,
-    "del": 2,
+    "del": 1,
     "trailing_del": 0,
     "dur_expected_ratio": 1.22,
     "truncated": false,
@@ -4513,9 +4513,9 @@
     "peak_dbfs": -1.11,
     "clipping_pct": 0.0,
     "snr_db_est": 55.9,
-    "_hypothesis": "Renovar sua saída em car.example.org-refill.",
+    "_hypothesis": "Renove a sua receita em car.example.org.refill",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:16:59+00:00",
+    "_run_ts": "2026-07-21T05:02:44+00:00",
     "ttfa_p50_ms": 79.4,
     "ttfa_p90_ms": 79.4,
     "ttfa_iqr_ms": 0.0,
@@ -4557,7 +4557,7 @@
       "min": 0.33948915057967843,
       "max": 0.33948915057967843
     },
-    "_rescored_ts": "2026-07-21T04:16:59+00:00"
+    "_rescored_ts": "2026-07-21T05:02:44+00:00"
   },
   {
     "id": "cs-01-en",
@@ -4591,7 +4591,7 @@
     "snr_db_est": 91.5,
     "_hypothesis": "Thank you for calling. How can I help?",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:01+00:00",
+    "_run_ts": "2026-07-21T05:02:50+00:00",
     "ttfa_p50_ms": 77.4,
     "ttfa_p90_ms": 77.4,
     "ttfa_iqr_ms": 0.0,
@@ -4633,7 +4633,7 @@
       "min": 0.37591551765003445,
       "max": 0.37591551765003445
     },
-    "_rescored_ts": "2026-07-21T04:17:01+00:00"
+    "_rescored_ts": "2026-07-21T05:02:50+00:00"
   },
   {
     "id": "cs-01-es",
@@ -4667,7 +4667,7 @@
     "snr_db_est": 50.5,
     "_hypothesis": "Gracias por llamar. ¿En qué puedo ayudarle?",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:03+00:00",
+    "_run_ts": "2026-07-21T05:02:56+00:00",
     "ttfa_p50_ms": 77.0,
     "ttfa_p90_ms": 77.0,
     "ttfa_iqr_ms": 0.0,
@@ -4709,7 +4709,7 @@
       "min": 0.3556187953860069,
       "max": 0.3556187953860069
     },
-    "_rescored_ts": "2026-07-21T04:17:03+00:00"
+    "_rescored_ts": "2026-07-21T05:02:56+00:00"
   },
   {
     "id": "cs-01-fr",
@@ -4720,7 +4720,7 @@
     "audio_s": 3.28,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "cer_pct": 2.0,
     "ref_words": 9,
     "detected_lang": "fr",
     "sub": 0,
@@ -4741,9 +4741,9 @@
     "peak_dbfs": -0.9,
     "clipping_pct": 0.0,
     "snr_db_est": 95.1,
-    "_hypothesis": "Merci de votre appel. Comment puis-je vous aider ?",
+    "_hypothesis": "Merci de votre appel. Comment puis-je vous aider?",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:05+00:00",
+    "_run_ts": "2026-07-21T05:03:02+00:00",
     "ttfa_p50_ms": 766.0,
     "ttfa_p90_ms": 766.0,
     "ttfa_iqr_ms": 0.0,
@@ -4785,7 +4785,7 @@
       "min": 0.583873189998485,
       "max": 0.583873189998485
     },
-    "_rescored_ts": "2026-07-21T04:17:05+00:00"
+    "_rescored_ts": "2026-07-21T05:03:02+00:00"
   },
   {
     "id": "cs-01-de",
@@ -4819,7 +4819,7 @@
     "snr_db_est": 63.1,
     "_hypothesis": "Danke für Ihren Anruf. Wie kann ich helfen?",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:07+00:00",
+    "_run_ts": "2026-07-21T05:03:08+00:00",
     "ttfa_p50_ms": 78.6,
     "ttfa_p90_ms": 78.6,
     "ttfa_iqr_ms": 0.0,
@@ -4861,7 +4861,7 @@
       "min": 0.3698308071852807,
       "max": 0.3698308071852807
     },
-    "_rescored_ts": "2026-07-21T04:17:07+00:00"
+    "_rescored_ts": "2026-07-21T05:03:08+00:00"
   },
   {
     "id": "cs-01-pt",
@@ -4895,7 +4895,7 @@
     "snr_db_est": 72.0,
     "_hypothesis": "Obrigado por ligar. Como posso ajudar?",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:09+00:00",
+    "_run_ts": "2026-07-21T05:03:14+00:00",
     "ttfa_p50_ms": 70.3,
     "ttfa_p90_ms": 70.3,
     "ttfa_iqr_ms": 0.0,
@@ -4937,7 +4937,7 @@
       "min": 0.3630780337516626,
       "max": 0.3630780337516626
     },
-    "_rescored_ts": "2026-07-21T04:17:09+00:00"
+    "_rescored_ts": "2026-07-21T05:03:14+00:00"
   },
   {
     "id": "cs-02-en",
@@ -4971,7 +4971,7 @@
     "snr_db_est": 92.9,
     "_hypothesis": "Your order number is 629-T4.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:17:12+00:00",
+    "_run_ts": "2026-07-21T05:03:20+00:00",
     "ttfa_p50_ms": 76.3,
     "ttfa_p90_ms": 76.3,
     "ttfa_iqr_ms": 0.0,
@@ -5013,7 +5013,7 @@
       "min": 0.3634175595185038,
       "max": 0.3634175595185038
     },
-    "_rescored_ts": "2026-07-21T04:17:12+00:00"
+    "_rescored_ts": "2026-07-21T05:03:20+00:00"
   },
   {
     "id": "cs-02-es",
@@ -5047,7 +5047,7 @@
     "snr_db_est": 46.3,
     "_hypothesis": "Su número de pedido es 629-T4.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:17:13+00:00",
+    "_run_ts": "2026-07-21T05:03:26+00:00",
     "ttfa_p50_ms": 82.3,
     "ttfa_p90_ms": 82.3,
     "ttfa_iqr_ms": 0.0,
@@ -5089,7 +5089,7 @@
       "min": 0.3468539362984302,
       "max": 0.3468539362984302
     },
-    "_rescored_ts": "2026-07-21T04:17:13+00:00"
+    "_rescored_ts": "2026-07-21T05:03:26+00:00"
   },
   {
     "id": "cs-02-fr",
@@ -5099,8 +5099,8 @@
     "chars": 36,
     "audio_s": 3.28,
     "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_raw_pct": 33.33,
+    "cer_pct": 2.78,
     "ref_words": 10,
     "detected_lang": "fr",
     "sub": 0,
@@ -5121,9 +5121,9 @@
     "peak_dbfs": -1.35,
     "clipping_pct": 0.0,
     "snr_db_est": 93.8,
-    "_hypothesis": "Votre numéro de commande est 629-T4.",
+    "_hypothesis": "Votre numéro de commande est 629 T4.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:17:16+00:00",
+    "_run_ts": "2026-07-21T05:03:32+00:00",
     "ttfa_p50_ms": 75.0,
     "ttfa_p90_ms": 75.0,
     "ttfa_iqr_ms": 0.0,
@@ -5165,7 +5165,7 @@
       "min": 0.36405746093805647,
       "max": 0.36405746093805647
     },
-    "_rescored_ts": "2026-07-21T04:17:16+00:00"
+    "_rescored_ts": "2026-07-21T05:03:32+00:00"
   },
   {
     "id": "cs-02-de",
@@ -5175,8 +5175,8 @@
     "chars": 30,
     "audio_s": 3.68,
     "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_raw_pct": 50.0,
+    "cer_pct": 3.33,
     "ref_words": 8,
     "detected_lang": "de",
     "sub": 0,
@@ -5197,9 +5197,9 @@
     "peak_dbfs": -2.41,
     "clipping_pct": 0.0,
     "snr_db_est": 90.8,
-    "_hypothesis": "Ihre Bestellnummer ist 629-T4.",
+    "_hypothesis": "Ihre Bestellnummer ist 629 T4.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:17:18+00:00",
+    "_run_ts": "2026-07-21T05:03:39+00:00",
     "ttfa_p50_ms": 81.2,
     "ttfa_p90_ms": 81.2,
     "ttfa_iqr_ms": 0.0,
@@ -5241,7 +5241,7 @@
       "min": 0.3544390207534889,
       "max": 0.3544390207534889
     },
-    "_rescored_ts": "2026-07-21T04:17:18+00:00"
+    "_rescored_ts": "2026-07-21T05:03:39+00:00"
   },
   {
     "id": "cs-02-pt",
@@ -5275,7 +5275,7 @@
     "snr_db_est": 59.3,
     "_hypothesis": "O seu número de encomenda é 629 T4.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:17:20+00:00",
+    "_run_ts": "2026-07-21T05:03:45+00:00",
     "ttfa_p50_ms": 69.8,
     "ttfa_p90_ms": 69.8,
     "ttfa_iqr_ms": 0.0,
@@ -5317,7 +5317,7 @@
       "min": 0.3388052167323504,
       "max": 0.3388052167323504
     },
-    "_rescored_ts": "2026-07-21T04:17:20+00:00"
+    "_rescored_ts": "2026-07-21T05:03:45+00:00"
   },
   {
     "id": "cs-03-en",
@@ -5351,7 +5351,7 @@
     "snr_db_est": 95.7,
     "_hypothesis": "We're open Monday to Friday, 8 a.m. to 6 p.m.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:22+00:00",
+    "_run_ts": "2026-07-21T05:03:51+00:00",
     "ttfa_p50_ms": 78.3,
     "ttfa_p90_ms": 78.3,
     "ttfa_iqr_ms": 0.0,
@@ -5393,7 +5393,7 @@
       "min": 0.35630015505724244,
       "max": 0.35630015505724244
     },
-    "_rescored_ts": "2026-07-21T04:17:22+00:00"
+    "_rescored_ts": "2026-07-21T05:03:51+00:00"
   },
   {
     "id": "cs-03-es",
@@ -5427,7 +5427,7 @@
     "snr_db_est": 51.9,
     "_hypothesis": "Abrimos de lunes a viernes de 8 a 18 h.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:25+00:00",
+    "_run_ts": "2026-07-21T05:03:58+00:00",
     "ttfa_p50_ms": 75.7,
     "ttfa_p90_ms": 75.7,
     "ttfa_iqr_ms": 0.0,
@@ -5469,7 +5469,7 @@
       "min": 0.3517791454140358,
       "max": 0.3517791454140358
     },
-    "_rescored_ts": "2026-07-21T04:17:25+00:00"
+    "_rescored_ts": "2026-07-21T05:03:58+00:00"
   },
   {
     "id": "cs-03-fr",
@@ -5479,8 +5479,8 @@
     "chars": 56,
     "audio_s": 3.52,
     "wer_pct": 7.14,
-    "wer_raw_pct": 23.08,
-    "cer_pct": 5.36,
+    "wer_raw_pct": 15.38,
+    "cer_pct": 12.5,
     "ref_words": 14,
     "detected_lang": "fr",
     "sub": 0,
@@ -5501,9 +5501,9 @@
     "peak_dbfs": -1.52,
     "clipping_pct": 0.0,
     "snr_db_est": 94.9,
-    "_hypothesis": "Nous sommes ouverts du lundi au vendredi, de 8 à 18h.",
+    "_hypothesis": "Nous sommes ouverts du lundi au vendredi, de 8 à 18 heures.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:27+00:00",
+    "_run_ts": "2026-07-21T05:04:05+00:00",
     "ttfa_p50_ms": 73.9,
     "ttfa_p90_ms": 73.9,
     "ttfa_iqr_ms": 0.0,
@@ -5545,7 +5545,7 @@
       "min": 0.3554055231764627,
       "max": 0.3554055231764627
     },
-    "_rescored_ts": "2026-07-21T04:17:27+00:00"
+    "_rescored_ts": "2026-07-21T05:04:05+00:00"
   },
   {
     "id": "cs-03-de",
@@ -5579,7 +5579,7 @@
     "snr_db_est": 87.0,
     "_hypothesis": "Wir haben Montag bis Freitag von 8 bis 18 Uhr geöffnet.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:30+00:00",
+    "_run_ts": "2026-07-21T05:04:12+00:00",
     "ttfa_p50_ms": 71.8,
     "ttfa_p90_ms": 71.8,
     "ttfa_iqr_ms": 0.0,
@@ -5621,7 +5621,7 @@
       "min": 0.35880258151535044,
       "max": 0.35880258151535044
     },
-    "_rescored_ts": "2026-07-21T04:17:30+00:00"
+    "_rescored_ts": "2026-07-21T05:04:12+00:00"
   },
   {
     "id": "cs-03-pt",
@@ -5630,14 +5630,14 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 50,
     "audio_s": 4.96,
-    "wer_pct": 23.08,
-    "wer_raw_pct": 40.0,
-    "cer_pct": 14.0,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 13,
     "detected_lang": "pt",
-    "sub": 2,
+    "sub": 0,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.954,
     "truncated": false,
@@ -5653,9 +5653,9 @@
     "peak_dbfs": -2.67,
     "clipping_pct": 0.0,
     "snr_db_est": 51.2,
-    "_hypothesis": "Estamos abertos de segunda à sexta, das 8 às 18 ouro.",
+    "_hypothesis": "Estamos abertos de segunda a sexta, das 8h às 18h.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:32+00:00",
+    "_run_ts": "2026-07-21T05:04:18+00:00",
     "ttfa_p50_ms": 80.6,
     "ttfa_p90_ms": 80.6,
     "ttfa_iqr_ms": 0.0,
@@ -5697,7 +5697,7 @@
       "min": 0.34048951142251793,
       "max": 0.34048951142251793
     },
-    "_rescored_ts": "2026-07-21T04:17:32+00:00"
+    "_rescored_ts": "2026-07-21T05:04:18+00:00"
   },
   {
     "id": "cs-04-en",
@@ -5731,7 +5731,7 @@
     "snr_db_est": 88.1,
     "_hypothesis": "Track your parcel at track.ship.com with code R229.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:34+00:00",
+    "_run_ts": "2026-07-21T05:04:24+00:00",
     "ttfa_p50_ms": 112.1,
     "ttfa_p90_ms": 112.1,
     "ttfa_iqr_ms": 0.0,
@@ -5773,7 +5773,7 @@
       "min": 0.3526058527544808,
       "max": 0.3526058527544808
     },
-    "_rescored_ts": "2026-07-21T04:17:34+00:00"
+    "_rescored_ts": "2026-07-21T05:04:24+00:00"
   },
   {
     "id": "cs-04-es",
@@ -5807,7 +5807,7 @@
     "snr_db_est": 47.6,
     "_hypothesis": "Siga su paquete en track.ship.com con el código R229.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:37+00:00",
+    "_run_ts": "2026-07-21T05:04:31+00:00",
     "ttfa_p50_ms": 78.8,
     "ttfa_p90_ms": 78.8,
     "ttfa_iqr_ms": 0.0,
@@ -5849,7 +5849,7 @@
       "min": 0.3376834654827418,
       "max": 0.3376834654827418
     },
-    "_rescored_ts": "2026-07-21T04:17:37+00:00"
+    "_rescored_ts": "2026-07-21T05:04:31+00:00"
   },
   {
     "id": "cs-04-fr",
@@ -5883,7 +5883,7 @@
     "snr_db_est": 94.4,
     "_hypothesis": "Suivez votre colis sur track.chip.com avec le code R229.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:40+00:00",
+    "_run_ts": "2026-07-21T05:04:38+00:00",
     "ttfa_p50_ms": 82.3,
     "ttfa_p90_ms": 82.3,
     "ttfa_iqr_ms": 0.0,
@@ -5925,7 +5925,7 @@
       "min": 0.343377491250673,
       "max": 0.343377491250673
     },
-    "_rescored_ts": "2026-07-21T04:17:40+00:00"
+    "_rescored_ts": "2026-07-21T05:04:38+00:00"
   },
   {
     "id": "cs-04-de",
@@ -5959,7 +5959,7 @@
     "snr_db_est": 54.8,
     "_hypothesis": "Verfolgen Sie Ihr Paket auf track.chip.com mit dem Code R229.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:42+00:00",
+    "_run_ts": "2026-07-21T05:04:45+00:00",
     "ttfa_p50_ms": 86.1,
     "ttfa_p90_ms": 86.1,
     "ttfa_iqr_ms": 0.0,
@@ -6001,7 +6001,7 @@
       "min": 0.335286655408217,
       "max": 0.335286655408217
     },
-    "_rescored_ts": "2026-07-21T04:17:42+00:00"
+    "_rescored_ts": "2026-07-21T05:04:45+00:00"
   },
   {
     "id": "cs-04-pt",
@@ -6010,12 +6010,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 62,
     "audio_s": 6.96,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_pct": 6.67,
+    "wer_raw_pct": 10.0,
+    "cer_pct": 1.61,
     "ref_words": 15,
     "detected_lang": "pt",
-    "sub": 0,
+    "sub": 1,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -6033,9 +6033,9 @@
     "peak_dbfs": -1.19,
     "clipping_pct": 0.0,
     "snr_db_est": 49.4,
-    "_hypothesis": "Acompanhe a sua encomenda em track.ship.com com o código R229.",
+    "_hypothesis": "Acompanhe a sua encomenda em track.chip.com com o código R229.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:45+00:00",
+    "_run_ts": "2026-07-21T05:04:52+00:00",
     "ttfa_p50_ms": 79.5,
     "ttfa_p90_ms": 79.5,
     "ttfa_iqr_ms": 0.0,
@@ -6077,7 +6077,7 @@
       "min": 0.328125593604941,
       "max": 0.328125593604941
     },
-    "_rescored_ts": "2026-07-21T04:17:45+00:00"
+    "_rescored_ts": "2026-07-21T05:04:52+00:00"
   },
   {
     "id": "cs-05-en",
@@ -6087,8 +6087,8 @@
     "chars": 41,
     "audio_s": 4.16,
     "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_raw_pct": 28.57,
+    "cer_pct": 17.07,
     "ref_words": 11,
     "detected_lang": "en",
     "sub": 0,
@@ -6109,9 +6109,9 @@
     "peak_dbfs": -2.44,
     "clipping_pct": 0.0,
     "snr_db_est": 94.0,
-    "_hypothesis": "We've refunded 129.99 euros to your card.",
+    "_hypothesis": "We've refunded €129.99 to your card.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:47+00:00",
+    "_run_ts": "2026-07-21T05:04:59+00:00",
     "ttfa_p50_ms": 73.0,
     "ttfa_p90_ms": 73.0,
     "ttfa_iqr_ms": 0.0,
@@ -6153,7 +6153,7 @@
       "min": 0.34645974264290713,
       "max": 0.34645974264290713
     },
-    "_rescored_ts": "2026-07-21T04:17:47+00:00"
+    "_rescored_ts": "2026-07-21T05:04:59+00:00"
   },
   {
     "id": "cs-05-es",
@@ -6162,12 +6162,12 @@
     "voice_id": "Gijj_GPBfJVcP-FZ",
     "chars": 44,
     "audio_s": 5.12,
-    "wer_pct": 25.0,
-    "wer_raw_pct": 37.5,
-    "cer_pct": 6.82,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "es",
-    "sub": 3,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -6185,9 +6185,9 @@
     "peak_dbfs": -4.13,
     "clipping_pct": 0.0,
     "snr_db_est": 67.2,
-    "_hypothesis": "Leemos de vuelto 129,99 euros a su tarjeta.",
+    "_hypothesis": "Le hemos devuelto 129,99 euros a su tarjeta.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:49+00:00",
+    "_run_ts": "2026-07-21T05:05:05+00:00",
     "ttfa_p50_ms": 70.5,
     "ttfa_p90_ms": 70.5,
     "ttfa_iqr_ms": 0.0,
@@ -6229,7 +6229,7 @@
       "min": 0.3371230446765501,
       "max": 0.3371230446765501
     },
-    "_rescored_ts": "2026-07-21T04:17:49+00:00"
+    "_rescored_ts": "2026-07-21T05:05:05+00:00"
   },
   {
     "id": "cs-05-fr",
@@ -6238,14 +6238,14 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 50,
     "audio_s": 4.0,
-    "wer_pct": 8.33,
-    "wer_raw_pct": 12.5,
-    "cer_pct": 10.0,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "fr",
     "sub": 0,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.833,
     "truncated": false,
@@ -6261,9 +6261,9 @@
     "peak_dbfs": -0.46,
     "clipping_pct": 0.0,
     "snr_db_est": 90.7,
-    "_hypothesis": "Nous avons remboursé 129,99 € sur votre carte.",
+    "_hypothesis": "Nous avons remboursé 129,99 euros sur votre carte.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:52+00:00",
+    "_run_ts": "2026-07-21T05:05:11+00:00",
     "ttfa_p50_ms": 71.5,
     "ttfa_p90_ms": 71.5,
     "ttfa_iqr_ms": 0.0,
@@ -6305,7 +6305,7 @@
       "min": 0.3458341570446712,
       "max": 0.3458341570446712
     },
-    "_rescored_ts": "2026-07-21T04:17:52+00:00"
+    "_rescored_ts": "2026-07-21T05:05:11+00:00"
   },
   {
     "id": "cs-05-de",
@@ -6337,9 +6337,9 @@
     "peak_dbfs": -2.83,
     "clipping_pct": 0.0,
     "snr_db_est": 62.5,
-    "_hypothesis": "Wir haben 129,99 Euro auf ihre Karte erstattet.",
+    "_hypothesis": "Wir haben 129,99 Euro auf Ihre Karte erstattet.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:54+00:00",
+    "_run_ts": "2026-07-21T05:05:17+00:00",
     "ttfa_p50_ms": 76.3,
     "ttfa_p90_ms": 76.3,
     "ttfa_iqr_ms": 0.0,
@@ -6381,7 +6381,7 @@
       "min": 0.3420197385621269,
       "max": 0.3420197385621269
     },
-    "_rescored_ts": "2026-07-21T04:17:54+00:00"
+    "_rescored_ts": "2026-07-21T05:05:17+00:00"
   },
   {
     "id": "cs-05-pt",
@@ -6415,7 +6415,7 @@
     "snr_db_est": 50.6,
     "_hypothesis": "Reembolsamos 129,99 euros no seu cartão.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:17:57+00:00",
+    "_run_ts": "2026-07-21T05:05:24+00:00",
     "ttfa_p50_ms": 82.2,
     "ttfa_p90_ms": 82.2,
     "ttfa_iqr_ms": 0.0,
@@ -6457,7 +6457,7 @@
       "min": 0.3385252965381369,
       "max": 0.3385252965381369
     },
-    "_rescored_ts": "2026-07-21T04:17:57+00:00"
+    "_rescored_ts": "2026-07-21T05:05:24+00:00"
   },
   {
     "id": "cs-06-en",
@@ -6468,7 +6468,7 @@
     "audio_s": 6.8,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 1.79,
+    "cer_pct": 0.89,
     "ref_words": 23,
     "detected_lang": "en",
     "sub": 0,
@@ -6489,9 +6489,9 @@
     "peak_dbfs": -3.35,
     "clipping_pct": 0.0,
     "snr_db_est": 58.2,
-    "_hypothesis": "I am truly sorry for the delay and I understand how frustrating this has been. Let me fix it for you right now.",
+    "_hypothesis": "I am truly sorry for the delay, and I understand how frustrating this has been, let me fix it for you right now.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:00+00:00",
+    "_run_ts": "2026-07-21T05:05:32+00:00",
     "ttfa_p50_ms": 82.9,
     "ttfa_p90_ms": 82.9,
     "ttfa_iqr_ms": 0.0,
@@ -6533,7 +6533,7 @@
       "min": 0.3285520653725112,
       "max": 0.3285520653725112
     },
-    "_rescored_ts": "2026-07-21T04:18:00+00:00"
+    "_rescored_ts": "2026-07-21T05:05:32+00:00"
   },
   {
     "id": "cs-06-es",
@@ -6567,7 +6567,7 @@
     "snr_db_est": 48.9,
     "_hypothesis": "Lamento mucho la demora y entiendo lo frustrante que ha sido, permítame solucionarlo ahora mismo.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:03+00:00",
+    "_run_ts": "2026-07-21T05:05:40+00:00",
     "ttfa_p50_ms": 82.3,
     "ttfa_p90_ms": 82.3,
     "ttfa_iqr_ms": 0.0,
@@ -6609,7 +6609,7 @@
       "min": 0.32689380266960694,
       "max": 0.32689380266960694
     },
-    "_rescored_ts": "2026-07-21T04:18:03+00:00"
+    "_rescored_ts": "2026-07-21T05:05:40+00:00"
   },
   {
     "id": "cs-06-fr",
@@ -6643,7 +6643,7 @@
     "snr_db_est": 84.4,
     "_hypothesis": "Je suis vraiment désolé pour ce retard et je comprends à quel point c'est frustrant, laissez-moi arranger cela tout de suite.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:05+00:00",
+    "_run_ts": "2026-07-21T05:05:48+00:00",
     "ttfa_p50_ms": 97.0,
     "ttfa_p90_ms": 97.0,
     "ttfa_iqr_ms": 0.0,
@@ -6685,7 +6685,7 @@
       "min": 0.3387670213735386,
       "max": 0.3387670213735386
     },
-    "_rescored_ts": "2026-07-21T04:18:05+00:00"
+    "_rescored_ts": "2026-07-21T05:05:48+00:00"
   },
   {
     "id": "cs-06-de",
@@ -6696,7 +6696,7 @@
     "audio_s": 6.8,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 2.34,
+    "cer_pct": 1.56,
     "ref_words": 23,
     "detected_lang": "de",
     "sub": 0,
@@ -6717,9 +6717,9 @@
     "peak_dbfs": -2.37,
     "clipping_pct": 0.0,
     "snr_db_est": 49.2,
-    "_hypothesis": "Es tut mir sehr leid für die Verzögerung und ich verstehe, wie frustrierend das war.  Lassen Sie mich das sofort für Sie regeln.",
+    "_hypothesis": "Es tut mir sehr leid für die Verzögerung und ich verstehe, wie frustrierend das war, lassen Sie mich das sofort für Sie regeln.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:09+00:00",
+    "_run_ts": "2026-07-21T05:05:56+00:00",
     "ttfa_p50_ms": 76.6,
     "ttfa_p90_ms": 76.6,
     "ttfa_iqr_ms": 0.0,
@@ -6761,7 +6761,7 @@
       "min": 0.32521282556775655,
       "max": 0.32521282556775655
     },
-    "_rescored_ts": "2026-07-21T04:18:09+00:00"
+    "_rescored_ts": "2026-07-21T05:05:56+00:00"
   },
   {
     "id": "cs-06-pt",
@@ -6770,12 +6770,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 98,
     "audio_s": 7.68,
-    "wer_pct": 6.25,
-    "wer_raw_pct": 6.67,
-    "cer_pct": 3.06,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 2.04,
     "ref_words": 16,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -6793,9 +6793,9 @@
     "peak_dbfs": -1.62,
     "clipping_pct": 0.0,
     "snr_db_est": 46.1,
-    "_hypothesis": "Lamento imenso o atraso e cumpriendo como isto foi frustrante, deixe-me resolver isto agora mesmo.",
+    "_hypothesis": "Lamento imenso o atraso e compreendo como isto foi frustrante.  Deixe-me resolver isto agora mesmo.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:12+00:00",
+    "_run_ts": "2026-07-21T05:06:05+00:00",
     "ttfa_p50_ms": 74.7,
     "ttfa_p90_ms": 74.7,
     "ttfa_iqr_ms": 0.0,
@@ -6837,7 +6837,7 @@
       "min": 0.3247214988894282,
       "max": 0.3247214988894282
     },
-    "_rescored_ts": "2026-07-21T04:18:12+00:00"
+    "_rescored_ts": "2026-07-21T05:06:05+00:00"
   },
   {
     "id": "cs-07-en",
@@ -6871,7 +6871,7 @@
     "snr_db_est": 93.3,
     "_hypothesis": "As an apology, here's 20% off your next order.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:15+00:00",
+    "_run_ts": "2026-07-21T05:06:12+00:00",
     "ttfa_p50_ms": 76.4,
     "ttfa_p90_ms": 76.4,
     "ttfa_iqr_ms": 0.0,
@@ -6913,7 +6913,7 @@
       "min": 0.35587048619921313,
       "max": 0.35587048619921313
     },
-    "_rescored_ts": "2026-07-21T04:18:15+00:00"
+    "_rescored_ts": "2026-07-21T05:06:12+00:00"
   },
   {
     "id": "cs-07-es",
@@ -6924,7 +6924,7 @@
     "audio_s": 5.6,
     "wer_pct": 13.33,
     "wer_raw_pct": 14.29,
-    "cer_pct": 13.92,
+    "cer_pct": 15.19,
     "ref_words": 15,
     "detected_lang": "es",
     "sub": 0,
@@ -6945,9 +6945,9 @@
     "peak_dbfs": -3.34,
     "clipping_pct": 0.0,
     "snr_db_est": 47.4,
-    "_hypothesis": "Como disculpa, le ofrecemos un 20% de descuento en su próximo pedido.",
+    "_hypothesis": "Como disculpa le ofrecemos un 20% de descuento en su próximo pedido.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:17+00:00",
+    "_run_ts": "2026-07-21T05:06:19+00:00",
     "ttfa_p50_ms": 71.7,
     "ttfa_p90_ms": 71.7,
     "ttfa_iqr_ms": 0.0,
@@ -6989,7 +6989,7 @@
       "min": 0.33297736545137013,
       "max": 0.33297736545137013
     },
-    "_rescored_ts": "2026-07-21T04:18:17+00:00"
+    "_rescored_ts": "2026-07-21T05:06:19+00:00"
   },
   {
     "id": "cs-07-fr",
@@ -7023,7 +7023,7 @@
     "snr_db_est": 96.2,
     "_hypothesis": "Pour nous excuser, voici 20% de réduction sur votre prochaine commande.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:19+00:00",
+    "_run_ts": "2026-07-21T05:06:25+00:00",
     "ttfa_p50_ms": 75.4,
     "ttfa_p90_ms": 75.4,
     "ttfa_iqr_ms": 0.0,
@@ -7065,7 +7065,7 @@
       "min": 0.34218355041957693,
       "max": 0.34218355041957693
     },
-    "_rescored_ts": "2026-07-21T04:18:19+00:00"
+    "_rescored_ts": "2026-07-21T05:06:25+00:00"
   },
   {
     "id": "cs-07-de",
@@ -7099,7 +7099,7 @@
     "snr_db_est": 55.9,
     "_hypothesis": "Als Entschuldigung erhalten Sie 20% Rabatt auf Ihre nächste Bestellung.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:21+00:00",
+    "_run_ts": "2026-07-21T05:06:31+00:00",
     "ttfa_p50_ms": 79.6,
     "ttfa_p90_ms": 79.6,
     "ttfa_iqr_ms": 0.0,
@@ -7141,7 +7141,7 @@
       "min": 0.3911301657771234,
       "max": 0.3911301657771234
     },
-    "_rescored_ts": "2026-07-21T04:18:21+00:00"
+    "_rescored_ts": "2026-07-21T05:06:31+00:00"
   },
   {
     "id": "cs-07-pt",
@@ -7175,7 +7175,7 @@
     "snr_db_est": 48.7,
     "_hypothesis": "Como pedido de desculpas, oferecemos 20% de desconto na próxima encomenda.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:23+00:00",
+    "_run_ts": "2026-07-21T05:06:38+00:00",
     "ttfa_p50_ms": 76.6,
     "ttfa_p90_ms": 76.6,
     "ttfa_iqr_ms": 0.0,
@@ -7217,7 +7217,7 @@
       "min": 0.3315730432119121,
       "max": 0.3315730432119121
     },
-    "_rescored_ts": "2026-07-21T04:18:23+00:00"
+    "_rescored_ts": "2026-07-21T05:06:38+00:00"
   },
   {
     "id": "game-01-en",
@@ -7249,9 +7249,9 @@
     "peak_dbfs": -4.18,
     "clipping_pct": 0.0,
     "snr_db_est": 90.7,
-    "_hypothesis": "travel to Eldergrove and find the blacksmith, Thorn.",
+    "_hypothesis": "Travel to Eldergrove and find the blacksmith, Thorn.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:26+00:00",
+    "_run_ts": "2026-07-21T05:06:44+00:00",
     "ttfa_p50_ms": 75.4,
     "ttfa_p90_ms": 75.4,
     "ttfa_iqr_ms": 0.0,
@@ -7293,7 +7293,7 @@
       "min": 0.3599096692952393,
       "max": 0.3599096692952393
     },
-    "_rescored_ts": "2026-07-21T04:18:26+00:00"
+    "_rescored_ts": "2026-07-21T05:06:44+00:00"
   },
   {
     "id": "game-01-es",
@@ -7304,7 +7304,7 @@
     "audio_s": 3.84,
     "wer_pct": 37.5,
     "wer_raw_pct": 37.5,
-    "cer_pct": 4.35,
+    "cer_pct": 6.52,
     "ref_words": 8,
     "detected_lang": "es",
     "sub": 2,
@@ -7325,9 +7325,9 @@
     "peak_dbfs": -3.54,
     "clipping_pct": 0.0,
     "snr_db_est": 91.3,
-    "_hypothesis": "viaja a Elder Grove y busca al herrero, Thorn.",
+    "_hypothesis": "Viaja a Elder Grove y busca al herrero Thorn.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:28+00:00",
+    "_run_ts": "2026-07-21T05:06:51+00:00",
     "ttfa_p50_ms": 85.1,
     "ttfa_p90_ms": 85.1,
     "ttfa_iqr_ms": 0.0,
@@ -7369,7 +7369,7 @@
       "min": 0.3592926255640288,
       "max": 0.3592926255640288
     },
-    "_rescored_ts": "2026-07-21T04:18:28+00:00"
+    "_rescored_ts": "2026-07-21T05:06:51+00:00"
   },
   {
     "id": "game-01-fr",
@@ -7403,7 +7403,7 @@
     "snr_db_est": 95.7,
     "_hypothesis": "Voyage jusqu'à Elder Grove et trouve le forgeron, Thorn.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:31+00:00",
+    "_run_ts": "2026-07-21T05:06:58+00:00",
     "ttfa_p50_ms": 78.0,
     "ttfa_p90_ms": 78.0,
     "ttfa_iqr_ms": 0.0,
@@ -7445,7 +7445,7 @@
       "min": 0.3628514171544148,
       "max": 0.3628514171544148
     },
-    "_rescored_ts": "2026-07-21T04:18:31+00:00"
+    "_rescored_ts": "2026-07-21T05:06:58+00:00"
   },
   {
     "id": "game-01-de",
@@ -7454,13 +7454,13 @@
     "voice_id": "zyla-_bhVQtNTBdT",
     "chars": 51,
     "audio_s": 3.84,
-    "wer_pct": 12.5,
-    "wer_raw_pct": 12.5,
-    "cer_pct": 1.96,
+    "wer_pct": 37.5,
+    "wer_raw_pct": 37.5,
+    "cer_pct": 3.92,
     "ref_words": 8,
     "detected_lang": "de",
-    "sub": 1,
-    "ins": 0,
+    "sub": 2,
+    "ins": 1,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 1.2,
@@ -7477,9 +7477,9 @@
     "peak_dbfs": -2.63,
     "clipping_pct": 0.0,
     "snr_db_est": 86.8,
-    "_hypothesis": "Reise nach Eldergrove und finde den Schmied Torne.",
+    "_hypothesis": "Reise nach Elder Grove und finde den Schmied Torne.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:34+00:00",
+    "_run_ts": "2026-07-21T05:07:05+00:00",
     "ttfa_p50_ms": 72.2,
     "ttfa_p90_ms": 72.2,
     "ttfa_iqr_ms": 0.0,
@@ -7521,7 +7521,7 @@
       "min": 0.36083263444974056,
       "max": 0.36083263444974056
     },
-    "_rescored_ts": "2026-07-21T04:18:34+00:00"
+    "_rescored_ts": "2026-07-21T05:07:05+00:00"
   },
   {
     "id": "game-01-pt",
@@ -7532,7 +7532,7 @@
     "audio_s": 3.92,
     "wer_pct": 37.5,
     "wer_raw_pct": 37.5,
-    "cer_pct": 7.84,
+    "cer_pct": 3.92,
     "ref_words": 8,
     "detected_lang": "pt",
     "sub": 2,
@@ -7553,9 +7553,9 @@
     "peak_dbfs": -1.43,
     "clipping_pct": 0.0,
     "snr_db_est": 87.7,
-    "_hypothesis": "Viaja até Elder Grove e encontra o Ferreiro.  Torne.",
+    "_hypothesis": "Viaja até Elder Grove e encontra o ferreiro, Thorn.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:36+00:00",
+    "_run_ts": "2026-07-21T05:07:11+00:00",
     "ttfa_p50_ms": 92.8,
     "ttfa_p90_ms": 92.8,
     "ttfa_iqr_ms": 0.0,
@@ -7597,7 +7597,7 @@
       "min": 0.3450326650029941,
       "max": 0.3450326650029941
     },
-    "_rescored_ts": "2026-07-21T04:18:36+00:00"
+    "_rescored_ts": "2026-07-21T05:07:11+00:00"
   },
   {
     "id": "game-02-en",
@@ -7607,8 +7607,8 @@
     "chars": 51,
     "audio_s": 4.08,
     "wer_pct": 7.69,
-    "wer_raw_pct": 9.09,
-    "cer_pct": 5.88,
+    "wer_raw_pct": 18.18,
+    "cer_pct": 19.61,
     "ref_words": 13,
     "detected_lang": "en",
     "sub": 1,
@@ -7629,9 +7629,9 @@
     "peak_dbfs": -4.25,
     "clipping_pct": 0.0,
     "snr_db_est": 91.3,
-    "_hypothesis": "you earn 250 xp and your health is at 80 percent",
+    "_hypothesis": "You earn 250 XP and your health is at 80%.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:39+00:00",
+    "_run_ts": "2026-07-21T05:07:18+00:00",
     "ttfa_p50_ms": 77.3,
     "ttfa_p90_ms": 77.3,
     "ttfa_iqr_ms": 0.0,
@@ -7673,7 +7673,7 @@
       "min": 0.3486052584146539,
       "max": 0.3486052584146539
     },
-    "_rescored_ts": "2026-07-21T04:18:39+00:00"
+    "_rescored_ts": "2026-07-21T05:07:18+00:00"
   },
   {
     "id": "game-02-es",
@@ -7705,9 +7705,9 @@
     "peak_dbfs": -4.35,
     "clipping_pct": 0.0,
     "snr_db_est": 45.5,
-    "_hypothesis": "has ganado 250 xp y tu salud está al 80%.",
+    "_hypothesis": "Has ganado 250 XP y tu salud está al 80%.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:42+00:00",
+    "_run_ts": "2026-07-21T05:07:24+00:00",
     "ttfa_p50_ms": 76.0,
     "ttfa_p90_ms": 76.0,
     "ttfa_iqr_ms": 0.0,
@@ -7749,7 +7749,7 @@
       "min": 0.3399365823411028,
       "max": 0.3399365823411028
     },
-    "_rescored_ts": "2026-07-21T04:18:42+00:00"
+    "_rescored_ts": "2026-07-21T05:07:24+00:00"
   },
   {
     "id": "game-02-fr",
@@ -7783,7 +7783,7 @@
     "snr_db_est": 94.3,
     "_hypothesis": "Tu as gagné 250 XP et ta santé est à 80%.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:44+00:00",
+    "_run_ts": "2026-07-21T05:07:31+00:00",
     "ttfa_p50_ms": 76.0,
     "ttfa_p90_ms": 76.0,
     "ttfa_iqr_ms": 0.0,
@@ -7825,7 +7825,7 @@
       "min": 0.3541916776081659,
       "max": 0.3541916776081659
     },
-    "_rescored_ts": "2026-07-21T04:18:44+00:00"
+    "_rescored_ts": "2026-07-21T05:07:31+00:00"
   },
   {
     "id": "game-02-de",
@@ -7859,7 +7859,7 @@
     "snr_db_est": 53.4,
     "_hypothesis": "Du hast 250 XP erhalten und deine Gesundheit liegt bei 80%.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:46+00:00",
+    "_run_ts": "2026-07-21T05:07:37+00:00",
     "ttfa_p50_ms": 73.2,
     "ttfa_p90_ms": 73.2,
     "ttfa_iqr_ms": 0.0,
@@ -7901,7 +7901,7 @@
       "min": 0.331691099820412,
       "max": 0.331691099820412
     },
-    "_rescored_ts": "2026-07-21T04:18:46+00:00"
+    "_rescored_ts": "2026-07-21T05:07:37+00:00"
   },
   {
     "id": "game-02-pt",
@@ -7935,7 +7935,7 @@
     "snr_db_est": 49.8,
     "_hypothesis": "Ganhaste 250 XP e a tua vida está a 80%.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:18:48+00:00",
+    "_run_ts": "2026-07-21T05:07:42+00:00",
     "ttfa_p50_ms": 75.2,
     "ttfa_p90_ms": 75.2,
     "ttfa_iqr_ms": 0.0,
@@ -7977,7 +7977,7 @@
       "min": 0.3404881696446359,
       "max": 0.3404881696446359
     },
-    "_rescored_ts": "2026-07-21T04:18:48+00:00"
+    "_rescored_ts": "2026-07-21T05:07:42+00:00"
   },
   {
     "id": "game-03-en",
@@ -8011,7 +8011,7 @@
     "snr_db_est": 85.0,
     "_hypothesis": "Enter the code G7X49 to unlock the skin.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:18:49+00:00",
+    "_run_ts": "2026-07-21T05:07:48+00:00",
     "ttfa_p50_ms": 81.5,
     "ttfa_p90_ms": 81.5,
     "ttfa_iqr_ms": 0.0,
@@ -8053,7 +8053,7 @@
       "min": 0.3504254028296102,
       "max": 0.3504254028296102
     },
-    "_rescored_ts": "2026-07-21T04:18:49+00:00"
+    "_rescored_ts": "2026-07-21T05:07:48+00:00"
   },
   {
     "id": "game-03-es",
@@ -8087,7 +8087,7 @@
     "snr_db_est": 67.2,
     "_hypothesis": "Introduce el código G7X49 para desbloquear el aspecto.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:18:51+00:00",
+    "_run_ts": "2026-07-21T05:07:54+00:00",
     "ttfa_p50_ms": 84.3,
     "ttfa_p90_ms": 84.3,
     "ttfa_iqr_ms": 0.0,
@@ -8129,7 +8129,7 @@
       "min": 0.33451207633091445,
       "max": 0.33451207633091445
     },
-    "_rescored_ts": "2026-07-21T04:18:51+00:00"
+    "_rescored_ts": "2026-07-21T05:07:54+00:00"
   },
   {
     "id": "game-03-fr",
@@ -8161,9 +8161,9 @@
     "peak_dbfs": -1.77,
     "clipping_pct": 0.0,
     "snr_db_est": 89.7,
-    "_hypothesis": "entre le code G7X49 pour débloquer le skin.",
+    "_hypothesis": "Entre le code G7X49 pour débloquer le skin.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:18:54+00:00",
+    "_run_ts": "2026-07-21T05:08:01+00:00",
     "ttfa_p50_ms": 81.2,
     "ttfa_p90_ms": 81.2,
     "ttfa_iqr_ms": 0.0,
@@ -8205,7 +8205,7 @@
       "min": 0.35289510808926183,
       "max": 0.35289510808926183
     },
-    "_rescored_ts": "2026-07-21T04:18:54+00:00"
+    "_rescored_ts": "2026-07-21T05:08:01+00:00"
   },
   {
     "id": "game-03-de",
@@ -8214,12 +8214,12 @@
     "voice_id": "zyla-_bhVQtNTBdT",
     "chars": 51,
     "audio_s": 4.96,
-    "wer_pct": 7.69,
-    "wer_raw_pct": 11.11,
-    "cer_pct": 1.96,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 13,
     "detected_lang": "de",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -8237,9 +8237,9 @@
     "peak_dbfs": -3.38,
     "clipping_pct": 0.0,
     "snr_db_est": 54.3,
-    "_hypothesis": "gibt den Code G7X49 ein, um den Skin freizuschalten.",
+    "_hypothesis": "Gib den Code G7X49 ein, um den Skin freizuschalten.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:18:56+00:00",
+    "_run_ts": "2026-07-21T05:08:07+00:00",
     "ttfa_p50_ms": 75.0,
     "ttfa_p90_ms": 75.0,
     "ttfa_iqr_ms": 0.0,
@@ -8281,7 +8281,7 @@
       "min": 0.3309979032051976,
       "max": 0.3309979032051976
     },
-    "_rescored_ts": "2026-07-21T04:18:56+00:00"
+    "_rescored_ts": "2026-07-21T05:08:07+00:00"
   },
   {
     "id": "game-03-pt",
@@ -8290,12 +8290,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 50,
     "audio_s": 5.76,
-    "wer_pct": 8.33,
-    "wer_raw_pct": 12.5,
-    "cer_pct": 2.0,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.0,
     "ref_words": 12,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -8313,9 +8313,9 @@
     "peak_dbfs": -1.31,
     "clipping_pct": 0.0,
     "snr_db_est": 48.7,
-    "_hypothesis": "Introduzo o código G7X49 para desbloquear o visual.",
+    "_hypothesis": "Introduz o código G7X49 para desbloquear o visual.",
     "_run_id": "68ea3bd4",
-    "_run_ts": "2026-07-21T04:18:58+00:00",
+    "_run_ts": "2026-07-21T05:08:13+00:00",
     "ttfa_p50_ms": 82.3,
     "ttfa_p90_ms": 82.3,
     "ttfa_iqr_ms": 0.0,
@@ -8357,7 +8357,7 @@
       "min": 0.33875669057754115,
       "max": 0.33875669057754115
     },
-    "_rescored_ts": "2026-07-21T04:18:58+00:00"
+    "_rescored_ts": "2026-07-21T05:08:13+00:00"
   },
   {
     "id": "game-04-en",
@@ -8389,9 +8389,9 @@
     "peak_dbfs": -3.35,
     "clipping_pct": 0.0,
     "snr_db_est": 92.0,
-    "_hypothesis": "you shall not pass without the ancient key.",
+    "_hypothesis": "You shall not pass without the ancient key.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:00+00:00",
+    "_run_ts": "2026-07-21T05:08:19+00:00",
     "ttfa_p50_ms": 81.1,
     "ttfa_p90_ms": 81.1,
     "ttfa_iqr_ms": 0.0,
@@ -8433,7 +8433,7 @@
       "min": 0.38176868860960783,
       "max": 0.38176868860960783
     },
-    "_rescored_ts": "2026-07-21T04:19:00+00:00"
+    "_rescored_ts": "2026-07-21T05:08:19+00:00"
   },
   {
     "id": "game-04-es",
@@ -8465,9 +8465,9 @@
     "peak_dbfs": -4.31,
     "clipping_pct": 0.0,
     "snr_db_est": 72.1,
-    "_hypothesis": "no pasarás sin la llave antigua.",
+    "_hypothesis": "No pasarás sin la llave antigua.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:02+00:00",
+    "_run_ts": "2026-07-21T05:08:24+00:00",
     "ttfa_p50_ms": 392.8,
     "ttfa_p90_ms": 392.8,
     "ttfa_iqr_ms": 0.0,
@@ -8509,7 +8509,7 @@
       "min": 0.4715725294842671,
       "max": 0.4715725294842671
     },
-    "_rescored_ts": "2026-07-21T04:19:02+00:00"
+    "_rescored_ts": "2026-07-21T05:08:24+00:00"
   },
   {
     "id": "game-04-fr",
@@ -8518,13 +8518,13 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 40,
     "audio_s": 2.72,
-    "wer_pct": 0.0,
+    "wer_pct": 37.5,
     "wer_raw_pct": 0.0,
-    "cer_pct": 5.0,
+    "cer_pct": 12.5,
     "ref_words": 8,
     "detected_lang": "fr",
-    "sub": 0,
-    "ins": 0,
+    "sub": 1,
+    "ins": 2,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.85,
@@ -8541,9 +8541,9 @@
     "peak_dbfs": -0.79,
     "clipping_pct": 0.0,
     "snr_db_est": 96.1,
-    "_hypothesis": "Tu ne passeras PAS sans la clé antique.",
+    "_hypothesis": "Tu ne passeras P.A.S. sans la clé antique.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:04+00:00",
+    "_run_ts": "2026-07-21T05:08:30+00:00",
     "ttfa_p50_ms": 73.8,
     "ttfa_p90_ms": 73.8,
     "ttfa_iqr_ms": 0.0,
@@ -8585,7 +8585,7 @@
       "min": 0.38906880208135897,
       "max": 0.38906880208135897
     },
-    "_rescored_ts": "2026-07-21T04:19:04+00:00"
+    "_rescored_ts": "2026-07-21T05:08:30+00:00"
   },
   {
     "id": "game-04-de",
@@ -8619,7 +8619,7 @@
     "snr_db_est": 89.3,
     "_hypothesis": "Ohne den alten Schlüssel kommst du hier nitscht vorbei.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:06+00:00",
+    "_run_ts": "2026-07-21T05:08:36+00:00",
     "ttfa_p50_ms": 74.1,
     "ttfa_p90_ms": 74.1,
     "ttfa_iqr_ms": 0.0,
@@ -8661,7 +8661,7 @@
       "min": 0.369877460943826,
       "max": 0.369877460943826
     },
-    "_rescored_ts": "2026-07-21T04:19:06+00:00"
+    "_rescored_ts": "2026-07-21T05:08:36+00:00"
   },
   {
     "id": "game-04-pt",
@@ -8695,7 +8695,7 @@
     "snr_db_est": 71.7,
     "_hypothesis": "tu não o passarás sem a chave antiga.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:07+00:00",
+    "_run_ts": "2026-07-21T05:08:42+00:00",
     "ttfa_p50_ms": 80.2,
     "ttfa_p90_ms": 80.2,
     "ttfa_iqr_ms": 0.0,
@@ -8737,7 +8737,7 @@
       "min": 0.380941800717015,
       "max": 0.380941800717015
     },
-    "_rescored_ts": "2026-07-21T04:19:07+00:00"
+    "_rescored_ts": "2026-07-21T05:08:42+00:00"
   },
   {
     "id": "game-05-en",
@@ -8771,7 +8771,7 @@
     "snr_db_est": 91.8,
     "_hypothesis": "Update your graphics driver and restart to fix the lag.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:10+00:00",
+    "_run_ts": "2026-07-21T05:08:48+00:00",
     "ttfa_p50_ms": 82.5,
     "ttfa_p90_ms": 82.5,
     "ttfa_iqr_ms": 0.0,
@@ -8813,7 +8813,7 @@
       "min": 0.35534376114336064,
       "max": 0.35534376114336064
     },
-    "_rescored_ts": "2026-07-21T04:19:10+00:00"
+    "_rescored_ts": "2026-07-21T05:08:48+00:00"
   },
   {
     "id": "game-05-es",
@@ -8845,9 +8845,9 @@
     "peak_dbfs": -3.15,
     "clipping_pct": 0.0,
     "snr_db_est": 56.7,
-    "_hypothesis": "actualiza el driver de gráficos y reinicia para arreglar el lag.",
+    "_hypothesis": "Actualiza el driver de gráficos y reinicia para arreglar el lag.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:12+00:00",
+    "_run_ts": "2026-07-21T05:08:55+00:00",
     "ttfa_p50_ms": 72.5,
     "ttfa_p90_ms": 72.5,
     "ttfa_iqr_ms": 0.0,
@@ -8889,7 +8889,7 @@
       "min": 0.34580854363938623,
       "max": 0.34580854363938623
     },
-    "_rescored_ts": "2026-07-21T04:19:12+00:00"
+    "_rescored_ts": "2026-07-21T05:08:55+00:00"
   },
   {
     "id": "game-05-fr",
@@ -8923,7 +8923,7 @@
     "snr_db_est": 91.5,
     "_hypothesis": "Mets à jour ton driver graphique et redémarre pour corriger le lag.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:15+00:00",
+    "_run_ts": "2026-07-21T05:09:02+00:00",
     "ttfa_p50_ms": 74.8,
     "ttfa_p90_ms": 74.8,
     "ttfa_iqr_ms": 0.0,
@@ -8965,7 +8965,7 @@
       "min": 0.3527421309785416,
       "max": 0.3527421309785416
     },
-    "_rescored_ts": "2026-07-21T04:19:15+00:00"
+    "_rescored_ts": "2026-07-21T05:09:02+00:00"
   },
   {
     "id": "game-05-de",
@@ -8974,12 +8974,12 @@
     "voice_id": "zyla-_bhVQtNTBdT",
     "chars": 72,
     "audio_s": 5.2,
-    "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 0.0,
+    "wer_pct": 9.09,
+    "wer_raw_pct": 9.09,
+    "cer_pct": 2.78,
     "ref_words": 11,
     "detected_lang": "de",
-    "sub": 0,
+    "sub": 1,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -8997,9 +8997,9 @@
     "peak_dbfs": -1.9,
     "clipping_pct": 0.0,
     "snr_db_est": 56.1,
-    "_hypothesis": "Aktualisiere deinen Grafiktreiber und starte neu, um den Lag zu beheben.",
+    "_hypothesis": "Aktualisiere deinen Grafiktreiber und starte neu, um den Lark zu beheben.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:17+00:00",
+    "_run_ts": "2026-07-21T05:09:08+00:00",
     "ttfa_p50_ms": 80.5,
     "ttfa_p90_ms": 80.5,
     "ttfa_iqr_ms": 0.0,
@@ -9041,7 +9041,7 @@
       "min": 0.3409381355965506,
       "max": 0.3409381355965506
     },
-    "_rescored_ts": "2026-07-21T04:19:17+00:00"
+    "_rescored_ts": "2026-07-21T05:09:08+00:00"
   },
   {
     "id": "game-05-pt",
@@ -9075,7 +9075,7 @@
     "snr_db_est": 58.0,
     "_hypothesis": "Atualiza o driver gráfico e reinicia para corrigir o lag.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:19+00:00",
+    "_run_ts": "2026-07-21T05:09:14+00:00",
     "ttfa_p50_ms": 85.0,
     "ttfa_p90_ms": 85.0,
     "ttfa_iqr_ms": 0.0,
@@ -9117,7 +9117,7 @@
       "min": 0.3534403125013341,
       "max": 0.3534403125013341
     },
-    "_rescored_ts": "2026-07-21T04:19:19+00:00"
+    "_rescored_ts": "2026-07-21T05:09:14+00:00"
   },
   {
     "id": "game-06-en",
@@ -9151,7 +9151,7 @@
     "snr_db_est": 96.1,
     "_hypothesis": "Lead the party through the cave to the throne.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:20+00:00",
+    "_run_ts": "2026-07-21T05:09:19+00:00",
     "ttfa_p50_ms": 73.0,
     "ttfa_p90_ms": 73.0,
     "ttfa_iqr_ms": 0.0,
@@ -9193,7 +9193,7 @@
       "min": 0.37673240729216356,
       "max": 0.37673240729216356
     },
-    "_rescored_ts": "2026-07-21T04:19:20+00:00"
+    "_rescored_ts": "2026-07-21T05:09:19+00:00"
   },
   {
     "id": "game-06-es",
@@ -9204,7 +9204,7 @@
     "audio_s": 3.52,
     "wer_pct": 11.11,
     "wer_raw_pct": 11.11,
-    "cer_pct": 4.17,
+    "cer_pct": 6.25,
     "ref_words": 9,
     "detected_lang": "es",
     "sub": 1,
@@ -9225,9 +9225,9 @@
     "peak_dbfs": -2.83,
     "clipping_pct": 0.0,
     "snr_db_est": 44.1,
-    "_hypothesis": "Invoca a Solotl para cruzar el abismo en llamas.",
+    "_hypothesis": "Invoca a Solothl para cruzar el abismo en llamas.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:23+00:00",
+    "_run_ts": "2026-07-21T05:09:26+00:00",
     "ttfa_p50_ms": 87.1,
     "ttfa_p90_ms": 87.1,
     "ttfa_iqr_ms": 0.0,
@@ -9269,7 +9269,7 @@
       "min": 0.3665364698384149,
       "max": 0.3665364698384149
     },
-    "_rescored_ts": "2026-07-21T04:19:23+00:00"
+    "_rescored_ts": "2026-07-21T05:09:26+00:00"
   },
   {
     "id": "game-06-fr",
@@ -9303,7 +9303,7 @@
     "snr_db_est": 96.4,
     "_hypothesis": "Les fils du roi comptant leur victoire au village.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:24+00:00",
+    "_run_ts": "2026-07-21T05:09:32+00:00",
     "ttfa_p50_ms": 81.0,
     "ttfa_p90_ms": 81.0,
     "ttfa_iqr_ms": 0.0,
@@ -9345,7 +9345,7 @@
       "min": 0.37991907750048476,
       "max": 0.37991907750048476
     },
-    "_rescored_ts": "2026-07-21T04:19:24+00:00"
+    "_rescored_ts": "2026-07-21T05:09:32+00:00"
   },
   {
     "id": "game-06-de",
@@ -9379,7 +9379,7 @@
     "snr_db_est": 66.2,
     "_hypothesis": "Der Krieger muss das brennende Hindernis umfahren.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:26+00:00",
+    "_run_ts": "2026-07-21T05:09:38+00:00",
     "ttfa_p50_ms": 81.1,
     "ttfa_p90_ms": 81.1,
     "ttfa_iqr_ms": 0.0,
@@ -9421,7 +9421,7 @@
       "min": 0.3683248219536703,
       "max": 0.3683248219536703
     },
-    "_rescored_ts": "2026-07-21T04:19:26+00:00"
+    "_rescored_ts": "2026-07-21T05:09:38+00:00"
   },
   {
     "id": "game-06-pt",
@@ -9455,7 +9455,7 @@
     "snr_db_est": 64.6,
     "_hypothesis": "O guerreiro tem sede de vitória nesta batalha.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:29+00:00",
+    "_run_ts": "2026-07-21T05:09:44+00:00",
     "ttfa_p50_ms": 82.1,
     "ttfa_p90_ms": 82.1,
     "ttfa_iqr_ms": 0.0,
@@ -9497,7 +9497,7 @@
       "min": 0.36289584564064026,
       "max": 0.36289584564064026
     },
-    "_rescored_ts": "2026-07-21T04:19:29+00:00"
+    "_rescored_ts": "2026-07-21T05:09:44+00:00"
   },
   {
     "id": "health-07-en",
@@ -9508,7 +9508,7 @@
     "audio_s": 12.64,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 1.01,
+    "cer_pct": 0.0,
     "ref_words": 39,
     "detected_lang": "en",
     "sub": 0,
@@ -9529,9 +9529,9 @@
     "peak_dbfs": -3.32,
     "clipping_pct": 0.0,
     "snr_db_est": 47.1,
-    "_hypothesis": "Before you leave, take one tablet each morning with food and two at night,  avoid driving for 48 hours, and if the swelling gets worse or your fever rises above 38 degrees,  call the clinic right away.",
+    "_hypothesis": "Before you leave, take one tablet each morning with food and two at night, avoid driving for 48 hours, and if the swelling gets worse or your fever rises above 38 degrees, call the clinic right away.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:32+00:00",
+    "_run_ts": "2026-07-21T05:09:53+00:00",
     "ttfa_p50_ms": 95.1,
     "ttfa_p90_ms": 95.1,
     "ttfa_iqr_ms": 0.0,
@@ -9573,7 +9573,7 @@
       "min": 0.31367588990118545,
       "max": 0.31367588990118545
     },
-    "_rescored_ts": "2026-07-21T04:19:32+00:00"
+    "_rescored_ts": "2026-07-21T05:09:53+00:00"
   },
   {
     "id": "health-07-es",
@@ -9607,7 +9607,7 @@
     "snr_db_est": 43.7,
     "_hypothesis": "Antes de irse, tome una pastilla cada mañana con la comida y dos por la noche, evite conducir  durante 48 horas y si la hinchazón empeora o la fiebre supera los 38 grados, llame de  inmediato a la clínica.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:37+00:00",
+    "_run_ts": "2026-07-21T05:10:05+00:00",
     "ttfa_p50_ms": 130.6,
     "ttfa_p90_ms": 130.6,
     "ttfa_iqr_ms": 0.0,
@@ -9649,7 +9649,7 @@
       "min": 0.3093914092290973,
       "max": 0.3093914092290973
     },
-    "_rescored_ts": "2026-07-21T04:19:37+00:00"
+    "_rescored_ts": "2026-07-21T05:10:05+00:00"
   },
   {
     "id": "health-07-fr",
@@ -9658,12 +9658,12 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 209,
     "audio_s": 11.76,
-    "wer_pct": 4.88,
-    "wer_raw_pct": 5.41,
-    "cer_pct": 2.87,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 0.48,
     "ref_words": 41,
     "detected_lang": "fr",
-    "sub": 2,
+    "sub": 0,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -9681,9 +9681,9 @@
     "peak_dbfs": -2.36,
     "clipping_pct": 0.0,
     "snr_db_est": 84.1,
-    "_hypothesis": "Avant de partir, prenez un comprimé chaque matin au repas et de le soir,  évitez de conduire pendant 48 heures et si l'enfure s'aggrave ou que la fièvre dépasse 38 degrés,  appelez tout de suite la clinique.",
+    "_hypothesis": "Avant de partir, prenez un comprimé chaque matin au repas et deux le soir, évitez de conduire pendant 48 heures et si l'enflure s'aggrave ou que la fièvre dépasse 38 degrés, appelez tout de suite la clinique.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:41+00:00",
+    "_run_ts": "2026-07-21T05:10:16+00:00",
     "ttfa_p50_ms": 79.0,
     "ttfa_p90_ms": 79.0,
     "ttfa_iqr_ms": 0.0,
@@ -9725,7 +9725,7 @@
       "min": 0.31231426809379054,
       "max": 0.31231426809379054
     },
-    "_rescored_ts": "2026-07-21T04:19:41+00:00"
+    "_rescored_ts": "2026-07-21T05:10:16+00:00"
   },
   {
     "id": "health-07-de",
@@ -9736,7 +9736,7 @@
     "audio_s": 13.52,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 1.28,
+    "cer_pct": 0.43,
     "ref_words": 42,
     "detected_lang": "de",
     "sub": 0,
@@ -9757,9 +9757,9 @@
     "peak_dbfs": -2.39,
     "clipping_pct": 0.0,
     "snr_db_est": 48.5,
-    "_hypothesis": "Bevor Sie gehen, nehmen Sie jeden Morgen eine Tablette zum Essen und zwei am Abend,  verzichten Sie 48 Stunden aufs Autofahren und wenn die Schwellung schlimmer wird oder das Fieber über 38 Grad steigt,  rufen Sie sofort die Klinik an.",
+    "_hypothesis": "Bevor Sie gehen, nehmen Sie jeden Morgen eine Tablette zum Essen und zwei am Abend, verzichten Sie 48 Stunden aufs Autofahren und wenn die Schwellung schlimmer wird oder das Fieber über 38 Grad steigt, rufen Sie sofort die Klinik an.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:45+00:00",
+    "_run_ts": "2026-07-21T05:10:27+00:00",
     "ttfa_p50_ms": 80.8,
     "ttfa_p90_ms": 80.8,
     "ttfa_iqr_ms": 0.0,
@@ -9801,7 +9801,7 @@
       "min": 0.31120011432970546,
       "max": 0.31120011432970546
     },
-    "_rescored_ts": "2026-07-21T04:19:45+00:00"
+    "_rescored_ts": "2026-07-21T05:10:27+00:00"
   },
   {
     "id": "health-07-pt",
@@ -9810,13 +9810,13 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 188,
     "audio_s": 14.0,
-    "wer_pct": 7.5,
-    "wer_raw_pct": 7.89,
-    "cer_pct": 3.72,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 1.6,
     "ref_words": 40,
     "detected_lang": "pt",
-    "sub": 2,
-    "ins": 1,
+    "sub": 0,
+    "ins": 0,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.875,
@@ -9833,9 +9833,9 @@
     "peak_dbfs": -2.46,
     "clipping_pct": 0.0,
     "snr_db_est": 45.4,
-    "_hypothesis": "Antes de sair, tome um comprimido de manhã com a comida e dois à noite e vite conduzir  durante 48 horas e se o enchaço piorar ou a febre subir acima dos 38 graus ligue já  para a clínica.",
+    "_hypothesis": "Antes de sair, tome um comprimido de manhã com a comida e dois à noite.  Evite conduzir durante 48 horas e se o inchaço piorar ou a febre subir acima dos 38 graus, ligue já para a clínica.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:50+00:00",
+    "_run_ts": "2026-07-21T05:10:38+00:00",
     "ttfa_p50_ms": 83.0,
     "ttfa_p90_ms": 83.0,
     "ttfa_iqr_ms": 0.0,
@@ -9877,7 +9877,7 @@
       "min": 0.3377743271620774,
       "max": 0.3377743271620774
     },
-    "_rescored_ts": "2026-07-21T04:19:50+00:00"
+    "_rescored_ts": "2026-07-21T05:10:38+00:00"
   },
   {
     "id": "bank-07-en",
@@ -9888,7 +9888,7 @@
     "audio_s": 14.24,
     "wer_pct": 4.76,
     "wer_raw_pct": 5.13,
-    "cer_pct": 1.83,
+    "cer_pct": 2.74,
     "ref_words": 42,
     "detected_lang": "en",
     "sub": 1,
@@ -9909,9 +9909,9 @@
     "peak_dbfs": -3.45,
     "clipping_pct": 0.0,
     "snr_db_est": 43.2,
-    "_hypothesis": "Your new account includes unlimited transfers, a monthly fee of 4.99 euros, and free withdrawals  at any ATM. The changes take effect on the first of next month, and you can cancel any time from  the app without a penalty.",
+    "_hypothesis": "your new account includes unlimited transfers a monthly fee of 4.99 euros  and free withdrawals at any atm the changes take effect on the first of next month  and you can cancel any time from the app without a penalty",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:19:54+00:00",
+    "_run_ts": "2026-07-21T05:10:54+00:00",
     "ttfa_p50_ms": 162.0,
     "ttfa_p90_ms": 162.0,
     "ttfa_iqr_ms": 0.0,
@@ -9953,7 +9953,7 @@
       "min": 0.3151541203462532,
       "max": 0.3151541203462532
     },
-    "_rescored_ts": "2026-07-21T04:19:54+00:00"
+    "_rescored_ts": "2026-07-21T05:10:54+00:00"
   },
   {
     "id": "bank-07-es",
@@ -9964,7 +9964,7 @@
     "audio_s": 17.6,
     "wer_pct": 0.0,
     "wer_raw_pct": 0.0,
-    "cer_pct": 0.4,
+    "cer_pct": 0.8,
     "ref_words": 40,
     "detected_lang": "es",
     "sub": 0,
@@ -9985,9 +9985,9 @@
     "peak_dbfs": -3.13,
     "clipping_pct": 0.0,
     "snr_db_est": 37.9,
-    "_hypothesis": "Su nueva cuenta incluye transferencias ilimitadas, una cuota mensual de 4,99 euros y retiradas gratuitas en cualquier cajero, los cambios entran en vigor el primero del próximo mes y puede cancelar cuando quiera desde la aplicación, sin penalización.",
+    "_hypothesis": "Su nueva cuenta incluye transferencias ilimitadas, una cuota mensual de 4,99 euros y retiradas gratuitas en cualquier cajero, los cambios entran en vigor el primero del próximo mes y puede cancelar cuando quiera desde la aplicación sin penalización.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:00+00:00",
+    "_run_ts": "2026-07-21T05:11:07+00:00",
     "ttfa_p50_ms": 86.3,
     "ttfa_p90_ms": 86.3,
     "ttfa_iqr_ms": 0.0,
@@ -10029,7 +10029,7 @@
       "min": 0.3023680003501217,
       "max": 0.3023680003501217
     },
-    "_rescored_ts": "2026-07-21T04:20:00+00:00"
+    "_rescored_ts": "2026-07-21T05:11:07+00:00"
   },
   {
     "id": "bank-07-fr",
@@ -10038,14 +10038,14 @@
     "voice_id": "zpmn3GOfiU_i5QGo",
     "chars": 278,
     "audio_s": 14.72,
-    "wer_pct": 8.89,
-    "wer_raw_pct": 7.32,
-    "cer_pct": 4.68,
+    "wer_pct": 6.67,
+    "wer_raw_pct": 2.44,
+    "cer_pct": 2.52,
     "ref_words": 45,
     "detected_lang": "fr",
     "sub": 1,
     "ins": 2,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.818,
     "truncated": false,
@@ -10061,9 +10061,9 @@
     "peak_dbfs": -1.15,
     "clipping_pct": 0.0,
     "snr_db_est": 88.5,
-    "_hypothesis": "Votre nouveau compte comprend des virements illimités, des frais mensuels de 4,99€ et des retraits gratuits à n'importe quel distributeur.  Les changements prennent effet le 1er du mois prochain et vous pouvez résilier à tout moment depuis l'application, sans pénalité.",
+    "_hypothesis": "Votre nouveau compte comprend des virements illimités, des frais mensuels de 4,99 euros et des retraits gratuits à n'importe quel distributeur.  Les changements prennent effet le 1er du mois prochain et vous pouvez résilier à tout moment depuis l'application, sans pénalité.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:05+00:00",
+    "_run_ts": "2026-07-21T05:11:20+00:00",
     "ttfa_p50_ms": 79.9,
     "ttfa_p90_ms": 79.9,
     "ttfa_iqr_ms": 0.0,
@@ -10105,7 +10105,7 @@
       "min": 0.3100102957605919,
       "max": 0.3100102957605919
     },
-    "_rescored_ts": "2026-07-21T04:20:05+00:00"
+    "_rescored_ts": "2026-07-21T05:11:20+00:00"
   },
   {
     "id": "bank-07-de",
@@ -10115,13 +10115,13 @@
     "chars": 247,
     "audio_s": 14.4,
     "wer_pct": 5.26,
-    "wer_raw_pct": 8.33,
-    "cer_pct": 3.64,
+    "wer_raw_pct": 5.56,
+    "cer_pct": 4.45,
     "ref_words": 38,
     "detected_lang": "de",
-    "sub": 1,
+    "sub": 2,
     "ins": 0,
-    "del": 1,
+    "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.947,
     "truncated": false,
@@ -10137,9 +10137,9 @@
     "peak_dbfs": -1.63,
     "clipping_pct": 0.0,
     "snr_db_est": 46.3,
-    "_hypothesis": "Ihr neues Konto bietet unbegrenzte Überweisungen, eine Monatsgebühr von 4,99€ und kostenlose Abhebungen an jeden Geldautomaten, die Änderungen gelten ab dem ersten des nächsten Monats und sie können jederzeit in der App kündigen ohne Gebühr.",
+    "_hypothesis": "Ihr neues Konto bietet unbegrenzte Überweisungen, eine Monatsgebühr von 4,99 Euro und kostenlose Abhebungen an jeden Geldautomaten.  Die Änderungen gelten ab dem 1. des nächsten Monats und Sie können jederzeit in der App kündigen ohne Gebühr.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:09+00:00",
+    "_run_ts": "2026-07-21T05:11:32+00:00",
     "ttfa_p50_ms": 82.7,
     "ttfa_p90_ms": 82.7,
     "ttfa_iqr_ms": 0.0,
@@ -10181,7 +10181,7 @@
       "min": 0.3089771006933814,
       "max": 0.3089771006933814
     },
-    "_rescored_ts": "2026-07-21T04:20:09+00:00"
+    "_rescored_ts": "2026-07-21T05:11:32+00:00"
   },
   {
     "id": "bank-07-pt",
@@ -10190,12 +10190,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 252,
     "audio_s": 18.32,
-    "wer_pct": 4.88,
-    "wer_raw_pct": 7.69,
-    "cer_pct": 4.37,
+    "wer_pct": 2.44,
+    "wer_raw_pct": 5.13,
+    "cer_pct": 3.17,
     "ref_words": 41,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 0,
     "ins": 0,
     "del": 1,
     "trailing_del": 0,
@@ -10213,9 +10213,9 @@
     "peak_dbfs": -1.18,
     "clipping_pct": 0.0,
     "snr_db_est": 41.7,
-    "_hypothesis": "A sua nova conta inclui transferências ilimitadas, uma taxa mensal de 4,99€ e levantamentos gratuitos  em qualquer multibanco.  As alterações entram em vigor no primeiro dia do próximo mês e podem cancelar quando  quiser na aplicação, sem penalização.",
+    "_hypothesis": "A sua nova conta inclui transferências ilimitadas, uma taxa mensal de 4,99€ e levantamentos gratuitos em qualquer multibanco.  As alterações entram em vigor no primeiro dia do próximo mês e pode cancelar quando quiser na aplicação, sem penalização.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:15+00:00",
+    "_run_ts": "2026-07-21T05:11:45+00:00",
     "ttfa_p50_ms": 91.6,
     "ttfa_p90_ms": 91.6,
     "ttfa_iqr_ms": 0.0,
@@ -10257,7 +10257,7 @@
       "min": 0.30052478262899335,
       "max": 0.30052478262899335
     },
-    "_rescored_ts": "2026-07-21T04:20:15+00:00"
+    "_rescored_ts": "2026-07-21T05:11:45+00:00"
   },
   {
     "id": "cs-08-en",
@@ -10267,8 +10267,8 @@
     "chars": 243,
     "audio_s": 12.56,
     "wer_pct": 0.0,
-    "wer_raw_pct": 0.0,
-    "cer_pct": 2.47,
+    "wer_raw_pct": 4.76,
+    "cer_pct": 4.94,
     "ref_words": 46,
     "detected_lang": "en",
     "sub": 0,
@@ -10289,9 +10289,9 @@
     "peak_dbfs": -2.89,
     "clipping_pct": 0.0,
     "snr_db_est": 45.1,
-    "_hypothesis": "I've looked into your case and here's what I can do. I'll refund the last payment,  extend your warranty by six months at no charge and send a replacement that should  arrive within three business days. You'll get a confirmation email shortly.",
+    "_hypothesis": "I've looked into your case, and here's what I can do, I'll refund the last payment,  extend your warranty by 6 months at no charge, and send a replacement that should arrive  within 3 business days, you'll get a confirmation email shortly.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:19+00:00",
+    "_run_ts": "2026-07-21T05:11:56+00:00",
     "ttfa_p50_ms": 79.0,
     "ttfa_p90_ms": 79.0,
     "ttfa_iqr_ms": 0.0,
@@ -10333,7 +10333,7 @@
       "min": 0.30641455160082665,
       "max": 0.30641455160082665
     },
-    "_rescored_ts": "2026-07-21T04:20:19+00:00"
+    "_rescored_ts": "2026-07-21T05:11:56+00:00"
   },
   {
     "id": "cs-08-es",
@@ -10367,7 +10367,7 @@
     "snr_db_est": 37.4,
     "_hypothesis": "He revisado su caso y esto es lo que puedo hacer, le devolveré el último pago, ampliaré su garantía seis meses sin coste y le enviaré un recambio que debería llegar en tres días hábiles, recibirá un correo de confirmación en breve.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:24+00:00",
+    "_run_ts": "2026-07-21T05:12:09+00:00",
     "ttfa_p50_ms": 76.4,
     "ttfa_p90_ms": 76.4,
     "ttfa_iqr_ms": 0.0,
@@ -10409,7 +10409,7 @@
       "min": 0.307870714879187,
       "max": 0.307870714879187
     },
-    "_rescored_ts": "2026-07-21T04:20:24+00:00"
+    "_rescored_ts": "2026-07-21T05:12:09+00:00"
   },
   {
     "id": "cs-08-fr",
@@ -10420,7 +10420,7 @@
     "audio_s": 13.6,
     "wer_pct": 8.7,
     "wer_raw_pct": 4.65,
-    "cer_pct": 6.32,
+    "cer_pct": 5.58,
     "ref_words": 46,
     "detected_lang": "fr",
     "sub": 3,
@@ -10441,9 +10441,9 @@
     "peak_dbfs": -0.76,
     "clipping_pct": 0.0,
     "snr_db_est": 93.0,
-    "_hypothesis": "J'ai examiné votre dossier, et voici ce que je peux faire.  Je rembourse le dernier paiement.  Je prolonge votre garantie de 6 mois gratuitement,  et j'envoie un remplacement qui devrait arriver sous 3 jours ouvrés.  Vous recevrez un email de confirmation sous peu.",
+    "_hypothesis": "J'ai examiné votre dossier et voici ce que je peux faire.  Je rembourse le dernier paiement, je prolonge votre garantie de 6 mois gratuitement  et j'envoie un remplacement qui devrait arriver sous 3 jours ouvrés.  Vous recevrez un email de confirmation sous peu.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:28+00:00",
+    "_run_ts": "2026-07-21T05:12:21+00:00",
     "ttfa_p50_ms": 94.9,
     "ttfa_p90_ms": 94.9,
     "ttfa_iqr_ms": 0.0,
@@ -10485,7 +10485,7 @@
       "min": 0.31097788197009574,
       "max": 0.31097788197009574
     },
-    "_rescored_ts": "2026-07-21T04:20:28+00:00"
+    "_rescored_ts": "2026-07-21T05:12:21+00:00"
   },
   {
     "id": "cs-08-de",
@@ -10519,7 +10519,7 @@
     "snr_db_est": 43.9,
     "_hypothesis": "Ich habe Ihren Fall geprüft und das kann ich tun.  Ich erstatte die letzte Zahlung, verlängere Ihre Garantie kostenlos um sechs Monate  und schicke einen Ersatz, der in drei Werktagen eintreffen sollte.  Sie erhalten in Kürze eine Bestätigungs-E-Mail.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:33+00:00",
+    "_run_ts": "2026-07-21T05:12:34+00:00",
     "ttfa_p50_ms": 74.3,
     "ttfa_p90_ms": 74.3,
     "ttfa_iqr_ms": 0.0,
@@ -10561,7 +10561,7 @@
       "min": 0.31075096386543344,
       "max": 0.31075096386543344
     },
-    "_rescored_ts": "2026-07-21T04:20:33+00:00"
+    "_rescored_ts": "2026-07-21T05:12:34+00:00"
   },
   {
     "id": "cs-08-pt",
@@ -10572,7 +10572,7 @@
     "audio_s": 17.44,
     "wer_pct": 4.65,
     "wer_raw_pct": 4.76,
-    "cer_pct": 5.08,
+    "cer_pct": 5.51,
     "ref_words": 43,
     "detected_lang": "pt",
     "sub": 2,
@@ -10593,9 +10593,9 @@
     "peak_dbfs": -1.43,
     "clipping_pct": 0.0,
     "snr_db_est": 41.2,
-    "_hypothesis": "Analisei o seu caso e é isto que posso fazer, vou reembolsar o último pagamento, prolongar  a sua garantia por 6 meses sem custos e enviar um substituto que deverá chegar em 3 dias  úteis, receberá um e-mail de confirmação em breve.",
+    "_hypothesis": "Analisei o seu caso e é isto que posso fazer.  Vou reembolsar o último pagamento, prolongar a sua garantia por 6 meses sem custos  e enviar um substituto que deverá chegar em 3 dias úteis.  Receberá um e-mail de confirmação em breve.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:39+00:00",
+    "_run_ts": "2026-07-21T05:12:48+00:00",
     "ttfa_p50_ms": 84.2,
     "ttfa_p90_ms": 84.2,
     "ttfa_iqr_ms": 0.0,
@@ -10637,7 +10637,7 @@
       "min": 0.30399944817504176,
       "max": 0.30399944817504176
     },
-    "_rescored_ts": "2026-07-21T04:20:39+00:00"
+    "_rescored_ts": "2026-07-21T05:12:48+00:00"
   },
   {
     "id": "game-07-en",
@@ -10646,13 +10646,13 @@
     "voice_id": "zyLIanWKViHkc6Wp",
     "chars": 209,
     "audio_s": 11.04,
-    "wer_pct": 5.26,
-    "wer_raw_pct": 5.26,
-    "cer_pct": 1.91,
+    "wer_pct": 0.0,
+    "wer_raw_pct": 0.0,
+    "cer_pct": 1.44,
     "ref_words": 38,
     "detected_lang": "en",
-    "sub": 1,
-    "ins": 1,
+    "sub": 0,
+    "ins": 0,
     "del": 0,
     "trailing_del": 0,
     "dur_expected_ratio": 0.726,
@@ -10669,9 +10669,9 @@
     "peak_dbfs": -2.85,
     "clipping_pct": 0.0,
     "snr_db_est": 45.9,
-    "_hypothesis": "Long ago, the kingdom of Valdoria fell to the shadow of Mordath and its people scattered across  the wastes. Only the bearer of the Sun Stone can pass the sealed gate and bring light back to these broken lands.",
+    "_hypothesis": "Long ago, the kingdom of Valdoria fell to the shadow of Mordath, and its people scattered  across the wastes, only the bearer of the sunstone can pass the sealed gate and bring  light back to these broken lands.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:42+00:00",
+    "_run_ts": "2026-07-21T05:12:58+00:00",
     "ttfa_p50_ms": 101.3,
     "ttfa_p90_ms": 101.3,
     "ttfa_iqr_ms": 0.0,
@@ -10713,7 +10713,7 @@
       "min": 0.3146214809212803,
       "max": 0.3146214809212803
     },
-    "_rescored_ts": "2026-07-21T04:20:42+00:00"
+    "_rescored_ts": "2026-07-21T05:12:58+00:00"
   },
   {
     "id": "game-07-es",
@@ -10722,12 +10722,12 @@
     "voice_id": "Gijj_GPBfJVcP-FZ",
     "chars": 220,
     "audio_s": 14.08,
-    "wer_pct": 2.44,
-    "wer_raw_pct": 2.44,
-    "cer_pct": 2.27,
+    "wer_pct": 4.88,
+    "wer_raw_pct": 4.88,
+    "cer_pct": 2.73,
     "ref_words": 41,
     "detected_lang": "es",
-    "sub": 1,
+    "sub": 2,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -10745,9 +10745,9 @@
     "peak_dbfs": -4.3,
     "clipping_pct": 0.0,
     "snr_db_est": 42.8,
-    "_hypothesis": "Hace mucho tiempo, el reino de Valdoria cayó ante la sombra de Mordaz y su pueblo se dispersó por los páramos,  solo el portador de la piedra solar puede cruzar la puerta sellada y devolver la luz a estas tierras rotas.",
+    "_hypothesis": "Hace mucho tiempo, el reino de Valdoria cayó ante la sombra de Mordaz, y su pueblo se dispersó  por los páramos, sólo el portador de la piedra solar puede cruzar la puerta sellada  y devolver la luz a estas tierras rotas.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:47+00:00",
+    "_run_ts": "2026-07-21T05:13:10+00:00",
     "ttfa_p50_ms": 138.3,
     "ttfa_p90_ms": 138.3,
     "ttfa_iqr_ms": 0.0,
@@ -10789,7 +10789,7 @@
       "min": 0.3108536458094443,
       "max": 0.3108536458094443
     },
-    "_rescored_ts": "2026-07-21T04:20:47+00:00"
+    "_rescored_ts": "2026-07-21T05:13:10+00:00"
   },
   {
     "id": "game-07-fr",
@@ -10800,7 +10800,7 @@
     "audio_s": 12.8,
     "wer_pct": 2.17,
     "wer_raw_pct": 2.27,
-    "cer_pct": 2.87,
+    "cer_pct": 1.64,
     "ref_words": 46,
     "detected_lang": "fr",
     "sub": 1,
@@ -10821,9 +10821,9 @@
     "peak_dbfs": -0.48,
     "clipping_pct": 0.0,
     "snr_db_est": 76.7,
-    "_hypothesis": "Il y a longtemps, le royaume de Valdoria est tombé sous l'ombre de Mordas et son peuple  s'est dispersé dans les terres désolées, seul le porteur de la pierre du soleil peut  franchir la porte scellée et rendre la lumière à ces terres brisées.",
+    "_hypothesis": "Il y a longtemps, le royaume de Valdoria est tombé sous l'ombre de Mordas, et son peuple s'est dispersé dans les terres désolées, seul le porteur de la pierre du soleil peut franchir la porte scellée et rendre la lumière à ces terres brisées.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:52+00:00",
+    "_run_ts": "2026-07-21T05:13:22+00:00",
     "ttfa_p50_ms": 82.4,
     "ttfa_p90_ms": 82.4,
     "ttfa_iqr_ms": 0.0,
@@ -10865,7 +10865,7 @@
       "min": 0.3129366296865268,
       "max": 0.3129366296865268
     },
-    "_rescored_ts": "2026-07-21T04:20:52+00:00"
+    "_rescored_ts": "2026-07-21T05:13:22+00:00"
   },
   {
     "id": "game-07-de",
@@ -10876,7 +10876,7 @@
     "audio_s": 12.4,
     "wer_pct": 2.63,
     "wer_raw_pct": 2.63,
-    "cer_pct": 1.6,
+    "cer_pct": 1.2,
     "ref_words": 38,
     "detected_lang": "de",
     "sub": 1,
@@ -10897,9 +10897,9 @@
     "peak_dbfs": -2.17,
     "clipping_pct": 0.0,
     "snr_db_est": 45.0,
-    "_hypothesis": "Vor langer Zeit fiel das Königreich Waldoria dem Schatten von Mordath anheim und sein Volk zerstreute sich in der Ödnis,  nur der Träger des Sonnensteins kann das versiegelte Tor durchschreiten und das Licht in diese zerbrochenen Lande zurückbringen.",
+    "_hypothesis": "Vor langer Zeit fiel das Königreich Valdoria dem Schatten von Mordad anheim, und sein Volk zerstreute sich in der Ödnis, nur der Träger des Sonnensteins kann das versiegelte Tor durchschreiten und das Licht in diese zerbrochenen Lande zurückbringen.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:20:56+00:00",
+    "_run_ts": "2026-07-21T05:13:34+00:00",
     "ttfa_p50_ms": 77.6,
     "ttfa_p90_ms": 77.6,
     "ttfa_iqr_ms": 0.0,
@@ -10941,7 +10941,7 @@
       "min": 0.3101630492429567,
       "max": 0.3101630492429567
     },
-    "_rescored_ts": "2026-07-21T04:20:56+00:00"
+    "_rescored_ts": "2026-07-21T05:13:34+00:00"
   },
   {
     "id": "game-07-pt",
@@ -10950,12 +10950,12 @@
     "voice_id": "EzmLkNorEpZG_oNv",
     "chars": 232,
     "audio_s": 15.92,
-    "wer_pct": 2.27,
-    "wer_raw_pct": 2.33,
+    "wer_pct": 4.55,
+    "wer_raw_pct": 4.65,
     "cer_pct": 2.16,
     "ref_words": 44,
     "detected_lang": "pt",
-    "sub": 1,
+    "sub": 2,
     "ins": 0,
     "del": 0,
     "trailing_del": 0,
@@ -10973,9 +10973,9 @@
     "peak_dbfs": -1.22,
     "clipping_pct": 0.0,
     "snr_db_est": 45.3,
-    "_hypothesis": "Há muito tempo, o reino de Valdória caiu perante a sombra de Mordate e o seu povo dispersou-se  pelas terras devastadas, só o portador da Pedra do Sol pode atravessar o portão selado  e trazer de volta a luz a estas terras quebradas.",
+    "_hypothesis": "Há muito tempo, o reino de Valdória caiu perante a sombra de Mordate e o seu povo dispersou-se pelas terras devastadas.  Só o portador da Pedra do Sol pode atravessar o portão selado e trazer de volta à luz a estas terras quebradas.",
     "_run_id": "26ed566c",
-    "_run_ts": "2026-07-21T04:21:01+00:00",
+    "_run_ts": "2026-07-21T05:13:47+00:00",
     "ttfa_p50_ms": 81.1,
     "ttfa_p90_ms": 81.1,
     "ttfa_iqr_ms": 0.0,
@@ -11017,6 +11017,6 @@
       "min": 0.3079080011474969,
       "max": 0.3079080011474969
     },
-    "_rescored_ts": "2026-07-21T04:21:01+00:00"
+    "_rescored_ts": "2026-07-21T05:13:47+00:00"
   }
 ]

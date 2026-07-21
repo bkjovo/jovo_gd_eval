@@ -173,6 +173,9 @@ def score_wav(wav_path, item, asr, utmos, dnsmos, run_id):
         "_hypothesis": intel["hypothesis"],
         # Which run produced this row. Latency across different runs is NOT comparable
         # (different network/day); the UI can use _run_id to avoid pooling across runs.
+        # Instrument provenance: a WER figure is meaningless without knowing which
+        # recogniser produced it. Recorded per row so it can never be lost.
+        "_asr_model": getattr(asr, "_soundcheck_name", None),
         "_run_id": run_id,
         "_run_ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
@@ -291,7 +294,11 @@ async def main():
                     help="discarded warmup calls per DISTINCT VOICE at the start of the run "
                          "(not per item). Absorbs connection + per-voice model load; costs a "
                          "handful of credits. 0 disables.")
-    ap.add_argument("--asr-model", default="small")
+    ap.add_argument("--asr-model", default="large-v3",
+                    help="ASR model for the WER round-trip. Defaults to large-v3: "
+                         "whisper small materially inflates non-English WER (measured on this "
+                         "corpus, Portuguese 10.68%% -> 4.70%%), which reads as a model defect "
+                         "but is an instrument artifact.")
     ap.add_argument("--latency-ids", default="all",
                     help="'all' (default), 'none', or comma-separated ids/base_ids that get "
                          "latency trials. Others are scored quality-only (no latency calls).")

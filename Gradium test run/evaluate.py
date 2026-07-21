@@ -143,8 +143,17 @@ def prosody(wav, sr, n_words=None):
 
 
 def load_asr(model_size):
+    """Load the ASR model, tagging it with its name.
+
+    The tag matters: a WER figure is uninterpretable without knowing which recogniser
+    produced it. Measured on this corpus, `small` vs `large-v3` moved Portuguese WER
+    from 10.68% to 4.70% with the audio unchanged — an instrument artifact that reads
+    exactly like a model defect. The name is recorded on every scored row.
+    """
     from faster_whisper import WhisperModel
-    return WhisperModel(model_size, device="cpu", compute_type="int8")
+    model = WhisperModel(model_size, device="cpu", compute_type="int8")
+    model._soundcheck_name = model_size
+    return model
 
 
 def _trailing_deletions(alignment):
