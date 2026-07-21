@@ -68,16 +68,22 @@ says so in an amber banner.
    moved to the session scratchpad and can be deleted. Commit identity is set
    repo-locally to Joseph Vosburgh <vosburgh.joseph@gmail.com>; change it with
    `git config user.name "..."` then `git commit --amend --reset-author` if wrong.
-2. **Create the Supabase project**, run `web/supabase/schema.sql`, put the two values in
-   `web/.env.local`. Then ask Claude to submit a rating locally against real Supabase to
-   confirm the write path before deploying. The `on_conflict` upsert has never been
-   exercised against actual Postgres.
-3. **Deploy to Vercel.** `cd web && npx vercel && npx vercel --prod`. Set the two env
-   vars in Project Settings, redeploy, then verify by submitting a rating on the
-   deployed URL and confirming the row lands in Supabase. This is the case study's one
-   hard requirement.
+2. ~~Create the Supabase project, run the schema, wire `.env.local`, verify locally.~~
+   Done 2026-07-20. Project ref `vrngmmxqfmbxfecflpay`. Table `ratings` created, RLS on
+   with no policies. Write / read / upsert / validation all verified against real
+   Postgres. Gotcha for next time: the Data API screen gives the URL with `/rest/v1/`
+   already appended; strip it, `SUPABASE_URL` must be the bare origin because the code
+   adds the path itself.
+3. ~~Deploy to Vercel.~~ **LIVE at https://soundcheck-tau-amber.vercel.app** (project
+   `jo-vo/soundcheck`, account `jovo-nyc`). Env vars set in production/preview/dev.
+   Production write path verified end to end: a rating submitted on the live URL lands in
+   Supabase and reads back. Deployed via CLI from `web/` (no GitHub remote needed).
+   Redeploy with `cd web && npx vercel deploy --prod --yes --token=<TOKEN>`.
+   SECURITY: the Supabase `service_role` key and a Vercel access token are both in this
+   session's chat transcript. Rotate both when convenient (Supabase API Keys page; Vercel
+   account/tokens page).
 4. **Seed reviews** across the corpus, non-English first, so the dashboard is not empty
-   when graders open it.
+   when graders open it. Ratings now persist, so this is worth doing.
 5. **Build the 20x5 parallel corpus** (see below). Costs credits; needs a decision on
    trials first.
 6. **Write the GTM page** properly. There is a dedicated 45-minute session on it.
