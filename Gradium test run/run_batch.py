@@ -4,9 +4,13 @@ run_batch.py — batch reference-free TTS eval over a JSONL manifest.
 For each manifest item:
   * QUALITY  — one buffered synthesis (client.tts) saved as a listenable WAV,
                then signal sanity + WER/CER (ASR vs text) + UTMOS + DNSMOS.
-  * LATENCY  — N separate timed streaming trials (client.tts_stream), plus one
-               discarded warmup, giving client-side TTFA / total / RTF stats.
-               Skipped entirely for items not in the latency selection (trials=0).
+  * LATENCY  — N timed streaming trials (client.tts_stream) giving client-side
+               TTFA / total / RTF. Skipped entirely for items not in the latency
+               selection (trials=0). Warmup is RUN-LEVEL, not per-clip: a few
+               discarded calls per distinct voice before any timing, which is where
+               the real cold start lives (connection setup + voice model load).
+               Per-clip warmup would cost ~145x more and, by synthesizing each
+               clip's text twice, risks timing a server-side cache hit.
 
 Quality and latency use independent synthesis calls (decoupled by design).
 Whisper + UTMOS + DNSMOS models load once and are reused across all items.
@@ -25,16 +29,17 @@ Outputs (in --out-dir, default outputs/):
 
 Run:
     uv run --env-file .env python run_batch.py --manifest corpus/manifest_125.jsonl --out-dir corpus/outputs
-    # recommended v2 run: quality on all, latency (5 trials) only on a stratified subset
+    # recommended v2 run: quality + one timed latency call on every clip,
+    # with a single run-level warmup per voice
     uv run --env-file .env python run_batch.py --manifest corpus/manifest_125.jsonl \
-        --out-dir corpus/outputs \
-        --latency-ids cs-01,bank-06,game-04,bank-01,health-01,game-02,cs-08,bank-07,game-07
+        --out-dir corpus/outputs --trials 1 --latency-ids all
     # add or fix a few clips later (only these are billed):
     uv run --env-file .env python run_batch.py --manifest corpus/manifest_125.jsonl \
         --out-dir corpus/outputs --only bank-03-fr,bank-03-de
 
-WARNING: billable. Per processed item = 1 quality + (warmup + trials) latency calls,
-each charged over the item's character count. Skipped items cost nothing.
+WARNING: billable. Per processed item = 1 quality + trials latency calls, each
+charged over the item's character count, plus a few credits of run-level warmup.
+Skipped items cost nothing.
 UTMOS/DNSMOS are English-trained; compare MOS within a language only.
 """
 
@@ -77,7 +82,40 @@ _EMPTY_LATENCY = {
 }
 
 
-async def process_item(client, item, asr, utmos, dnsmos, trials, warmup, out_dir, run_id):
+async def warm_up(client, items, per_voice, warm_text="Hello."):
+    """
+    Run-level warmup: a few discarded calls per DISTINCT VOICE before any timing.
+
+    This absorbs the things that are actually cold — connection/TLS setup and
+    per-voice model loading — both of which are one-time, not per-clip. Warming
+    every clip would pay ~145x for a 5x cost, and because it would synthesize each
+    clip's exact text twice, any server-side (text, voice) caching would turn the
+    timed call into a cache hit and understate TTFA. Every clip's text is unique, so
+    a novel-text call is also the realistic thing to measure.
+    """
+    if per_voice <= 0:
+        return 0
+    seen, chars = {}, 0
+    for it in items:
+        seen.setdefault(it["voice_id"], it["lang"])
+    for voice_id, lang in seen.items():
+        setup = {
+            "model_name": "default",
+            "voice_id": voice_id,
+            "output_format": "wav",
+            "json_config": {"rewrite_rules": lang},
+        }
+        for _ in range(per_voice):
+            try:
+                await trial_stream(client, setup, warm_text)
+                chars += len(warm_text)
+            except Exception as exc:  # noqa: BLE001 - a failed warmup must not kill the run
+                print(f"  warmup failed for voice {voice_id}: {type(exc).__name__}: {exc}")
+    print(f"  warmed {len(seen)} voice(s) x {per_voice} call(s) ≈ {chars} credits", flush=True)
+    return chars
+
+
+async def process_item(client, item, asr, utmos, dnsmos, trials, out_dir, run_id):
     setup = {
         "model_name": "default",
         "voice_id": item["voice_id"],
@@ -100,10 +138,8 @@ async def process_item(client, item, asr, utmos, dnsmos, trials, warmup, out_dir
     mos = predicted_mos(wav, sr, utmos)
     aud = audio_quality(wav, sr, dnsmos)
 
-    # --- LATENCY: warmup (discarded) + N timed trials, or skipped when trials=0 ---
+    # --- LATENCY: N timed trials (warmup is run-level, see warm_up()) ---
     if trials > 0:
-        for _ in range(warmup):
-            await trial_stream(client, setup, text)
         latency_trials = [await trial_stream(client, setup, text) for _ in range(trials)]
         ttfa = summarize([t["ttfa"] for t in latency_trials])
         total = summarize([t["total"] for t in latency_trials])
@@ -210,7 +246,10 @@ async def main():
     ap.add_argument("--manifest", default="manifest.jsonl")
     ap.add_argument("--out-dir", default="outputs")
     ap.add_argument("--trials", type=int, default=5, help="timed latency trials per item")
-    ap.add_argument("--warmup", type=int, default=1, help="discarded warmup trials per item")
+    ap.add_argument("--warmup-per-voice", type=int, default=1,
+                    help="discarded warmup calls per DISTINCT VOICE at the start of the run "
+                         "(not per item). Absorbs connection + per-voice model load; costs a "
+                         "handful of credits. 0 disables.")
     ap.add_argument("--asr-model", default="small")
     ap.add_argument("--latency-ids", default="all",
                     help="'all' (default), 'none', or comma-separated ids/base_ids that get "
@@ -253,17 +292,23 @@ async def main():
 
     # --- cost estimate for the to-process set only ---
     def calls_for(it):
-        return 1 + (args.warmup + args.trials if wants_latency(it, args.latency_ids) else 0)
+        return 1 + (args.trials if wants_latency(it, args.latency_ids) else 0)
     est_credits = sum(len(it["text"]) * calls_for(it) for it in to_process)
     n_lat = sum(1 for it in to_process if wants_latency(it, args.latency_ids))
+    # Run-level warmup: distinct voices x calls x a short throwaway string.
+    n_voices = len({it["voice_id"] for it in to_process}) if n_lat else 0
+    est_warmup = n_voices * max(0, args.warmup_per_voice) * len("Hello.")
+    est_credits += est_warmup
 
     # In --only mode, skipped items are "not selected" rather than "already scored";
     # label accurately either way.
     reason = "not selected" if only else "already scored"
     print(f"manifest: {len(items)} items | to process: {len(to_process)} "
           f"({n_lat} with latency) | skipping ({reason}): {len(skipped)}")
+    warm_note = (f", incl. {est_warmup} for run-level warmup of {n_voices} voice(s)"
+                 if est_warmup else "")
     print(f"est. cost for this run ≈ {est_credits} credits "
-          f"(skipped items cost nothing)\n")
+          f"(skipped items cost nothing{warm_note})\n")
 
     stale = [i for i in existing if i not in manifest_ids]
     if stale:
@@ -295,6 +340,12 @@ async def main():
     run_id = uuid.uuid4().hex[:8]
     client = gradium.client.GradiumClient(api_key=api_key)
 
+    # Warm once per voice before any timing, so the first timed clip is not paying
+    # for connection setup or a cold voice model.
+    if n_lat:
+        lat_items = [it for it in to_process if wants_latency(it, args.latency_ids)]
+        await warm_up(client, lat_items, args.warmup_per_voice)
+
     # Start from prior results (optionally pruned), then overwrite processed ids.
     merged = {i: r for i, r in existing.items() if not (args.prune and i not in manifest_ids)}
 
@@ -304,7 +355,7 @@ async def main():
         trials = args.trials if do_lat else 0
         try:
             row = await process_item(client, it, asr, utmos, dnsmos,
-                                     trials, args.warmup, out_dir, run_id)
+                                     trials, out_dir, run_id)
             merged[it["id"]] = row
             n_done += 1
             trunc_flag = " TRUNC" if row["truncated"] else ""
