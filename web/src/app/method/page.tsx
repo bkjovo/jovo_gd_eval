@@ -270,6 +270,80 @@ export default function MethodPage() {
         </div>
       </section>
 
+      {/* --- The measurement chain --- */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium">The measurement chain</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          Intelligibility is not measured directly. It is measured through a recogniser
+          and a text normalizer, and both are part of the instrument. On this corpus,
+          three separate figures that looked like model defects turned out to be
+          properties of our own tooling. They are documented here because a word error
+          rate is uninterpretable without knowing what produced it.
+        </p>
+
+        <div className="space-y-3">
+          <div className="rounded-lg border p-4">
+            <h3 className="text-sm font-medium">Recogniser size changed the answer</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              The corpus was first scored with <code className="font-mono text-xs">whisper small</code>,
+              which put Portuguese at 10.68% WER and made it look like the weakest
+              language. Re-scoring the identical audio with{" "}
+              <code className="font-mono text-xs">large-v3</code> took Portuguese to 4.70%.
+              Several Portuguese transcripts became character-identical to the source: the
+              synthesis had been correct all along, and the small model was inventing words,
+              at one point transcribing the Portuguese{" "}
+              <span className="font-medium text-foreground">xarope</span> as the English{" "}
+              <span className="font-medium text-foreground">syrup</span>. A controlled check
+              confirmed the effect was specific to non-English: ten Portuguese and French
+              clips improved from 36.5% to 14.9% while three clean English, German and
+              Spanish controls did not move at all. Scoring now defaults to{" "}
+              <code className="font-mono text-xs">large-v3</code> and every row records the
+              recogniser that produced it.
+            </p>
+          </div>
+
+          <div className="rounded-lg border p-4">
+            <h3 className="text-sm font-medium">Normalization, and why raw is reported too</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Text is normalized before alignment using{" "}
+              <span className="font-medium text-foreground">OpenAI&apos;s Whisper normalizers</span>
+              , the ones used to report WER in the Whisper paper:{" "}
+              <code className="font-mono text-xs">EnglishTextNormalizer</code> for English,{" "}
+              <code className="font-mono text-xs">BasicTextNormalizer</code> for the rest.
+              One documented rule is added on top, splitting digit-bearing alphanumeric
+              tokens into characters, because the multilingual normalizer does not address
+              alphanumeric tokenization: Whisper returns{" "}
+              <code className="font-mono text-xs">A739K2</code> as one token in French and
+              German but as <code className="font-mono text-xs">A 739 K2</code> in English,
+              Spanish and Portuguese, for identical input. Both figures are published, raw
+              and normalized, so the size of the correction is always visible.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              There is no community standard here. The multilingual ASR leaderboard
+              documents its English normalization and not its multilingual one, and
+              published work finds Whisper&apos;s normalizer corrupts non-Latin scripts
+              outright. Every lab reporting multilingual WER is making undocumented choices
+              that move the numbers; this page is the disclosure.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
+            <h3 className="text-sm font-medium">
+              Blind spot: how formatted content is vocalized
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              WER cannot tell you whether{" "}
+              <code className="font-mono text-xs">A739K2</code> was read character by
+              character or chunked, or whether{" "}
+              <code className="font-mono text-xs">500 mg</code> became &ldquo;milligrams&rdquo;
+              or &ldquo;em gee&rdquo;. Every one of those readings transcribes back to the
+              same string. This is a second named blind spot alongside accent, and it routes
+              to human review for the same reason: no reference-free metric can see it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* --- Thresholds --- */}
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Thresholds</h2>
