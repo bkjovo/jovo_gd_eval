@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 
 export const metadata = {
-  title: "Methodology · Soundcheck",
+  title: "Methodology",
 };
 
 const LIMITATIONS = [

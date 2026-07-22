@@ -5,7 +5,7 @@ import { MetricsExplorer } from "@/components/metrics-explorer";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Metrics Deep Dive · Soundcheck",
+  title: "Metrics Deep Dive",
 };
 
 export default async function MetricsPage() {

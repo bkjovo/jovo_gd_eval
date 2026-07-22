@@ -2,7 +2,7 @@ import { loadClips } from "@/lib/load-clips";
 import { SampleBrowser } from "@/components/sample-browser";
 
 export const metadata = {
-  title: "Samples · Soundcheck",
+  title: "Samples",
 };
 
 export default function SamplesPage() {

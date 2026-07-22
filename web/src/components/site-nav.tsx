@@ -21,13 +21,6 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:gap-6 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background text-[11px] font-bold">
-            S
-          </span>
-          <span className="font-semibold tracking-tight">Soundcheck</span>
-        </Link>
-
         <nav className="relative flex items-center gap-0.5 overflow-x-auto [scrollbar-width:none] after:pointer-events-none after:sticky after:right-0 after:h-full after:w-6 after:shrink-0 after:bg-gradient-to-l after:from-background sm:gap-1 sm:after:hidden">
           {LINKS.map((l) => {
             const active = pathname.startsWith(l.href);

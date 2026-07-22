@@ -3,7 +3,7 @@ import { loadClips } from "@/lib/load-clips";
 import { Rater } from "@/components/rater";
 
 export const metadata = {
-  title: "Review clips · Soundcheck",
+  title: "Annotate",
 };
 
 export default function RatePage() {

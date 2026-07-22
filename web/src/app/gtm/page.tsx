@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const metadata = {
-  title: "Go-to-market · Soundcheck",
+  title: "Go-to-market",
 };
 
 const SECTIONS = [
