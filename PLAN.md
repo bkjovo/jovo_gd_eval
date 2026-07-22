@@ -1,6 +1,6 @@
 # Gradium Case Study: state and next steps
 
-Last updated 2026-07-21.
+Last updated 2026-07-21 (evening).
 
 **Deliverable:** a working evaluation tool at a public URL.
 **Their three weighted criteria:** (1) UI/UX for collecting feedback, (2) the evaluation
@@ -8,88 +8,109 @@ logic, (3) how it becomes actionable for research. Plus a GTM story at the onsit
 
 ## LIVE: https://soundcheck-tau-amber.vercel.app
 
-145 clips, 5 languages, deployed and verified. Supabase wired and confirmed writing in
-production. The original 7-clip demo has been removed.
+145 clips, 5 languages. Deployed and verified end-to-end against production.
 
 ---
 
-## TOMORROW, in priority order
+## ONE BLOCKER (needs a human, 15 seconds)
 
-### 1. Annotation UX (the big one, needs real time)
-The `/rate` flow works but is not good enough. It is also **criterion #1 in their
-rubric**, so it carries the most weight of anything left. Known gaps:
-- The flow was built for a 7-clip demo and now faces 145 clips. Queue construction,
-  progress, and session length all need rethinking at that scale.
-- No way to skip a clip, go back, or correct a mis-tap.
-- No keyboard-first path through the whole flow (space/1-5/Enter exist, tags do not).
-- Tag groups are a flat wall of chips; with 11 tags across 5 groups it needs hierarchy
-  or progressive disclosure.
-- Nothing tells a reviewer why their input matters or what happens to it.
-- Mobile has never been properly exercised on the real flow, only the language gate.
-- The reveal screen (your rating vs. the machine's) is thin and is the payoff moment.
-- **Two named blind spots now need explicit review affordances**: accent, and
-  formatted-content vocalization (was "A739K2" read out or chunked?). WER provably
-  cannot see either, so the UI has to ask.
+The live `ratings` table has **no `probes` column**, so blind-spot answers are being
+discarded on write. Everything else works; the site says so in an amber banner.
 
-### 2. Site formatting / visual pass
-Consistency sweep across all pages. Tables are dense at 145 rows, the summary is long,
-spacing and hierarchy are uneven between pages. No em dashes anywhere (house style).
+In the Supabase SQL editor, **project `vrngmmxqfmbxfecflpay`**:
 
-### 3. GTM page
-Still a placeholder with section scaffolding at `/gtm`. There is a dedicated 45-minute
-go-to-market session at the onsite. Seeds are already in the file (positioning, users,
-wedge). The measurement-chain story below is a genuine differentiator worth building
-positioning around.
+```sql
+alter table public.ratings
+  add column if not exists probes jsonb not null default '{}'::jsonb;
+```
 
-### Also open (smaller)
-- **Adjudicate `game-04-fr`**: ALL-CAPS `PAS` transcribed as `P.A.S.` If the model really
-  spelled it out, that is a real actionable defect for any product using caps for
-  emphasis. Ten seconds on the Samples page to confirm. Highest-value single listen.
-- **Seed real reviews** so the dashboard is not empty. Zero ratings currently.
-- **Rotate secrets**: the Supabase service_role key and a Vercel token are both in the
-  2026-07-20/21 chat transcript. Revoking the Vercel token does not affect the running
-  deployment.
+Collection resumes immediately, **no redeploy needed**. This has been attempted once and
+did not land; confirm the editor is on the right project. Current live columns are:
+`clip_id, created_at, defect_tags, id, listened_ms, other_text, overall, replays, session_id`.
+
+Why Claude cannot do it: PostgREST will not execute DDL, only a service-role key is
+available (no DB password, no Supabase access token), and neither psql nor the Supabase
+CLI is installed.
 
 ---
 
-## Where things stand
+## NEXT, in priority order
+
+1. **Site formatting / visual pass.** Consistency across all pages: spacing, hierarchy,
+   dense tables at 145 rows, long summary page. No em dashes anywhere (house style).
+2. **GTM page.** Still a placeholder with section scaffolding at `/gtm`. Dedicated
+   45-minute onsite session. Seeds already in the file. The measurement-chain story
+   below is genuine positioning material.
+3. **Adjudicate `game-04-fr`**: ALL-CAPS `PAS` transcribed as `P.A.S.` If the model
+   really spelled it out, that is an actionable defect for any product using caps for
+   emphasis. Ten seconds on the Samples page. Highest-value single listen.
+4. **Seed real reviews.** Zero ratings currently, so all human panels are empty.
+5. **Rotate secrets.** A Supabase service_role key and two Vercel tokens are in the
+   session transcripts. Revoking the Vercel token does not affect the live deployment.
+
+---
+
+## What exists
+
+### Site (`web/`) — Next.js 16 + shadcn/ui
+| Route | Purpose |
+|---|---|
+| `/` | Exec summary: ready-to-ship verdict, objective metrics, threshold-derived action items |
+| `/rate` | Blind annotation flow (nav label "Annotate!") |
+| `/samples` | All 145 clips with audio, source text, ASR transcript, word-level diff |
+| `/metrics` | Deep dive: language / difficulty / use-case cuts, rater tags, probe results |
+| `/method` | Methodology, subjective→objective mapping, measurement chain, limitations |
+| `/gtm` | Placeholder |
+
+### Annotation flow (rebuilt 2026-07-21)
+- **The reveal**, which had been designed and never built. After submitting, the reviewer
+  sees their score against UTMOS on the same 1-5 scale, the measured metrics, and what
+  the recogniser actually heard. Calls out when every automated check passed but the
+  human scored it low.
+- **Blindness is architectural**: `/rate` is served a metrics-stripped payload, and
+  `/api/clip-metrics` is called only AFTER a rating is submitted. Nothing to leak.
+- **Targeted probes**, driven by each clip's `stress_category`. WER is blind to HOW
+  something was vocalized (character-by-character and chunked readings of `A739K2`
+  transcribe identically), so the reviewer is asked directly. 8 probe types plus a
+  universal accent probe. Answers validated against the declared taxonomy.
+- Accent is `probeOnly`: documented in the methodology table, no longer a chip, so the
+  same signal is not collected twice and split.
+- Sets of 10 with a real finish line, skip/back, progress, keyboard (space/1-5/enter/s/b).
+- Mobile verified at 375x812 on all five pages: no body-level horizontal scroll; wide
+  tables scroll inside their own containers.
 
 ### Corpus (v2)
-29 items x 5 languages = 145 clips. Banking / healthcare / customer service / gaming NPC.
-Domain-relevant, stress-covered (numbers, units, currency, URLs, acronyms, codes, phone
-numbers, dates, proper nouns, loanwords, percentages, ALL-CAPS, long prosody, very short,
-homographs). Length 2-18s, capped under 20s. Generated by `corpus/build_corpus.py`;
-edit the Python and re-run. User has signed off on the queries.
+29 items x 5 languages = 145 clips across banking / healthcare / customer service /
+gaming NPC. Generated by `corpus/build_corpus.py`; edit the Python and re-run. User has
+signed off on the queries.
 
 ### Results (scored on large-v3)
-| metric | value |
-|---|---|
-| WER | **3.85%** normalized (7.16% raw), micro-averaged |
-| UTMOS | 4.04 |
-| DNSMOS | 3.34 |
-| TTFA p90 | 92ms, pooled across 145 trials |
-| truncations | 0 |
-
+WER **3.85%** normalized (7.16% raw, micro-averaged) · UTMOS 4.04 · DNSMOS 3.34 ·
+TTFA p90 92ms pooled · 0 truncations.
 Per-language WER: en 2.23 / es 2.65 / de 3.55 / pt 4.70 / fr 5.86.
 **Not comparable across languages** (see measurement chain).
 
-### Voices: persona-matched, validated
-Steven(gb) Miguel(es) Romain(fr) David(de) Rodrigo(pt) — all current-gen, masculine,
-adult, native region, "Neutral/Informational". F0 spread landed at 2.81-3.62 semitones
-across the five, a tight band, so the tag-based match held in actual delivery.
+### Voices: persona-matched and validated
+Steven(gb) Miguel(es) Romain(fr) David(de) Rodrigo(pt), all current-gen, masculine,
+adult, native region, "Neutral/Informational". F0 spread 2.81-3.62 semitones across the
+five, so the tag-based match held in actual delivery.
 
-### THE MEASUREMENT CHAIN (the most valuable finding of the project)
+---
+
+## THE MEASUREMENT CHAIN (most valuable finding of the project)
+
 Three figures that looked like Gradium defects were properties of our own tooling:
+
 1. **Recogniser size.** `whisper small` put Portuguese at 10.68% WER. `large-v3` on the
    identical audio: 4.70%. Several pt transcripts became character-identical to source;
-   `small` had been inventing words (transcribed Portuguese "xarope" as English "syrup").
+   `small` had been inventing words, transcribing Portuguese "xarope" as English "syrup".
    Controlled: 10 pt/fr clips went 36.5% -> 14.9% while 3 en/de/es controls did not move.
 2. **Corpus authoring.** Codes were written pre-spelled (`A, 7, 3, 9, K, 2`), a form no
-   production system stores. Rewritten to `A739K2` etc; WER 50-73% -> 0%.
+   production system stores. Rewritten to `A739K2`; WER 50-73% -> 0%.
 3. **Normalization.** Whisper's own normalizers (English + Basic) plus one documented
-   rule for alphanumeric tokenization, because `BasicTextNormalizer` does not address it
-   and returns `A739K2` as one token in fr/de but `A 739 K2` in en/es/pt. Raw and
-   normalized both published.
+   rule for alphanumeric tokenization, because `BasicTextNormalizer` does not address it:
+   Whisper returns `A739K2` as one token in fr/de but `A 739 K2` in en/es/pt, for
+   identical input. Raw and normalized are both published.
 
 There is **no community standard** for multilingual WER normalization. The multilingual
 ASR leaderboard documents its English pipeline and not its multilingual one; published
@@ -108,25 +129,27 @@ disclosure is a differentiator, not a caveat. Written up on `/method`.
 
 - **Repo**: git at the Gradium root. `gradbot/`, `.venv/`, `node_modules/`, all `.env`
   excluded and verified.
-- **Site**: Next.js 16 + shadcn/ui in `web/`. Routes `/` `/rate` `/samples` `/metrics`
-  `/method` `/gtm`.
 - **Deploy**: `cd web && npx vercel deploy --prod --yes --token=<TOKEN>`. CLI-from-local,
-  no GitHub remote needed. Vercel project `jo-vo/soundcheck`.
+  no GitHub remote. Vercel project `jo-vo/soundcheck`, account `jovo-nyc`. Tokens are
+  short-lived by choice; a revoked token means "get a fresh one", not a broken setup.
 - **Supabase**: project ref `vrngmmxqfmbxfecflpay`, `ratings` table, RLS on with no
   policies (service-role only). Gotcha: the Data API screen hands you a URL with
   `/rest/v1/` appended; `SUPABASE_URL` must be the bare origin.
 - **Pipeline**: incremental. `run_batch.py` skips already-scored clips (0 credits),
   `--only <ids>` for targeted work, `--rescore` re-applies metrics to existing audio with
   no API calls, `--dry-run` prints cost. Defaults to `large-v3`.
-- **Publish**: `python export_site.py` -> writes `clips.json`, copies audio, prunes stale.
+- **Publish**: `python export_site.py` writes `clips.json`, copies audio, prunes stale.
+- **Spend**: ~24.2k Gradium credits total. All rescoring since has been free.
 
-### Spend so far
-~24.2k credits (23k initial run + 1.2k for the 3 corrected code items). All rescoring
-since then has been free.
-
-### Gotchas
-- A local dev server with `.env.local` set writes to the SAME production Supabase.
+## Gotchas
+- A local dev server with `.env.local` set writes to the SAME production Supabase. Park
+  the file (`mv .env.local .env.local.PARKED`) before local testing.
+- The same missing-column failure surfaces as Postgres `42703` on a SELECT but PostgREST
+  `PGRST204` on an INSERT. Detection must match both.
 - `lib/clips.ts` must stay free of `node:fs`; the loader is `lib/load-clips.ts`.
 - The in-memory ratings fallback hangs off `globalThis` or handlers and pages diverge.
 - shadcn's `Button` here has no `asChild`.
 - Node is at `/opt/homebrew/bin`, not always on a fresh shell's PATH.
+- The browser automation tool sends keyboard events with an empty `key` field; keyboard
+  shortcuts that look broken under automation may be fine for real users. Verify with a
+  constructed `KeyboardEvent` before "fixing" working code.
