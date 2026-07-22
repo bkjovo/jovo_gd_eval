@@ -88,6 +88,29 @@ export type ClipsPayload = {
   clips: Clip[];
 };
 
+/**
+ * Corpus display order: use case, then line number, then language.
+ *
+ * The JSON is in generation order, which appends the long_prosody lines at the end —
+ * so health-07 landed after game-07 instead of after health-06. Ordering by the parts
+ * of the id keeps every use case in one contiguous block.
+ */
+const LANG_ORDER = ["en", "es", "fr", "de", "pt"];
+
+export function byCorpusOrder(a: Clip, b: Clip): number {
+  const parse = (id: string) => {
+    const m = /^([a-z]+)-(\d+)-([a-z]+)$/.exec(id);
+    return m ? { group: m[1], n: Number(m[2]), lang: m[3] } : { group: id, n: 0, lang: "" };
+  };
+  const x = parse(a.id);
+  const y = parse(b.id);
+  return (
+    x.group.localeCompare(y.group) ||
+    x.n - y.n ||
+    LANG_ORDER.indexOf(x.lang) - LANG_ORDER.indexOf(y.lang)
+  );
+}
+
 export function mean(xs: number[]): number {
   if (xs.length === 0) return NaN;
   return xs.reduce((a, b) => a + b, 0) / xs.length;

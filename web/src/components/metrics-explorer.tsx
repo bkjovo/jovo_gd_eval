@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
+import { ChevronRight } from "lucide-react";
 import type { Clip } from "@/lib/clips";
+import Link from "next/link";
 import { mean, microWer, pooledTtfa } from "@/lib/clips";
 import type { ClipAggregate } from "@/lib/ratings";
 import {
@@ -18,6 +20,7 @@ import {
   TONES,
   TONE_FIT,
 } from "@/lib/annotation";
+import { ALL, FilterSelect } from "@/components/filter-select";
 import { StatTile } from "@/components/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,52 +38,25 @@ type Props = {
   clips: Clip[];
   aggregates: Record<string, ClipAggregate>;
   totalRatings: number;
+  coverage: { ratings: number; clipsRated: number; sessions: number };
 };
 
-const ALL = "__all__";
-
-function Filter({
-  label,
-  value,
-  options,
-  onChange,
-  format,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
-  format?: (v: string) => string;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 rounded-md border bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-      >
-        <option value={ALL}>All</option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {format ? format(o) : o}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
+function byLanguage(clips: Clip[]) {
+  const map = new Map<string, Clip[]>();
+  for (const c of clips) map.set(c.lang, [...(map.get(c.lang) ?? []), c]);
+  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]));
 }
 
-export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
+export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: Props) {
   const [lang, setLang] = useState(ALL);
-  const [difficulty, setDifficulty] = useState(ALL);
+  const [stress, setStress] = useState(ALL);
   const [useCase, setUseCase] = useState(ALL);
   const [selected, setSelected] = useState<string | null>(null);
 
   const options = useMemo(
     () => ({
       langs: [...new Set(clips.map((c) => c.lang))].sort(),
-      difficulties: [...new Set(clips.map((c) => c.difficulty))].sort(),
+      stress: [...new Set(clips.map((c) => c.stress_category))].sort(),
       useCases: [...new Set(clips.map((c) => c.use_case))].sort(),
     }),
     [clips],
@@ -91,13 +67,11 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
       clips.filter(
         (c) =>
           (lang === ALL || c.lang === lang) &&
-          (difficulty === ALL || c.difficulty === difficulty) &&
+          (stress === ALL || c.stress_category === stress) &&
           (useCase === ALL || c.use_case === useCase),
       ),
-    [clips, lang, difficulty, useCase],
+    [clips, lang, stress, useCase],
   );
-
-  const detail = selected ? filtered.find((c) => c.id === selected) ?? null : null;
 
   const crossLanguage = lang === ALL && options.langs.length > 1;
 
@@ -105,20 +79,21 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
     <div className="space-y-8">
       {/* --- Cuts --- */}
       <div className="flex flex-wrap items-end gap-4 rounded-lg border bg-card p-4">
-        <Filter
+        <FilterSelect
           label="Language"
           value={lang}
           options={options.langs}
           onChange={setLang}
           format={(l) => LANGUAGE_NAMES[l] ?? l}
         />
-        <Filter
-          label="Difficulty"
-          value={difficulty}
-          options={options.difficulties}
-          onChange={setDifficulty}
+        <FilterSelect
+          label="Stress case"
+          value={stress}
+          options={options.stress}
+          onChange={setStress}
+          format={(v) => v.replace(/_/g, " ")}
         />
-        <Filter
+        <FilterSelect
           label="Use case"
           value={useCase}
           options={options.useCases}
@@ -138,6 +113,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
         <>
           {/* --- Headline metrics for the cut --- */}
           <section className="space-y-3">
+            <h2 className="text-sm font-medium">Objective metrics</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <StatTile
                 dimension={DIMENSIONS.int.label}
@@ -145,7 +121,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
                 value={microWer(filtered).wer.toFixed(2)}
                 unit="%"
                 verdict={verdictFor("wer_pct", microWer(filtered).wer)}
-                caption={`Micro-averaged: ${microWer(filtered).errors} errors / ${microWer(filtered).words} words`}
+                caption={`${microWer(filtered).errors} errors / ${microWer(filtered).words} words`}
               />
               <StatTile
                 dimension={DIMENSIONS.nat.label}
@@ -196,7 +172,8 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
           {/* --- Blind-spot probe answers: the signal no metric produces --- */}
           <HumanFindings clips={filtered} aggregates={aggregates} />
 
-          {/* --- Per-clip table --- */}
+          {/* --- Per-clip table. Rows expand in place: a detail panel rendered at the
+               bottom of a 145-row table is off-screen from the row that opened it. --- */}
           <section className="space-y-3">
             <h2 className="text-sm font-medium">Per-clip detail</h2>
             <Card>
@@ -208,11 +185,8 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
                         <TableHead>Clip</TableHead>
                         <TableHead>Stress case</TableHead>
                         <TableHead className="text-right">WER %</TableHead>
-                        <TableHead className="text-right">UTMOS</TableHead>
-                        <TableHead className="text-right">DNSMOS</TableHead>
                         <TableHead className="text-right">TTFA p90</TableHead>
-                        <TableHead className="text-right">Human score</TableHead>
-                        <TableHead className="text-right">n</TableHead>
+                        <TableHead className="text-right"># annotations</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -220,39 +194,48 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
                         const agg = aggregates[c.id];
                         const isOpen = selected === c.id;
                         return (
-                          <TableRow
-                            key={c.id}
-                            onClick={() => setSelected(isOpen ? null : c.id)}
-                            className={cn("cursor-pointer", isOpen && "bg-muted/50")}
-                          >
-                            <TableCell>
-                              <div className="font-mono text-xs">{c.id}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {LANGUAGE_NAMES[c.lang] ?? c.lang} · {c.difficulty}
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-xs text-muted-foreground">
-                              {c.stress_category.replace(/_/g, " ")}
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums">
-                              {c.metrics.int.wer_pct.toFixed(1)}
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums">
-                              {c.metrics.nat.utmos.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums">
-                              {c.metrics.aud.dnsmos_ovrl.toFixed(2)}
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums">
-                              {c.metrics.lat.ttfa_p90_ms.toFixed(0)} ms
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums">
-                              {agg ? agg.mean_overall.toFixed(2) : "\u2013"}
-                            </TableCell>
-                            <TableCell className="text-right tabular-nums text-muted-foreground">
-                              {agg?.n ?? 0}
-                            </TableCell>
-                          </TableRow>
+                          <Fragment key={c.id}>
+                            <TableRow
+                              onClick={() => setSelected(isOpen ? null : c.id)}
+                              className={cn("cursor-pointer", isOpen && "bg-muted/50")}
+                            >
+                              <TableCell>
+                                <div className="flex items-center gap-1.5">
+                                  <ChevronRight
+                                    className={cn(
+                                      "size-3 shrink-0 text-muted-foreground transition-transform",
+                                      isOpen && "rotate-90",
+                                    )}
+                                  />
+                                  <div>
+                                    <div className="font-mono text-xs">{c.id}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {LANGUAGE_NAMES[c.lang] ?? c.lang}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                {c.stress_category.replace(/_/g, " ")}
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums">
+                                {c.metrics.int.wer_pct.toFixed(1)}
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums">
+                                {c.metrics.lat.ttfa_p90_ms.toFixed(0)} ms
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums text-muted-foreground">
+                                {agg?.n ?? 0}
+                              </TableCell>
+                            </TableRow>
+                            {isOpen ? (
+                              <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={5} className="bg-muted/30 p-4">
+                                  <ClipDetail clip={c} agg={agg} />
+                                </TableCell>
+                              </TableRow>
+                            ) : null}
+                          </Fragment>
                         );
                       })}
                     </TableBody>
@@ -260,11 +243,103 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
                 </div>
               </CardContent>
             </Card>
-            <p className="text-xs text-muted-foreground">Select a row for the full breakdown.</p>
+            <p className="text-xs text-muted-foreground">
+              Select a row to expand it. # annotations counts submitted reviews from the
+              Annotate tab.
+            </p>
           </section>
 
-          {/* --- Detail panel --- */}
-          {detail ? <ClipDetail clip={detail} agg={aggregates[detail.id]} /> : null}
+          {/* --- Per-language objective breakdown, moved from the archived summary --- */}
+          <section className="space-y-3">
+            <h2 className="text-sm font-medium">By language (objective metrics only)</h2>
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Language</TableHead>
+                        <TableHead className="text-right">Clips</TableHead>
+                        <TableHead className="text-right">WER %</TableHead>
+                        <TableHead className="text-right">CER %</TableHead>
+                        <TableHead className="text-right">UTMOS</TableHead>
+                        <TableHead className="text-right">DNSMOS</TableHead>
+                        <TableHead className="text-right">F0 std (st)</TableHead>
+                        <TableHead className="text-right">TTFA p90</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {byLanguage(filtered).map(([l, group]) => (
+                        <TableRow key={l}>
+                          <TableCell className="font-medium">
+                            {LANGUAGE_NAMES[l] ?? l}
+                            <span className="ml-2 font-mono text-xs text-muted-foreground">
+                              {l}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">{group.length}</TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {microWer(group).wer.toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {mean(group.map((c) => c.metrics.int.cer_pct)).toFixed(1)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {mean(group.map((c) => c.metrics.nat.utmos)).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {mean(group.map((c) => c.metrics.aud.dnsmos_ovrl)).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {mean(group.map((c) => c.metrics.nat.f0_semitone_std)).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right tabular-nums">
+                            {pooledTtfa(group, 90).value.toFixed(0)} ms
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* --- Review coverage, moved from the archived summary --- */}
+          <section>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Review coverage</CardTitle>
+                <CardDescription className="text-xs">
+                  How much human signal backs the findings above.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <div className="text-2xl font-semibold tabular-nums">{coverage.ratings}</div>
+                    <div className="text-xs text-muted-foreground">annotations collected</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-semibold tabular-nums">
+                      {coverage.clipsRated}/{clips.length}
+                    </div>
+                    <div className="text-xs text-muted-foreground">clips with at least one</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-semibold tabular-nums">{coverage.sessions}</div>
+                    <div className="text-xs text-muted-foreground">distinct rater sessions</div>
+                  </div>
+                </div>
+                <Link
+                  href="/rate"
+                  className="inline-flex items-center rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background hover:opacity-90"
+                >
+                  Contribute a review
+                </Link>
+              </CardContent>
+            </Card>
+          </section>
         </>
       )}
     </div>
@@ -283,22 +358,16 @@ type Highlight = {
 };
 
 /**
- * Top issues: the five findings worth leading with for the current cut.
+ * Top issues: the findings worth leading with for the current cut.
  *
  * Emitted in a fixed order of decision-relevance, taking the first five that clear
  * their threshold. Not sorted by a severity score: ranking a word error rate against a
  * loudness spread against a share of reviewers requires inventing an exchange rate
- * between unlike units, and the result would look objective without being it. The
- * order below is an editorial judgement and is meant to read as one.
+ * between unlike units, and the result would look objective without being it.
  *
- * Reviewer-derived findings come first because they are the ones the automated stack
- * cannot produce, and the two leading ones are specifically about the metrics being
- * wrong — a defect WER scored as perfect, and an error that was our recogniser rather
- * than the voice. Those are the findings that change what a research team does next.
- *
- * Every group is guarded on a minimum denominator. A stress category with nine words
- * in the cut can hit 33% WER on a single substitution, and leading with that would be
- * reporting noise as a finding.
+ * Every grouped finding is guarded on two denominators, at least 25 words and more than
+ * one clip. A stress category with nine words in the cut can hit 33% on a single
+ * substitution, which is noise rather than a finding.
  */
 function TopIssues({
   clips,
@@ -338,31 +407,13 @@ function TopIssues({
     const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
     const times = (v: number) =>
-      overall.wer > 0.05 ? `${(v / overall.wer).toFixed(1)}× the ${overall.wer.toFixed(1)}% average for this cut` : "against a corpus average of effectively zero";
+      overall.wer > 0.05
+        ? `${(v / overall.wer).toFixed(1)}x the ${overall.wer.toFixed(1)}% average for this cut`
+        : "cut average is effectively zero";
 
     // ---- reviewer-derived ----
     const reviewed = clips.filter((c) => (aggregates[c.id]?.n ?? 0) > 0);
     const reviewsInScope = reviewed.reduce((s, c) => s + (aggregates[c.id]?.n ?? 0), 0);
-    const flaggedWords = (a: ClipAggregate) =>
-      Object.values(a.word_issue_counts).reduce((s, v) => s + v, 0);
-
-    // The thesis of the whole tool: a clip can be word-perfect to an ASR round trip and
-    // still be wrong to an ear, because the recogniser normalises away exactly the
-    // failures the stress corpus was built to provoke.
-    const silent = reviewed.filter(
-      (c) => c.metrics.int.wer_pct === 0 && flaggedWords(aggregates[c.id]) > 0,
-    );
-    if (silent.length > 0) {
-      out.push({
-        id: "silent",
-        kind: "reviewers",
-        value: String(silent.length),
-        title: `clip${silent.length === 1 ? "" : "s"} scored 0% WER, yet reviewers heard a word fail`,
-        detail: `${silent.length} of ${reviewed.length} reviewed clips scored 0.0% word error rate while a reviewer flagged a word inside them. These are invisible to the round trip by construction: the recogniser writes down what the word should have been.`,
-        tone: "bad",
-      });
-    }
-
     const adj: Record<string, number> = {};
     for (const c of clips) {
       const a = aggregates[c.id];
@@ -377,9 +428,10 @@ function TopIssues({
         id: "adjudication",
         kind: "reviewers",
         value: String(Math.round((adjAsr / adjTotal) * 100)),
-        unit: "%",
-        title: "of flagged errors were our instrument, not the voice",
-        detail: `Reviewers adjudicated ${adjTotal} disputed words by ear: ${adjAudio} ${adjAudio === 1 ? "was" : "were"} genuinely wrong in the audio, ${adjAsr} ${adjAsr === 1 ? "was" : "were"} the recogniser mishearing a correct reading. Raw WER charges the model for both.`,
+        unit: "% of disputed words",
+        title:
+          "of ASR-identified WER errors (post-normalizations) were flagged by raters as non-issues",
+        detail: `${adjTotal} disputed words adjudicated by ear. ${adjAudio} wrong in the audio, ${adjAsr} misheard by the recogniser. Raw WER counts both.`,
         tone: "warn",
       });
     }
@@ -391,9 +443,9 @@ function TopIssues({
         id: "stress",
         kind: "measured",
         value: byStress.wer.toFixed(1),
-        unit: "%",
+        unit: "% WER",
         title: `${byStress.k.replace(/_/g, " ")} is the worst stress case`,
-        detail: `${plural(byStress.errors, "error")} across ${byStress.words} words in ${plural(byStress.count, "clip")} — ${times(byStress.wer)}.`,
+        detail: `${plural(byStress.errors, "error")} across ${byStress.words} words in ${plural(byStress.count, "clip")}. ${times(byStress.wer)}.`,
         tone: verdictFor("wer_pct", byStress.wer) === "fail" ? "bad" : "warn",
       });
     }
@@ -405,9 +457,9 @@ function TopIssues({
           id: "language",
           kind: "measured",
           value: byLang.wer.toFixed(1),
-          unit: "%",
+          unit: "% WER",
           title: `${LANGUAGE_NAMES[byLang.k] ?? byLang.k} has the highest word error rate`,
-          detail: `${plural(byLang.errors, "error")} across ${byLang.words} words. Treat as a lead, not a verdict: WER is read through a recogniser whose own accuracy varies by language, so part of any cross-language gap is the instrument. This corpus has already had one such figure turn out to be exactly that.`,
+          detail: `${plural(byLang.errors, "error")} across ${byLang.words} words. Not comparable across languages: ASR accuracy itself varies by language.`,
           tone: "warn",
         });
       }
@@ -419,9 +471,9 @@ function TopIssues({
         id: "usecase",
         kind: "measured",
         value: byUse.wer.toFixed(1),
-        unit: "%",
+        unit: "% WER",
         title: `${byUse.k.replace(/_/g, " ")} is the worst use case`,
-        detail: `${plural(byUse.errors, "error")} across ${byUse.words} words in ${plural(byUse.count, "clip")} — ${times(byUse.wer)}.`,
+        detail: `${plural(byUse.errors, "error")} across ${byUse.words} words in ${plural(byUse.count, "clip")}. ${times(byUse.wer)}.`,
         tone: verdictFor("wer_pct", byUse.wer) === "fail" ? "bad" : "warn",
       });
     }
@@ -443,9 +495,9 @@ function TopIssues({
         id: "tone",
         kind: "reviewers",
         value: String(Math.round((toneMismatch / toneTotal) * 100)),
-        unit: "%",
+        unit: "% of tone judgements",
         title: "of clips were read in a tone that did not fit the use case",
-        detail: `${toneMismatch} of ${toneTotal} tone judgements landed outside what the use case wants — an urgent read on a healthcare line, say. Nothing in the automated stack scores register.`,
+        detail: `${toneMismatch} of ${toneTotal} tone judgements fell outside the register the use case calls for. No metric in the stack scores register.`,
         tone: "warn",
       });
     }
@@ -464,8 +516,9 @@ function TopIssues({
         id: "kind",
         kind: "reviewers",
         value: String(topKind[1]),
+        unit: "flags",
         title: `${kindLabel.toLowerCase()} is the most common word-level failure`,
-        detail: `Flagged ${topKind[1]} times. WER tells you a clip was wrong; it cannot tell you which word broke or why, which is what a fix has to start from.`,
+        detail: "WER identifies that a clip was wrong, not which word broke.",
         tone: "warn",
       });
     }
@@ -476,9 +529,9 @@ function TopIssues({
         id: "ttfa",
         kind: "measured",
         value: ttfa.value.toFixed(0),
-        unit: "ms",
+        unit: "ms TTFA p90",
         title: "time-to-first-audio p90 is above target",
-        detail: `Pooled across ${ttfa.nTrials} trials, against a ${THRESHOLDS.ttfa_p90_ms.warn}ms target. The tail is what a caller notices on a live line, not the median.`,
+        detail: `Pooled across ${ttfa.nTrials} trials. Target is ${THRESHOLDS.ttfa_p90_ms.warn}ms.`,
         tone: verdictFor("ttfa_p90_ms", ttfa.value) === "fail" ? "bad" : "warn",
       });
     }
@@ -489,9 +542,9 @@ function TopIssues({
         id: "utmos",
         kind: "measured",
         value: utmos.toFixed(2),
-        unit: "/ 5",
+        unit: "/ 5 UTMOS",
         title: "predicted naturalness is below target",
-        detail: `Against a ${THRESHOLDS.utmos.warn} target. UTMOS is English-trained, so this figure is weakest exactly where a non-English cut needs it most.`,
+        detail: `Target is ${THRESHOLDS.utmos.warn}. UTMOS is English-trained and less reliable on other languages.`,
         tone: verdictFor("utmos", utmos) === "fail" ? "bad" : "warn",
       });
     }
@@ -503,9 +556,9 @@ function TopIssues({
         id: "lufs",
         kind: "measured",
         value: spread.toFixed(1),
-        unit: "LU",
+        unit: "LU spread",
         title: "loudness varies across the corpus",
-        detail: `From ${Math.min(...lufs).toFixed(1)} to ${Math.max(...lufs).toFixed(1)} LUFS. A caller hears this as one clip being quieter than the last, and it is a normalisation fix rather than a model one.`,
+        detail: `${Math.min(...lufs).toFixed(1)} to ${Math.max(...lufs).toFixed(1)} LUFS. A normalisation fix, not a model one.`,
         tone: "warn",
       });
     }
@@ -520,36 +573,25 @@ function TopIssues({
       <div>
         <h2 className="text-sm font-medium">Top issues</h2>
         <p className="text-xs text-muted-foreground">
-          What this cut is actually saying, from the measurements and from the{" "}
-          {reviewsInScope} review{reviewsInScope === 1 ? "" : "s"} covering it
-          {totalRatings > 0 ? ` (${totalRatings} across the full corpus)` : ""}.
+          From the measurements and from the {reviewsInScope} annotation
+          {reviewsInScope === 1 ? "" : "s"} covering this cut
+          {totalRatings > 0 ? ` (${totalRatings} across the corpus)` : ""}.
         </p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {highlights.map((h) => (
-          <Card
-            key={h.id}
-            className={cn(
-              "border-l-4",
-              h.tone === "bad" ? "border-l-red-500/70" : "border-l-amber-500/70",
-            )}
-          >
-            <CardContent className="space-y-2 pt-6">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "text-[10px] font-normal",
-                  h.kind === "reviewers"
-                    ? "border-amber-500/40 text-amber-700 dark:text-amber-400"
-                    : "text-muted-foreground",
-                )}
-              >
-                {h.kind === "reviewers" ? "from reviewers" : "measured"}
-              </Badge>
-              <div className="flex items-baseline gap-1">
+      <Card>
+        <CardContent className="divide-y p-0">
+          {highlights.map((h) => (
+            <div
+              key={h.id}
+              className={cn(
+                "flex flex-col gap-1 border-l-4 p-4 sm:flex-row sm:items-baseline sm:gap-4",
+                h.tone === "bad" ? "border-l-red-500/70" : "border-l-amber-500/70",
+              )}
+            >
+              <div className="flex shrink-0 items-baseline gap-1.5 sm:w-52">
                 <span
                   className={cn(
-                    "text-3xl font-semibold tabular-nums",
+                    "text-2xl font-semibold tabular-nums",
                     h.tone === "bad"
                       ? "text-red-600 dark:text-red-400"
                       : "text-amber-600 dark:text-amber-400",
@@ -558,15 +600,28 @@ function TopIssues({
                   {h.value}
                 </span>
                 {h.unit ? (
-                  <span className="text-sm text-muted-foreground">{h.unit}</span>
+                  <span className="text-xs text-muted-foreground">{h.unit}</span>
                 ) : null}
               </div>
-              <p className="text-sm font-medium leading-snug">{h.title}</p>
-              <p className="text-xs leading-relaxed text-muted-foreground">{h.detail}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium leading-snug">{h.title}</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">{h.detail}</p>
+              </div>
+              <Badge
+                variant="outline"
+                className={cn(
+                  "shrink-0 self-start text-[10px] font-normal sm:self-center",
+                  h.kind === "reviewers"
+                    ? "border-amber-500/40 text-amber-700 dark:text-amber-400"
+                    : "text-muted-foreground",
+                )}
+              >
+                {h.kind === "reviewers" ? "from reviewers" : "measured"}
+              </Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </section>
   );
 }
@@ -718,7 +773,7 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
 
 
 /**
- * What only humans could tell us.
+ * Human-generated insights.
  *
  * Nothing on this panel is derivable from the automated stack. Word-level flags say
  * WHICH word failed and how, which no clip-level metric produces. Tone-vs-use-case is
@@ -762,13 +817,7 @@ function HumanFindings({
   if (roll.n === 0) {
     return (
       <section className="space-y-3">
-        <div>
-          <h2 className="text-sm font-medium">What only humans could tell us</h2>
-          <p className="text-xs text-muted-foreground">
-            Word-level failures, register, and whether a flagged error was really the
-            model or really the recogniser. None of this is derivable from the metrics.
-          </p>
-        </div>
+        <h2 className="text-sm font-medium">Human-generated insights</h2>
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
           No reviews yet.{" "}
           <a href="/rate" className="underline underline-offset-2">Review a set</a> to
@@ -803,14 +852,7 @@ function HumanFindings({
 
   return (
     <section className="space-y-3">
-      <div>
-        <h2 className="text-sm font-medium">What only humans could tell us</h2>
-        <p className="text-xs text-muted-foreground">
-          {roll.n} review{roll.n === 1 ? "" : "s"} in this cut. Word-level failures,
-          register, and whether a flagged error was really the model or really the
-          recogniser. None of this is derivable from the metrics.
-        </p>
-      </div>
+      <h2 className="text-sm font-medium">Human-generated insights</h2>
 
       <div className="grid gap-3 lg:grid-cols-2">
         {/* the instrument-correcting one */}
@@ -819,8 +861,8 @@ function HumanFindings({
             <CardContent className="pt-6">
               <h3 className="text-sm font-medium">Was the flagged error real?</h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Reviewers adjudicated {adjTotal} word{adjTotal === 1 ? "" : "s"} where the
-                recogniser disagreed with the source.
+                {adjTotal} word{adjTotal === 1 ? "" : "s"} where the recogniser disagreed
+                with the source, adjudicated by ear.
               </p>
               <div className="mt-3 flex flex-wrap gap-6">
                 <div>
@@ -841,7 +883,7 @@ function HumanFindings({
                       {Math.round((adjAsr / adjTotal) * 100)}%
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      of flagged errors were our instrument, not the model
+                      flagged by raters as non-issues
                     </div>
                   </div>
                 ) : null}

@@ -330,10 +330,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <h1 className="text-2xl font-semibold tracking-tight">
             Which languages do you understand?
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            You will only be asked about clips in the languages you pick. Judging whether
-            speech is intelligible in a language you do not speak produces noise, not data.
-          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {allLangs.map((l) => {

@@ -196,7 +196,7 @@ export function WordTagger({
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <span>
           {flags.length === 0
-            ? "Tap any word that sounded wrong. Skip if it was all fine."
+            ? "Tap any word that sounded wrong. Move on if it was all fine."
             : `${flags.length} word${flags.length === 1 ? "" : "s"} flagged`}
         </span>
         {flags.length > 0 ? (

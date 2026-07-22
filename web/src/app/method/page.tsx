@@ -17,31 +17,50 @@ export const metadata = {
 const LIMITATIONS = [
   {
     title: "UTMOS and DNSMOS are English-trained",
-    body: "Both predictors were trained on English speech. Their absolute values on Spanish, French, German, and Portuguese are not calibrated. Every ranking in this tool is therefore computed within a single language, and the interface refuses to present a cross-language naturalness comparison without a warning.",
+    body: "Absolute values on Spanish, French, German and Portuguese are uncalibrated. All ranking is computed within a single language.",
   },
   {
-    title: "Word and character error rate are measured through an ASR model",
-    body: "Nothing reads the audio directly. WER and CER come from transcribing the synthesised speech with Whisper and comparing that transcript to the source text, which means every number is a joint measurement of two systems: how well the voice model spoke, and how well the recogniser listened. A Whisper mistake is indistinguishable from a Gradium mistake in the score. This cuts three ways. Absolute WER is a ceiling on measurable quality rather than a true error count. Cross-language comparison is confounded, because Whisper is materially stronger on English than on the other languages here, so part of any gap between languages is the recogniser. And individual flagged clips need a human to confirm before anyone acts on them: the one action-required intelligibility failure in this corpus, fr-1, is a French clip where the recogniser heard \"sourde la veille\" for \"sourd de la veille\", which is at least as likely to be an ASR error as a synthesis error. Read the transcript against the source on the Samples page before treating any single WER figure as a defect.",
+    title: "WER and CER are measured through an ASR model",
+    body: "Nothing reads the audio directly. Both numbers are a joint measurement of the voice model and the recogniser, and a Whisper error is indistinguishable from a Gradium error in the score. Absolute WER is a ceiling on measurable quality, not an error count. Cross-language comparison is confounded because Whisper is stronger on English than on the other four languages.",
   },
   {
     title: "No ground-truth audio exists",
-    body: "There is no reference recording of a human saying these lines, so every metric here is reference-free by necessity. That rules out the distributional metrics (TTSDS2 and similar) that would otherwise be the strongest naturalness signal; they require a natural-speech corpus to compare against.",
+    body: "There is no reference recording of these lines, so every metric is reference-free. This rules out distributional metrics such as TTSDS2, which require a natural-speech corpus to compare against.",
   },
   {
     title: "Speaker similarity is not measured",
-    body: "Speaker similarity, meaning whether the output sounds like the intended voice, is absent. It only becomes meaningful when evaluating cloned voices against a reference speaker, which is not what this corpus tests.",
+    body: "It is only meaningful when evaluating cloned voices against a reference speaker, which this corpus does not test.",
   },
   {
     title: "Latency is measured client-side",
-    body: "The API returns no timing information of any kind, so time-to-first-audio is measured around the call with a monotonic clock. It therefore includes network round-trip from wherever the harness ran, and cannot be compared across runs on different networks.",
+    body: "The API returns no timing data, so time-to-first-audio is measured around the call with a monotonic clock. It includes network round-trip and is not comparable across runs on different networks.",
   },
   {
     title: "Anonymous review is spammable",
-    body: "There is no login, because requiring one would cost more signal than it protects. Listening time and replay count are recorded with each rating so low-effort submissions can be filtered after the fact, but a determined bad actor could still skew a small sample.",
+    body: "There is no login. Listening time and replay count are recorded with each rating so low-effort submissions can be filtered after the fact.",
   },
   {
     title: "Small samples are labelled, not hidden",
-    body: "Any figure backed by fewer than three ratings is marked as low-sample rather than quietly rendered. A confident-looking number computed from one opinion is worse than no number.",
+    body: "Any figure backed by fewer than three ratings is marked low-sample.",
+  },
+];
+
+const AGGREGATION = [
+  {
+    title: "Word error rate: micro-averaged, never a percentile",
+    body: "Corpus WER is total errors divided by total reference words, not the mean of per-clip rates. A macro-average weights a two-word utterance the same as a twenty-word one, so the headline moves with corpus composition rather than with the model. A percentile of WER is not meaningful either: WER is already a ratio. Tail behaviour is reported as the single worst clip.",
+  },
+  {
+    title: "Latency: one percentile over pooled trials",
+    body: "Every clip is synthesised several times and each attempt timed. The corpus p90 is computed over all measurements pooled, not by averaging per-clip p90s, which is not a percentile of anything and understates the tail. Pooling is valid because time-to-first-audio is roughly independent of text length. It would not be valid for total synthesis time or real-time factor.",
+  },
+  {
+    title: "Predicted MOS and signal metrics: plain means, within a language",
+    body: "UTMOS and DNSMOS return one bounded score per clip, so a mean is the honest summary.",
+  },
+  {
+    title: "Individual clips report their own values",
+    body: "Nothing on the Samples page or in a per-clip breakdown is aggregated, so any row traces back to the measurement that produced it.",
   },
 ];
 
@@ -60,21 +79,16 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">The problem</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          &ldquo;This sounds robotic.&rdquo; &ldquo;The accent feels off.&rdquo; These are
-          the sentences people actually say about synthetic voice, and none of them are
-          measurable as stated. The usual responses are both unsatisfying: run an expensive
-          human MOS panel that is slow and cannot be repeated per model version, or lean on
-          automated proxies that produce a clean number which may have nothing to do with
-          what users complain about.
+          &ldquo;This sounds robotic.&rdquo; &ldquo;The accent feels off.&rdquo; Neither is
+          measurable as stated. The two standard answers are a human MOS panel, which is
+          slow and cannot be repeated per model version, or automated proxies, which
+          produce a clean number that may not track what users complain about.
         </p>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          This tool does neither. It runs both, on the same clips, and treats{" "}
-          <span className="font-medium text-foreground">
-            the disagreement between them as the finding
-          </span>
-          . An automated metric that passes a clip humans reject is not a rounding error;
-          it is a gap in coverage, and it tells a research team precisely where their
-          current evaluation stack is blind.
+          This tool runs both on the same clips and treats{" "}
+          <span className="font-medium text-foreground">the disagreement as the finding</span>
+          . A metric that passes a clip humans reject is a gap in coverage, and it locates
+          where the evaluation stack is blind.
         </p>
       </section>
 
@@ -83,8 +97,8 @@ export default function MethodPage() {
         <div>
           <h2 className="text-lg font-medium">The defect taxonomy</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Failures are organised into four dimensions. Each is measured independently,
-            because a clip can be perfectly intelligible and still unusable.
+            Four dimensions, measured independently. A clip can be perfectly intelligible
+            and still unusable.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -106,21 +120,16 @@ export default function MethodPage() {
         </div>
       </section>
 
-      {/* --- The mapping: this is the core of the methodology --- */}
+      {/* --- The mapping --- */}
       <section className="space-y-4">
         <div>
-          <h2 className="text-lg font-medium">Subjective judgement → objective metric</h2>
+          <h2 className="text-lg font-medium">Subjective judgement to objective metric</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every checkbox a reviewer can tick is declared alongside the metric that is
-            supposed to catch the same defect. This table is the translation layer, and it
-            is enforced in code: the rating UI and the scoring harness read the same
-            definition.
-          </p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            The small caps label is how the defect is grouped for reviewers while they
-            listen; the Dimension column is which measurement family it belongs to. These
-            deliberately differ in one place. Pronunciation failure sits under Naturalness
-            for a listener, but it is measured as Intelligibility.
+            Every defect a reviewer can report is declared alongside the metric meant to
+            catch it. The rating UI and the scoring harness read the same definition. The
+            small caps label is how the defect is grouped for a listener; Dimension is the
+            measurement family. They differ in one place: pronunciation failure sits under
+            Naturalness for a listener but is measured as Intelligibility.
           </p>
         </div>
 
@@ -183,10 +192,9 @@ export default function MethodPage() {
           <p className="mt-1.5 text-sm text-muted-foreground">
             <span className="font-medium text-foreground">Accent</span> has no objective
             counterpart. Reviewers can hear whether a voice carries the right regional
-            accent for its intended market, and nothing in the automated stack scores it.
-            Naming that explicitly is more useful than quietly implying the suite is
-            complete: it is either a gap that needs a new detector, or a permanent
-            human-in-the-loop check, but it should never be assumed covered.
+            accent for its market; nothing in the automated stack scores it. It is either a
+            gap needing a new detector or a permanent human check, but it should not be
+            assumed covered.
           </p>
         </div>
       </section>
@@ -195,108 +203,57 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Why review happens blind</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Reviewers never see a machine score before submitting. Showing a predicted MOS of
-          4.5 before someone forms their own judgement anchors them to it, and the
-          agreement you then measure is an artifact of your own interface rather than a
-          property of the model. Metrics are structurally excluded from the payload sent to
-          the review page, not merely hidden with CSS.
+          Reviewers never see a machine score, before or after submitting. A predicted MOS
+          shown first anchors the judgement; shown after, it calibrates the reviewer across
+          a session. Either way the agreement measured is an artifact of the interface.
+          Metrics are excluded from the payload sent to the review page rather than hidden
+          in the UI, and the transcript endpoint returns no quality scores.
         </p>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Reviewers are also asked which languages they understand, and are only served
-          clips in those languages. Asking someone to judge whether German speech is
-          intelligible when they do not speak German generates confident noise.
+          Reviewers select the languages they understand and are served only those clips.
         </p>
       </section>
 
       {/* --- Aggregation --- */}
       <section className="space-y-3">
         <h2 className="text-lg font-medium">How figures are aggregated</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Rolling per-clip numbers up into one headline figure is where evaluation tools
-          quietly go wrong, so the choices are stated here rather than left implicit. Each
-          metric is aggregated the way its own distribution warrants; there is no single
-          rule applied to everything.
+        <p className="text-sm text-muted-foreground">
+          Each metric is aggregated the way its own distribution warrants. There is no
+          single rule applied to everything.
         </p>
         <div className="space-y-3">
-          <div className="rounded-lg border p-4">
-            <h3 className="text-sm font-medium">
-              Word error rate: micro-averaged, never a percentile
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Corpus WER is total errors divided by total reference words, not the mean of
-              per-clip rates. A macro-average weights every clip equally regardless of
-              length, so a two-word utterance counts as much as a twenty-word one and the
-              headline moves when the corpus composition changes rather than when the model
-              does. A percentile of WER is not meaningful either: WER is already a ratio,
-              and the p90 of a set of ratios answers &ldquo;how bad is the ninth-worst
-              clip&rdquo;, which is a corpus property rather than a model property. Tail
-              behaviour is reported separately as the single worst clip, which is
-              interpretable.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="text-sm font-medium">
-              Latency: one percentile over the pooled trials
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Every clip is synthesised several times and each attempt is timed. The corpus
-              p90 is computed over all of those measurements pooled together, not by
-              averaging each clip&rsquo;s p90. The mean of a set of tail statistics is not a
-              percentile of anything and systematically understates the real tail. Pooling
-              is sound here because time-to-first-audio is roughly independent of text
-              length; it would not be sound for total synthesis time or real-time factor,
-              which scale with the utterance and would mix populations.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="text-sm font-medium">
-              Predicted MOS and signal metrics: plain means, within a language
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              UTMOS and DNSMOS return one score per clip on a bounded scale, so a mean is
-              the honest summary. It is only ever read within a single language, for the
-              training-data reason described below.
-            </p>
-          </div>
-          <div className="rounded-lg border p-4">
-            <h3 className="text-sm font-medium">Individual clips report their own values</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Nothing on the Samples page or in a per-clip breakdown is aggregated. Each
-              clip shows its own WER against its own transcript, and its own latency
-              across its own trials, so a single row can always be traced back to the
-              measurement that produced it.
-            </p>
-          </div>
+          {AGGREGATION.map((a) => (
+            <div key={a.title} className="rounded-lg border p-4">
+              <h3 className="text-sm font-medium">{a.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{a.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* --- The measurement chain --- */}
       <section className="space-y-3">
         <h2 className="text-lg font-medium">The measurement chain</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Intelligibility is not measured directly. It is measured through a recogniser
-          and a text normalizer, and both are part of the instrument. On this corpus,
-          three separate figures that looked like model defects turned out to be
-          properties of our own tooling. They are documented here because a word error
-          rate is uninterpretable without knowing what produced it.
+        <p className="text-sm text-muted-foreground">
+          Intelligibility is measured through a recogniser and a text normalizer, both part
+          of the instrument. Three figures on this corpus that looked like model defects
+          were properties of our own tooling.
         </p>
 
         <div className="space-y-3">
           <div className="rounded-lg border p-4">
             <h3 className="text-sm font-medium">Recogniser size changed the answer</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              The corpus was first scored with <code className="font-mono text-xs">whisper small</code>,
-              which put Portuguese at 10.68% WER and made it look like the weakest
-              language. Re-scoring the identical audio with{" "}
-              <code className="font-mono text-xs">large-v3</code> took Portuguese to 4.70%.
-              Several Portuguese transcripts became character-identical to the source: the
-              synthesis had been correct all along, and the small model was inventing words,
-              at one point transcribing the Portuguese{" "}
-              <span className="font-medium text-foreground">xarope</span> as the English{" "}
+              Scored with <code className="font-mono text-xs">whisper small</code>,
+              Portuguese came out at 10.68% WER, the weakest language. The identical audio
+              re-scored with <code className="font-mono text-xs">large-v3</code> gave 4.70%.
+              Several Portuguese transcripts became character-identical to the source; the
+              small model had been inventing words, transcribing{" "}
+              <span className="font-medium text-foreground">xarope</span> as{" "}
               <span className="font-medium text-foreground">syrup</span>. A controlled check
               confirmed the effect was specific to non-English: ten Portuguese and French
-              clips improved from 36.5% to 14.9% while three clean English, German and
-              Spanish controls did not move at all. Scoring now defaults to{" "}
+              clips improved from 36.5% to 14.9%, while three English, German and Spanish
+              controls did not move. Scoring defaults to{" "}
               <code className="font-mono text-xs">large-v3</code> and every row records the
               recogniser that produced it.
             </p>
@@ -305,25 +262,36 @@ export default function MethodPage() {
           <div className="rounded-lg border p-4">
             <h3 className="text-sm font-medium">Normalization, and why raw is reported too</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              Text is normalized before alignment using{" "}
-              <span className="font-medium text-foreground">OpenAI&apos;s Whisper normalizers</span>
-              , the ones used to report WER in the Whisper paper:{" "}
+              Text is normalized before alignment with OpenAI&apos;s Whisper normalizers:{" "}
               <code className="font-mono text-xs">EnglishTextNormalizer</code> for English,{" "}
-              <code className="font-mono text-xs">BasicTextNormalizer</code> for the rest.
-              One documented rule is added on top, splitting digit-bearing alphanumeric
-              tokens into characters, because the multilingual normalizer does not address
-              alphanumeric tokenization: Whisper returns{" "}
+              <code className="font-mono text-xs">BasicTextNormalizer</code> otherwise. One
+              rule is added on top, splitting digit-bearing alphanumeric tokens into
+              characters, because Whisper returns{" "}
               <code className="font-mono text-xs">A739K2</code> as one token in French and
               German but as <code className="font-mono text-xs">A 739 K2</code> in English,
-              Spanish and Portuguese, for identical input. Both figures are published, raw
-              and normalized, so the size of the correction is always visible.
+              Spanish and Portuguese for identical input. Raw and normalized are both
+              published so the size of the correction stays visible.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              There is no community standard here. The multilingual ASR leaderboard
-              documents its English normalization and not its multilingual one, and
-              published work finds Whisper&apos;s normalizer corrupts non-Latin scripts
-              outright. Every lab reporting multilingual WER is making undocumented choices
-              that move the numbers; this page is the disclosure.
+              There is no community standard. The multilingual ASR leaderboard documents its
+              English normalization and not its multilingual one, and published work finds
+              Whisper&apos;s normalizer corrupts non-Latin scripts.
+            </p>
+          </div>
+
+          <div className="rounded-lg border p-4">
+            <h3 className="text-sm font-medium">
+              Reviewers adjudicate the recogniser, and it is usually wrong
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              When the transcript disagrees with the source, the reviewer is asked, last and
+              on those words only, whether the audio or the transcript was wrong. Most
+              disputes resolve against the instrument. On{" "}
+              <code className="font-mono text-xs">cs-07-fr</code> the source reads{" "}
+              <span className="font-medium text-foreground">voici 20 pour cent</span> and
+              Whisper wrote <span className="font-medium text-foreground">voici 20%</span>,
+              charging the model three word errors for a correct reading. That verdict is
+              what separates a corrected WER from a raw one.
             </p>
           </div>
 
@@ -332,30 +300,24 @@ export default function MethodPage() {
               Blind spot: how formatted content is vocalized
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              WER cannot tell you whether{" "}
+              WER cannot tell whether{" "}
               <code className="font-mono text-xs">A739K2</code> was read character by
               character or chunked, or whether{" "}
-              <code className="font-mono text-xs">500 mg</code> became &ldquo;milligrams&rdquo;
-              or &ldquo;em gee&rdquo;. Every one of those readings transcribes back to the
-              same string. This is a second named blind spot alongside accent.
+              <code className="font-mono text-xs">500 mg</code> became
+              &ldquo;milligrams&rdquo; or &ldquo;em gee&rdquo;. All of those transcribe back
+              to the same string.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Naming a blind spot is not the same as covering it, so the review flow{" "}
-              <span className="font-medium text-foreground">asks directly</span>. Reviewers
-              tap the individual word that went wrong and say what kind of failure it was:
-              a mispronounced code, a botched acronym, a homograph read the wrong way, a
-              name mangled. That is a level of detail no clip-level metric produces, since
-              word error rate can tell you something broke but never which word.
+              The review flow asks directly. Reviewers tap the word that went wrong and say
+              what kind of failure it was: a mispronounced code, a botched acronym, a
+              homograph read the wrong way, a mangled name. No clip-level metric produces
+              that.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Accent is only partly covered.</span>{" "}
-              A code-switched word can be flagged for a wrong accent, so a French word
-              inside an English sentence is caught. Whether the voice as a whole sounds
-              native for its market is currently not collected: it was asked for a while and
-              removed, because a per-clip question that a reviewer answers the same way
-              fifty times in a row produces agreement rather than information. It remains a
-              real blind spot with no measurement behind it, which is worth stating plainly
-              rather than implying the taxonomy covers it.
+              A code-switched word can be flagged for a wrong accent. Whether the voice as a
+              whole sounds native for its market is not collected: a per-clip question
+              answered the same way fifty times produces agreement, not information.
             </p>
           </div>
         </div>
@@ -365,9 +327,8 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Thresholds</h2>
         <p className="text-sm text-muted-foreground">
-          Action items on the executive summary are generated by comparing measurements
-          against these values. Nothing on that page is hand-written; change the corpus and
-          the findings change with it.
+          Verdicts and derived findings come from comparing measurements against these
+          values. Change the corpus and the findings change with it.
         </p>
         <Card>
           <CardContent className="p-0">
@@ -404,13 +365,13 @@ export default function MethodPage() {
         <h2 className="text-lg font-medium">How a clip gets here</h2>
         <ol className="space-y-2 text-sm text-muted-foreground">
           <li>
-            <span className="font-medium text-foreground">1. Corpus.</span> A line is added
-            to a manifest with its language, difficulty, use case, and stress category.
+            <span className="font-medium text-foreground">1. Corpus.</span> A line enters a
+            manifest with its language, difficulty, use case and stress category.
           </li>
           <li>
-            <span className="font-medium text-foreground">2. Synthesis.</span> The harness
-            calls the Gradium API twice per clip: once buffered for a listenable file,
-            once streamed and timed for latency. The two are deliberately decoupled.
+            <span className="font-medium text-foreground">2. Synthesis.</span> Two Gradium
+            API calls per clip: one buffered for a listenable file, one streamed and timed
+            for latency.
           </li>
           <li>
             <span className="font-medium text-foreground">3. Scoring.</span> Whisper for the
@@ -419,18 +380,17 @@ export default function MethodPage() {
           </li>
           <li>
             <span className="font-medium text-foreground">4. Publication.</span> An export
-            step joins metadata to metrics and writes a single JSON file plus lossless
-            audio. The site reads that file and nothing else.
+            step joins metadata to metrics and writes one JSON file plus lossless audio. The
+            site reads that file and nothing else.
           </li>
           <li>
-            <span className="font-medium text-foreground">5. Review.</span> Humans rate
-            blind here; their input is aggregated by defect category and compared against
-            what the metrics detected.
+            <span className="font-medium text-foreground">5. Review.</span> Humans annotate
+            blind; their input is aggregated and compared against what the metrics detected.
           </li>
         </ol>
         <p className="text-sm text-muted-foreground">
-          Audio is served losslessly. Reviewers are asked to judge audio quality directly,
-          so compressing it would mean humans and DNSMOS were scoring different signals.
+          Audio is served losslessly. Reviewers judge audio quality directly, so compressing
+          it would mean humans and DNSMOS were scoring different signals.
         </p>
       </section>
 
@@ -439,8 +399,7 @@ export default function MethodPage() {
         <div>
           <h2 className="text-lg font-medium">Known limitations</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Stated plainly, because an evaluation tool that hides its own error bars is not
-            an evaluation tool.
+            An evaluation tool that hides its own error bars is not an evaluation tool.
           </p>
         </div>
         <div className="space-y-3">

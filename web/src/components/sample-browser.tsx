@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Clip } from "@/lib/clips";
+import { byCorpusOrder, type Clip } from "@/lib/clips";
 import { LANGUAGE_NAMES, verdictFor } from "@/lib/taxonomy";
+import { ALL, FilterSelect } from "@/components/filter-select";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -15,8 +16,6 @@ import { cn } from "@/lib/utils";
  * error from a recogniser error. Unlike the review flow, metrics are shown here
  * deliberately; this page is for inspection, not for collecting blind judgements.
  */
-
-const ALL = "__all__";
 
 /** Word-level diff so a reader can see exactly where the transcript diverged. */
 function diffWords(source: string, hypothesis: string) {
@@ -91,52 +90,59 @@ function DiffText({
 
 export function SampleBrowser({ clips }: { clips: Clip[] }) {
   const [lang, setLang] = useState(ALL);
+  const [stress, setStress] = useState(ALL);
+  const [useCase, setUseCase] = useState(ALL);
   const [onlyMismatched, setOnlyMismatched] = useState(false);
 
-  const langs = useMemo(
-    () => [...new Set(clips.map((c) => c.lang))].sort(),
+  const options = useMemo(
+    () => ({
+      langs: [...new Set(clips.map((c) => c.lang))].sort(),
+      stress: [...new Set(clips.map((c) => c.stress_category))].sort(),
+      useCases: [...new Set(clips.map((c) => c.use_case))].sort(),
+    }),
     [clips],
   );
 
   const filtered = useMemo(
     () =>
-      clips.filter(
-        (c) =>
-          (lang === ALL || c.lang === lang) &&
-          (!onlyMismatched || c.metrics.int.wer_pct > 0),
-      ),
-    [clips, lang, onlyMismatched],
+      clips
+        .filter(
+          (c) =>
+            (lang === ALL || c.lang === lang) &&
+            (stress === ALL || c.stress_category === stress) &&
+            (useCase === ALL || c.use_case === useCase) &&
+            (!onlyMismatched || c.metrics.int.wer_pct > 0),
+        )
+        .sort(byCorpusOrder),
+    [clips, lang, stress, useCase, onlyMismatched],
   );
 
   return (
     <div className="space-y-6">
-      {/* --- Filters --- */}
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setLang(ALL)}
-          className={cn(
-            "rounded-full border px-3 py-1.5 text-sm transition-colors",
-            lang === ALL ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
-          )}
-        >
-          All languages
-        </button>
-        {langs.map((l) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => setLang(l)}
-            className={cn(
-              "rounded-full border px-3 py-1.5 text-sm transition-colors",
-              lang === l ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
-            )}
-          >
-            {LANGUAGE_NAMES[l] ?? l}
-          </button>
-        ))}
-
-        <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+      {/* --- Cuts --- */}
+      <div className="flex flex-wrap items-end gap-4 rounded-lg border bg-card p-4">
+        <FilterSelect
+          label="Language"
+          value={lang}
+          options={options.langs}
+          onChange={setLang}
+          format={(l) => LANGUAGE_NAMES[l] ?? l}
+        />
+        <FilterSelect
+          label="Stress case"
+          value={stress}
+          options={options.stress}
+          onChange={setStress}
+          format={(s) => s.replace(/_/g, " ")}
+        />
+        <FilterSelect
+          label="Use case"
+          value={useCase}
+          options={options.useCases}
+          onChange={setUseCase}
+          format={(u) => u.replace(/_/g, " ")}
+        />
+        <label className="ml-auto flex cursor-pointer items-center gap-2 pb-1.5 text-sm text-muted-foreground">
           <input
             type="checkbox"
             checked={onlyMismatched}
@@ -148,10 +154,9 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Showing {filtered.length} of {clips.length} clips. Highlighted words mark where the
-        transcript diverged from the source: amber for words the recogniser missed, red for
-        words it added. A divergence is not automatically a synthesis defect, since the
-        recogniser makes its own mistakes.
+        Showing {filtered.length} of {clips.length} clips. Amber marks words the recogniser
+        missed, red marks words it added. A divergence is not necessarily a synthesis
+        defect: the recogniser makes its own errors.
       </p>
 
       {filtered.length === 0 ? (
@@ -177,16 +182,8 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
                     <Badge variant="outline">
                       {c.stress_category.replace(/_/g, " ")}
                     </Badge>
-                    <span className="ml-auto flex items-center gap-3 font-mono text-xs text-muted-foreground">
-                      <span>{c.audio_s.toFixed(1)}s</span>
-                      <span
-                        className={cn(
-                          verdictFor("wer_pct", c.metrics.int.wer_pct) === "fail" &&
-                            "text-red-600 dark:text-red-400",
-                        )}
-                      >
-                        WER {c.metrics.int.wer_pct}%
-                      </span>
+                    <span className="ml-auto font-mono text-xs text-muted-foreground">
+                      latency: {c.metrics.lat.ttfa_p50_ms.toFixed(0)} ms
                     </span>
                   </div>
 
@@ -214,16 +211,23 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
                     </div>
                   </div>
 
-                  {clean ? (
-                    <p className="text-xs text-muted-foreground">
-                      Transcript matches the source exactly.
-                    </p>
-                  ) : (
-                    <p className="font-mono text-xs text-muted-foreground">
-                      {c.metrics.int.sub} sub · {c.metrics.int.ins} ins · {c.metrics.int.del} del
-                      · CER {c.metrics.int.cer_pct}%
-                    </p>
-                  )}
+                  <p className="flex flex-wrap gap-x-3 font-mono text-xs text-muted-foreground">
+                    <span
+                      className={cn(
+                        "font-medium",
+                        verdictFor("wer_pct", c.metrics.int.wer_pct) === "fail"
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-foreground",
+                      )}
+                    >
+                      WER {c.metrics.int.wer_pct}%
+                    </span>
+                    <span>{c.metrics.int.sub} sub</span>
+                    <span>{c.metrics.int.ins} ins</span>
+                    <span>{c.metrics.int.del} del</span>
+                    <span>CER {c.metrics.int.cer_pct}%</span>
+                    {clean ? <span>transcript matches source exactly</span> : null}
+                  </p>
                 </CardContent>
               </Card>
             );

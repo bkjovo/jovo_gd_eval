@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 
 // Short labels keep the full nav visible on narrow screens instead of clipping the
 // last item off the edge.
+// The executive summary is archived: still served at /summary, no longer linked.
 const LINKS = [
-  { href: "/", label: "Executive summary", short: "Summary" },
+  { href: "/metrics", label: "Metrics Deep Dive", short: "Metrics" },
   { href: "/rate", label: "Annotate!", short: "Annotate!" },
   { href: "/samples", label: "Samples", short: "Samples" },
-  { href: "/metrics", label: "Metrics Deep Dive", short: "Metrics" },
   { href: "/method", label: "Methodology", short: "Method" },
   { href: "/gtm", label: "Go-to-market", short: "GTM" },
 ];
@@ -30,7 +30,7 @@ export function SiteNav() {
 
         <nav className="relative flex items-center gap-0.5 overflow-x-auto [scrollbar-width:none] after:pointer-events-none after:sticky after:right-0 after:h-full after:w-6 after:shrink-0 after:bg-gradient-to-l after:from-background sm:gap-1 sm:after:hidden">
           {LINKS.map((l) => {
-            const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+            const active = pathname.startsWith(l.href);
             return (
               <Link
                 key={l.href}

@@ -35,6 +35,11 @@ export default async function MetricsPage() {
         clips={clips}
         aggregates={aggregates}
         totalRatings={ratings.length}
+        coverage={{
+          ratings: ratings.length,
+          clipsRated: Object.keys(aggregates).length,
+          sessions: new Set(ratings.map((r) => r.session_id)).size,
+        }}
       />
     </div>
   );
