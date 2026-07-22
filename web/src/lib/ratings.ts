@@ -1,5 +1,6 @@
 import "server-only";
 import { HUMAN_REJECT_BELOW } from "./taxonomy";
+import type { Annotation } from "./annotation";
 
 /**
  * Rating store.
@@ -25,8 +26,12 @@ export type Rating = {
   overall: number;
   defect_tags: string[];
   other_text?: string | null;
-  /** Targeted probe answers, {probe_id: option_value}. Covers what metrics cannot see. */
-  probes?: Record<string, string>;
+  /**
+   * The structured annotation payload: word-level flags, cut-off, audio issues, tone,
+   * delivery problems, clip-level accent, and ASR adjudication. Stored in one jsonb
+   * column so the review flow can evolve without a migration per question.
+   */
+  probes?: Annotation;
   listened_ms: number;
   replays: number;
 };
@@ -162,8 +167,17 @@ export type ClipAggregate = {
   /** Share of reviewers scoring the clip below HUMAN_REJECT_BELOW. */
   reject_rate: number;
   tag_counts: Record<string, number>;
-  /** {probe_id: {option_value: count}} — the blind-spot answers, aggregated. */
-  probe_counts: Record<string, Record<string, number>>;
+  /** Word-level pronunciation kinds flagged, e.g. {homograph: 3, code: 1}. */
+  word_kind_counts: Record<string, number>;
+  /** Bare word issues, {dropped, wrong_word, pronunciation}. */
+  word_issue_counts: Record<string, number>;
+  tone_counts: Record<string, number>;
+  delivery_counts: Record<string, number>;
+  accent_counts: Record<string, number>;
+  cut_off_yes: number;
+  audio_issue_yes: number;
+  /** ASR adjudication tallies: was the audio wrong, or the transcript? */
+  adjudication_counts: Record<string, number>;
 };
 
 export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate> {
@@ -175,7 +189,14 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
       mean_overall: 0,
       reject_rate: 0,
       tag_counts: {},
-      probe_counts: {},
+      word_kind_counts: {},
+      word_issue_counts: {},
+      tone_counts: {},
+      delivery_counts: {},
+      accent_counts: {},
+      cut_off_yes: 0,
+      audio_issue_yes: 0,
+      adjudication_counts: {},
     });
     a.n += 1;
     a.mean_overall += r.overall;
@@ -183,8 +204,20 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
     for (const t of r.defect_tags ?? []) {
       a.tag_counts[t] = (a.tag_counts[t] ?? 0) + 1;
     }
-    for (const [probe, answer] of Object.entries(r.probes ?? {})) {
-      (a.probe_counts[probe] ??= {})[answer] = (a.probe_counts[probe]?.[answer] ?? 0) + 1;
+    const ann = r.probes ?? {};
+    for (const f of ann.word_flags ?? []) {
+      a.word_issue_counts[f.issue] = (a.word_issue_counts[f.issue] ?? 0) + 1;
+      if (f.kind) a.word_kind_counts[f.kind] = (a.word_kind_counts[f.kind] ?? 0) + 1;
+    }
+    if (ann.tone) a.tone_counts[ann.tone] = (a.tone_counts[ann.tone] ?? 0) + 1;
+    for (const d of ann.delivery_problems ?? []) {
+      a.delivery_counts[d] = (a.delivery_counts[d] ?? 0) + 1;
+    }
+    if (ann.accent) a.accent_counts[ann.accent] = (a.accent_counts[ann.accent] ?? 0) + 1;
+    if (ann.cut_off) a.cut_off_yes += 1;
+    if (ann.audio_issue) a.audio_issue_yes += 1;
+    for (const v of Object.values(ann.adjudication ?? {})) {
+      a.adjudication_counts[v] = (a.adjudication_counts[v] ?? 0) + 1;
     }
   }
   for (const a of Object.values(out)) {

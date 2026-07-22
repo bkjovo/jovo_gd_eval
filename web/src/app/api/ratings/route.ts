@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { insertRating, isPersisted, listRatings, probesDropped, type Rating } from "@/lib/ratings";
-import { ACCENT_PROBE, PROBES, TAGS_BY_ID } from "@/lib/taxonomy";
+import { TAGS_BY_ID } from "@/lib/taxonomy";
+import {
+  ACCENT_IDS,
+  ADJUDICATION_IDS,
+  DELIVERY_IDS,
+  PRONUNCIATION_KIND_IDS,
+  TONE_IDS,
+  WORD_ISSUE_IDS,
+  type Annotation,
+  type WordFlag,
+} from "@/lib/annotation";
 
 export const dynamic = "force-dynamic";
 
@@ -23,19 +33,11 @@ function parseRating(body: unknown): Rating | { error: string } {
     .filter((t): t is string => typeof t === "string")
     .filter((t) => t in TAGS_BY_ID);
 
-  // Probe answers must name a declared probe AND a declared option for it; anything
-  // else is dropped rather than stored, so the aggregate can never contain a value
-  // the taxonomy does not define.
-  const allProbes = { ...PROBES, [ACCENT_PROBE.id]: ACCENT_PROBE };
-  const probes: Record<string, string> = {};
-  if (typeof b.probes === "object" && b.probes !== null) {
-    for (const [k, v] of Object.entries(b.probes as Record<string, unknown>)) {
-      const probe = allProbes[k];
-      if (probe && typeof v === "string" && probe.options.some((o) => o.value === v)) {
-        probes[k] = v;
-      }
-    }
-  }
+  // Everything below is checked against the declared vocabulary and dropped when it
+  // does not match, so an aggregate can never contain a value the taxonomy does not
+  // define. Malformed fields are discarded individually rather than failing the whole
+  // submission: losing one answer is better than losing the reviewer's whole clip.
+  const probes = parseAnnotation(b.probes);
 
   return {
     session_id,
@@ -87,4 +89,55 @@ export async function GET() {
       { status: 502 },
     );
   }
+}
+
+
+function parseAnnotation(raw: unknown): Annotation {
+  if (typeof raw !== "object" || raw === null) return {};
+  const b = raw as Record<string, unknown>;
+  const out: Annotation = {};
+
+  if (Array.isArray(b.word_flags)) {
+    const flags: WordFlag[] = [];
+    for (const f of b.word_flags.slice(0, 200)) {
+      if (typeof f !== "object" || f === null) continue;
+      const g = f as Record<string, unknown>;
+      const index = Number(g.index);
+      const issue = typeof g.issue === "string" ? g.issue : "";
+      if (!Number.isInteger(index) || index < 0 || !WORD_ISSUE_IDS.has(issue as never)) continue;
+      const flag: WordFlag = {
+        index,
+        word: typeof g.word === "string" ? g.word.slice(0, 80) : "",
+        issue: issue as WordFlag["issue"],
+      };
+      // A kind is only meaningful on a pronunciation flag.
+      if (issue === "pronunciation" && typeof g.kind === "string" && PRONUNCIATION_KIND_IDS.has(g.kind)) {
+        flag.kind = g.kind;
+      }
+      flags.push(flag);
+    }
+    if (flags.length) out.word_flags = flags;
+  }
+
+  if (typeof b.cut_off === "boolean") out.cut_off = b.cut_off;
+  if (typeof b.audio_issue === "boolean") out.audio_issue = b.audio_issue;
+  if (typeof b.tone === "string" && TONE_IDS.has(b.tone)) out.tone = b.tone;
+  if (typeof b.accent === "string" && ACCENT_IDS.has(b.accent)) out.accent = b.accent;
+
+  if (Array.isArray(b.delivery_problems)) {
+    const d = b.delivery_problems.filter(
+      (x): x is string => typeof x === "string" && DELIVERY_IDS.has(x),
+    );
+    if (d.length) out.delivery_problems = d;
+  }
+
+  if (typeof b.adjudication === "object" && b.adjudication !== null) {
+    const adj: Record<string, string> = {};
+    for (const [k, v] of Object.entries(b.adjudication as Record<string, unknown>)) {
+      if (/^\d+$/.test(k) && typeof v === "string" && ADJUDICATION_IDS.has(v)) adj[k] = v;
+    }
+    if (Object.keys(adj).length) out.adjudication = adj;
+  }
+
+  return out;
 }

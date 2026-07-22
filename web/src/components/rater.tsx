@@ -3,15 +3,17 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RaterClip } from "@/lib/clips";
+import { LANGUAGE_NAMES } from "@/lib/taxonomy";
 import {
-  ACCENT_PROBE,
-  LANGUAGE_NAMES,
-  TAG_GROUPS,
-  TAG_GROUP_ORDER,
-  probeFor,
-  tagsInGroup,
-  type Probe,
-} from "@/lib/taxonomy";
+  ACCENT_OPTIONS,
+  ADJUDICATION,
+  DELIVERY_PROBLEMS,
+  TONES,
+  type Annotation,
+  type WordFlag,
+} from "@/lib/annotation";
+import { diffWords } from "@/lib/word-diff";
+import { WordTagger } from "@/components/word-tagger";
 import { RatingReveal, type RevealMetrics } from "@/components/rating-reveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,23 +23,28 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
 /**
- * Blind review flow.
+ * Blind review flow, in three passes.
  *
- * No objective metric reaches this component: /rate strips them from the payload, and
- * the reveal fetches them from /api/clip-metrics only AFTER a rating is submitted.
- * Showing a machine score first would anchor the reviewer and destroy the very
- * comparison the product is built on, so blindness is enforced by the data flow rather
- * than by remembering not to render something.
+ *   1. ACCURACY   — source text on screen; tap the words that went wrong.
+ *   2. IMPRESSION — how it sounds, judged holistically. Deliberately separated from
+ *      pass 1 by a scroll, because analytic and gestalt judgements contaminate each
+ *      other when collected together.
+ *   3. ADJUDICATION — only when the recogniser disagreed with the source, and only on
+ *      the disputed words. Runs LAST so the metric's verdict cannot anchor the score
+ *      given in pass 2.
+ *
+ * Pass 1 shows the SOURCE text, never the transcript. A dropped word does not appear
+ * in a transcript at all, so it could not be tapped; and the transcript carries the
+ * recogniser's own errors, which a reviewer would faithfully attribute to the model.
+ * The transcript appears in pass 3 and in the reveal, where the contrast is the point.
+ *
+ * No quality metric reaches this component before submission: /rate is served a
+ * metrics-stripped payload, /api/clip-transcript returns only the transcript, and
+ * /api/clip-metrics is called after the rating is saved.
  */
 
 const SESSION_KEY = "soundcheck.session_id";
 const LANGS_KEY = "soundcheck.langs";
-
-/**
- * The corpus is 145 clips; nobody reviews that in one sitting. Work is handed out in
- * short sets with a real finish line, so the reviewer always knows how much is left
- * and can stop at a natural boundary instead of abandoning mid-queue.
- */
 const SET_SIZE = 10;
 
 function getSessionId(): string {
@@ -50,7 +57,9 @@ function getSessionId(): string {
   return id;
 }
 
-type Phase = "gate" | "rating" | "reveal" | "setdone";
+type Phase = "gate" | "accuracy" | "impression" | "adjudication" | "reveal" | "setdone";
+
+type Transcript = { hypothesis: string; wer_pct: number };
 
 export function Rater({ clips }: { clips: RaterClip[] }) {
   const allLangs = useMemo(() => [...new Set(clips.map((c) => c.lang))].sort(), [clips]);
@@ -61,10 +70,19 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const [index, setIndex] = useState(0);
   const [setStart, setSetStart] = useState(0);
 
-  const [overall, setOverall] = useState<number | null>(null);
-  const [tags, setTags] = useState<string[]>([]);
-  const [probeAnswers, setProbeAnswers] = useState<Record<string, string>>({});
-  const [otherText, setOtherText] = useState("");
+  // pass 1
+  const [wordFlags, setWordFlags] = useState<WordFlag[]>([]);
+  const [cutOff, setCutOff] = useState<boolean | null>(null);
+  // pass 2
+  const [audioIssue, setAudioIssue] = useState<boolean | null>(null);
+  const [humanScore, setHumanScore] = useState<number | null>(null);
+  const [tone, setTone] = useState<string | null>(null);
+  const [delivery, setDelivery] = useState<string[]>([]);
+  const [accent, setAccent] = useState<string | null>(null);
+  // pass 3
+  const [transcript, setTranscript] = useState<Transcript | null>(null);
+  const [adjudication, setAdjudication] = useState<Record<string, string>>({});
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submittedCount, setSubmittedCount] = useState(0);
@@ -76,7 +94,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const playStartRef = useRef<number | null>(null);
   const hasPlayedRef = useRef(false);
   const replaysRef = useRef(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const topRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(LANGS_KEY);
@@ -91,20 +109,23 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   }, []);
 
   const resetClipState = useCallback(() => {
-    setOverall(null);
-    setTags([]);
-    setProbeAnswers({});
-    setOtherText("");
+    setWordFlags([]);
+    setCutOff(null);
+    setAudioIssue(null);
+    setHumanScore(null);
+    setTone(null);
+    setDelivery([]);
+    setAccent(null);
+    setTranscript(null);
+    setAdjudication({});
     setError(null);
     setReveal(null);
     listenedMsRef.current = 0;
     playStartRef.current = null;
     hasPlayedRef.current = false;
     replaysRef.current = 0;
-    setIsPlaying(false);
   }, []);
 
-  /** Order by fewest existing ratings so coverage fills in rather than clustering. */
   const start = useCallback(async () => {
     const eligible = clips.filter((c) => langs.includes(c.lang));
     let counts: Record<string, number> = {};
@@ -130,12 +151,12 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     setIndex(0);
     setSetStart(0);
     resetClipState();
-    setPhase(ordered.length ? "rating" : "setdone");
+    setPhase(ordered.length ? "accuracy" : "setdone");
   }, [clips, langs, resetClipState]);
 
   const current = queue[index];
   const inSet = index - setStart;
-  const targetedProbe: Probe | null = current ? probeFor(current.stress_category) : null;
+  const setTotal = Math.min(SET_SIZE, Math.max(1, queue.length - setStart));
 
   const togglePlay = useCallback(() => {
     const el = audioRef.current;
@@ -143,6 +164,13 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     if (el.paused) void el.play();
     else el.pause();
   }, []);
+
+  const flushListening = () => {
+    if (playStartRef.current !== null) {
+      listenedMsRef.current += Date.now() - playStartRef.current;
+      playStartRef.current = null;
+    }
+  };
 
   const advance = useCallback(() => {
     audioRef.current?.pause();
@@ -152,7 +180,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     }
     setIndex(index + 1);
     resetClipState();
-    setPhase("rating");
+    setPhase("accuracy");
   }, [index, queue.length, resetClipState]);
 
   const skip = useCallback(() => {
@@ -165,60 +193,108 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     audioRef.current?.pause();
     setIndex(index - 1);
     resetClipState();
-    setPhase("rating");
+    setPhase("accuracy");
   }, [index, resetClipState]);
 
-  const submit = useCallback(async () => {
-    if (!current || overall === null) return;
-    if (playStartRef.current !== null) {
-      listenedMsRef.current += Date.now() - playStartRef.current;
-      playStartRef.current = null;
-    }
-    setSubmitting(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/ratings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: getSessionId(),
-          clip_id: current.id,
-          overall,
-          defect_tags: tags,
-          probes: probeAnswers,
-          other_text: tags.includes("other") ? otherText : null,
-          listened_ms: listenedMsRef.current,
-          replays: replaysRef.current,
-        }),
-      });
-      if (!res.ok) {
-        const body = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? `submit failed (${res.status})`);
-      }
-      setSubmittedCount((n) => n + 1);
-      audioRef.current?.pause();
+  const submitAll = useCallback(
+    async (adj: Record<string, string>) => {
+      if (!current || humanScore === null) return;
+      flushListening();
+      setSubmitting(true);
+      setError(null);
 
-      // Metrics are fetched only now, after the judgement is locked in.
+      const annotation: Annotation = {
+        ...(wordFlags.length ? { word_flags: wordFlags } : {}),
+        cut_off: cutOff,
+        audio_issue: audioIssue,
+        tone,
+        ...(delivery.length ? { delivery_problems: delivery } : {}),
+        accent,
+        ...(Object.keys(adj).length ? { adjudication: adj } : {}),
+      };
+
       try {
-        const mr = await fetch(`/api/clip-metrics?id=${encodeURIComponent(current.id)}`, {
-          cache: "no-store",
+        const res = await fetch("/api/ratings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            session_id: getSessionId(),
+            clip_id: current.id,
+            overall: humanScore,
+            defect_tags: [],
+            probes: annotation,
+            listened_ms: listenedMsRef.current,
+            replays: replaysRef.current,
+          }),
         });
-        if (mr.ok) {
-          const { metrics } = (await mr.json()) as { metrics: RevealMetrics };
-          setReveal(metrics);
-          setPhase("reveal");
+        if (!res.ok) {
+          const body = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(body.error ?? `submit failed (${res.status})`);
+        }
+        setSubmittedCount((n) => n + 1);
+        audioRef.current?.pause();
+
+        try {
+          const mr = await fetch(`/api/clip-metrics?id=${encodeURIComponent(current.id)}`, {
+            cache: "no-store",
+          });
+          if (mr.ok) {
+            const { metrics } = (await mr.json()) as { metrics: RevealMetrics };
+            setReveal(metrics);
+            setPhase("reveal");
+            requestAnimationFrame(() =>
+              topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+            );
+            return;
+          }
+        } catch {
+          /* the rating is saved; a failed reveal must not lose it */
+        }
+        advance();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "submit failed");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [current, humanScore, wordFlags, cutOff, audioIssue, tone, delivery, accent, advance],
+  );
+
+  /** Pass 1 -> 2. Scrolling to the top is the deliberate cognitive reset. */
+  const toImpression = useCallback(() => {
+    setPhase("impression");
+    requestAnimationFrame(() =>
+      topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+    );
+  }, []);
+
+  /**
+   * Pass 2 -> 3 or straight to submit. The transcript is fetched only now, after the
+   * holistic score is locked, so nothing about the recogniser can anchor it.
+   */
+  const afterImpression = useCallback(async () => {
+    if (!current) return;
+    flushListening();
+    try {
+      const res = await fetch(`/api/clip-transcript?id=${encodeURIComponent(current.id)}`, {
+        cache: "no-store",
+      });
+      if (res.ok) {
+        const t = (await res.json()) as Transcript;
+        if (t.wer_pct > 0 && t.hypothesis) {
+          setTranscript(t);
+          setPhase("adjudication");
+          requestAnimationFrame(() =>
+            topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          );
           return;
         }
-      } catch {
-        /* the rating is saved; a failed reveal must not lose it */
       }
-      advance();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "submit failed");
-    } finally {
-      setSubmitting(false);
+    } catch {
+      /* adjudication is a bonus; never block the submission on it */
     }
-  }, [current, overall, tags, probeAnswers, otherText, advance]);
+    void submitAll({});
+  }, [current, submitAll]);
 
   const nextFromReveal = useCallback(() => {
     if (inSet + 1 >= SET_SIZE) {
@@ -234,45 +310,32 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     setSetStart(index + 1);
     setIndex(index + 1);
     resetClipState();
-    setPhase("rating");
+    setPhase("accuracy");
   }, [index, queue.length, resetClipState]);
 
-  // Keyboard: space play/pause, 1-5 score, Enter submit/next, S skip, B back.
+  // Space plays on the two listening passes; digits score on pass 2 only.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
-
-      if (phase === "reveal") {
-        if (e.key === "Enter" || e.code === "Space") {
-          e.preventDefault();
-          nextFromReveal();
-        }
+      const t = e.target as HTMLElement | null;
+      if (t && ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(t.tagName)) return;
+      if (phase === "reveal" && (e.key === "Enter" || e.code === "Space")) {
+        e.preventDefault();
+        nextFromReveal();
         return;
       }
-      if (phase !== "rating") return;
-
+      if (phase !== "accuracy" && phase !== "impression") return;
       if (e.code === "Space") {
         e.preventDefault();
         togglePlay();
-      } else if (["1", "2", "3", "4", "5"].includes(e.key)) {
-        setOverall(Number(e.key));
-      } else if (e.key === "Enter" && overall !== null && !submitting) {
-        e.preventDefault();
-        void submit();
-      } else if (e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        skip();
-      } else if (e.key.toLowerCase() === "b") {
-        e.preventDefault();
-        goBack();
+      } else if (phase === "impression" && ["1", "2", "3", "4", "5"].includes(e.key)) {
+        setHumanScore(Number(e.key));
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, togglePlay, submit, overall, submitting, skip, goBack, nextFromReveal]);
+  }, [phase, togglePlay, nextFromReveal]);
 
-  // ---------- Language gate ----------
+  // ---------- Gate ----------
   if (phase === "gate") {
     const eligible = clips.filter((c) => langs.includes(c.lang)).length;
     return (
@@ -284,10 +347,8 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <p className="mt-2 text-sm text-muted-foreground">
             You will only be asked about clips in the languages you pick. Judging whether
             speech is intelligible in a language you do not speak produces noise, not data.
-            This one question is what keeps the signal usable.
           </p>
         </div>
-
         <div className="flex flex-wrap gap-2">
           {allLangs.map((l) => {
             const on = langs.includes(l);
@@ -308,32 +369,27 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             );
           })}
         </div>
-
         <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground">What you are being asked for</p>
+          <p className="font-medium text-foreground">How it works</p>
           <p className="mt-1">
-            Roughly {SET_SIZE} clips per set, a few seconds each. You score how it sounds,
-            then get asked one targeted question about the thing automated metrics cannot
-            measure for that clip. After each one you see what the machine scored it, so you
-            can see where you and the model disagree.
+            {SET_SIZE} clips per set. For each one you listen twice: first tapping any words
+            that came out wrong, then judging how it sounds overall. At the end you see what
+            the machine scored it, so you can tell where you and the model disagree.
           </p>
         </div>
-
         <div className="flex items-center gap-3">
           <Button onClick={() => void start()} disabled={langs.length === 0} size="lg">
             Start reviewing
           </Button>
           <span className="text-xs text-muted-foreground">
-            {langs.length === 0
-              ? "Pick at least one language"
-              : `${eligible} clips available`}
+            {langs.length === 0 ? "Pick at least one language" : `${eligible} clips available`}
           </span>
         </div>
       </div>
     );
   }
 
-  // ---------- End of a set ----------
+  // ---------- End of set ----------
   if (phase === "setdone") {
     const remaining = Math.max(0, queue.length - index - 1);
     return (
@@ -346,15 +402,14 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             {submittedCount > 0 ? (
               <>
                 You reviewed {submittedCount} clip{submittedCount === 1 ? "" : "s"}
-                {skipped > 0 ? ` and skipped ${skipped}` : ""}. Your answers to the targeted
-                questions are the only record of things no metric in the stack can measure.
+                {skipped > 0 ? ` and skipped ${skipped}` : ""}. The word-level flags and
+                tone answers are the only record of things no metric here can measure.
               </>
             ) : (
               <>No clips matched the languages you selected.</>
             )}
           </p>
         </div>
-
         <div className="flex flex-wrap justify-center gap-3">
           {remaining > 0 ? (
             <Button size="lg" onClick={continueSet}>
@@ -371,30 +426,358 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             See the dashboard
           </Link>
         </div>
-        {remaining > 0 ? (
-          <p className="text-xs text-muted-foreground">{remaining} clips left in your languages</p>
-        ) : null}
       </div>
     );
   }
 
   if (!current) return null;
 
+  const header = (
+    <div className="space-y-2" ref={topRef}>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        <span>
+          Clip {inSet + 1} of {setTotal}
+          <span className="ml-2 opacity-60">({submittedCount} done)</span>
+        </span>
+        <div className="flex items-center gap-3">
+          {index > 0 && phase === "accuracy" ? (
+            <button type="button" onClick={goBack} className="hover:text-foreground">
+              Back
+            </button>
+          ) : null}
+          {phase === "accuracy" ? (
+            <button type="button" onClick={skip} className="hover:text-foreground">
+              Skip
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setPhase("gate")}
+            className="hover:text-foreground"
+          >
+            Languages
+          </button>
+        </div>
+      </div>
+      <Progress value={(inSet / setTotal) * 100} className="h-1" />
+    </div>
+  );
+
+  const player = (
+    <Card>
+      <CardContent className="space-y-4 pt-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="secondary">{LANGUAGE_NAMES[current.lang] ?? current.lang}</Badge>
+          <Badge variant="outline">{current.voice_name}</Badge>
+          <span className="ml-auto font-mono text-xs text-muted-foreground">
+            {current.audio_s.toFixed(1)}s
+          </span>
+        </div>
+        <audio
+          ref={audioRef}
+          src={current.audio_url}
+          preload="auto"
+          controls
+          className="w-full"
+          onPlay={() => {
+            if (hasPlayedRef.current) replaysRef.current += 1;
+            hasPlayedRef.current = true;
+            playStartRef.current = Date.now();
+          }}
+          onPause={flushListening}
+        />
+      </CardContent>
+    </Card>
+  );
+
+  // ---------- Pass 1: accuracy ----------
+  if (phase === "accuracy") {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 pb-10">
+        {header}
+        {player}
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-sm font-medium">Tap any words that came out wrong</h2>
+            <p className="text-xs text-muted-foreground">
+              This is the text the model was asked to read.
+            </p>
+          </div>
+          <WordTagger text={current.text} flags={wordFlags} onChange={setWordFlags} />
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-sm font-medium">Did the audio cut off any words?</h2>
+          <div className="flex gap-2">
+            {[
+              { v: true, label: "Yes" },
+              { v: false, label: "No" },
+            ].map((o) => (
+              <button
+                key={String(o.v)}
+                type="button"
+                onClick={() => setCutOff(o.v)}
+                className={cn(
+                  "h-11 flex-1 rounded-md border text-sm font-medium transition-colors",
+                  cutOff === o.v
+                    ? "border-foreground bg-foreground text-background"
+                    : "hover:bg-muted",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button size="lg" onClick={toImpression} disabled={cutOff === null}>
+            Next
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            {cutOff === null ? "Answer the cut-off question to continue" : "Now judge how it sounds"}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- Pass 2: impression ----------
+  if (phase === "impression") {
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 pb-10">
+        {header}
+        {player}
+        <blockquote className="rounded-md border-l-2 bg-muted/40 px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+          {current.text}
+        </blockquote>
+
+        <div className="space-y-2">
+          <h2 className="text-sm font-medium">Were there any audio issues?</h2>
+          <div className="flex gap-2">
+            {[
+              { v: true, label: "Yes: buzzing, garbled or glitchy" },
+              { v: false, label: "No" },
+            ].map((o) => (
+              <button
+                key={String(o.v)}
+                type="button"
+                onClick={() => setAudioIssue(o.v)}
+                className={cn(
+                  "h-11 flex-1 rounded-md border px-2 text-sm font-medium transition-colors",
+                  audioIssue === o.v
+                    ? "border-foreground bg-foreground text-background"
+                    : "hover:bg-muted",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h2 className="text-sm font-medium">
+            Does this sound like a real human, or like a machine?
+          </h2>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setHumanScore(n)}
+                className={cn(
+                  "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
+                  humanScore === n
+                    ? "border-foreground bg-foreground text-background"
+                    : "hover:bg-muted",
+                )}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-between gap-2 text-[11px] text-muted-foreground sm:text-xs">
+            <span>1: pure robot</span>
+            <span>5: real human</span>
+          </div>
+        </div>
+
+        <ChipGroup
+          title="What tone did you hear?"
+          options={TONES}
+          value={tone}
+          onChange={setTone}
+        />
+
+        <ChipGroup
+          title="Does the accent sound right for this language?"
+          hint="Nothing in the automated stack scores accent, so this is the only record of it."
+          options={ACCENT_OPTIONS.map((a) => ({ id: a.id, label: a.label }))}
+          value={accent}
+          onChange={setAccent}
+        />
+
+        {humanScore !== null && humanScore < 5 ? (
+          <div className="space-y-2">
+            <h2 className="text-sm font-medium">What made it sound off? (optional)</h2>
+            <div className="flex flex-wrap gap-2">
+              {DELIVERY_PROBLEMS.map((d) => {
+                const on = delivery.includes(d.id);
+                return (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() =>
+                      setDelivery((prev) =>
+                        on ? prev.filter((x) => x !== d.id) : [...prev, d.id],
+                      )
+                    }
+                    className={cn(
+                      "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                      on ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
+                    )}
+                  >
+                    {d.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        {error ? (
+          <Alert className="border-red-500/30 bg-red-500/5">
+            <AlertTitle className="text-sm">Could not save that rating</AlertTitle>
+            <AlertDescription className="text-xs">{error}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <div className="flex items-center gap-3">
+          <Button
+            size="lg"
+            onClick={() => void afterImpression()}
+            disabled={humanScore === null || audioIssue === null || submitting}
+          >
+            {submitting ? "Saving…" : "Submit"}
+          </Button>
+          <span className="text-xs text-muted-foreground">
+            {humanScore === null || audioIssue === null
+              ? "Answer the audio and human-likeness questions"
+              : ""}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------- Pass 3: adjudication ----------
+  if (phase === "adjudication" && transcript) {
+    const { srcMarks, src } = diffWords(current.text, transcript.hypothesis);
+    const disputed = srcMarks.flatMap((m, i) => (m ? [i] : []));
+    const answered = disputed.every((i) => adjudication[String(i)]);
+    return (
+      <div className="mx-auto max-w-2xl space-y-6 pb-10">
+        {header}
+        <Card className="border-amber-500/40 bg-amber-500/5">
+          <CardContent className="space-y-4 pt-6">
+            <div>
+              <h2 className="text-sm font-medium">One last thing: was the metric right?</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Our speech recogniser transcribed this clip differently from the source
+                text, which counted as an error. The recogniser makes its own mistakes, so
+                your ear is the tiebreaker. This is asked last, on purpose, so it could not
+                influence the score you just gave.
+              </p>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div className="rounded-md border bg-background p-3">
+                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Text it was asked to read
+                </div>
+                <p className="text-sm">{current.text}</p>
+              </div>
+              <div className="rounded-md border bg-background p-3">
+                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  What the recogniser wrote
+                </div>
+                <p className="text-sm">{transcript.hypothesis}</p>
+              </div>
+            </div>
+
+            <audio src={current.audio_url} controls preload="auto" className="w-full" />
+
+            <div className="space-y-3">
+              {disputed.map((i) => (
+                <div key={i} className="space-y-1.5">
+                  <p className="text-sm">
+                    <span className="text-muted-foreground">The word </span>
+                    <span className="rounded bg-amber-500/20 px-1 font-medium">{src[i]}</span>
+                    <span className="text-muted-foreground"> did not match.</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {ADJUDICATION.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() =>
+                          setAdjudication((prev) => ({ ...prev, [String(i)]: a.id }))
+                        }
+                        className={cn(
+                          "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                          adjudication[String(i)] === a.id
+                            ? "border-foreground bg-foreground text-background"
+                            : "bg-background hover:bg-muted",
+                        )}
+                      >
+                        {a.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {error ? (
+          <Alert className="border-red-500/30 bg-red-500/5">
+            <AlertTitle className="text-sm">Could not save that rating</AlertTitle>
+            <AlertDescription className="text-xs">{error}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <div className="flex items-center gap-3">
+          <Button size="lg" onClick={() => void submitAll(adjudication)} disabled={submitting}>
+            {submitting ? "Saving…" : "Finish clip"}
+          </Button>
+          {!answered ? (
+            <span className="text-xs text-muted-foreground">
+              You can skip any you are unsure about
+            </span>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   // ---------- Reveal ----------
   if (phase === "reveal" && reveal) {
     return (
       <div className="mx-auto max-w-2xl space-y-6 pb-8">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div ref={topRef} className="flex items-center justify-between text-xs text-muted-foreground">
           <span className="font-mono">{current.id}</span>
           <span>
-            {inSet + 1} of {Math.min(SET_SIZE, queue.length - setStart)} in this set
+            {inSet + 1} of {setTotal} in this set
           </span>
         </div>
         <RatingReveal
           sourceText={current.text}
-          overall={overall ?? 0}
+          overall={humanScore ?? 0}
           metrics={reveal}
-          probeAnswers={probeAnswers}
+          wordFlags={wordFlags}
+          accent={accent}
           stressCategory={current.stress_category}
         />
         <div className="flex items-center gap-3">
@@ -409,252 +792,40 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     );
   }
 
-  // ---------- Rating ----------
-  const canSubmit = overall !== null && !submitting;
-  const setTotal = Math.min(SET_SIZE, queue.length - setStart);
-
-  return (
-    <div className="mx-auto max-w-2xl space-y-6 pb-10">
-      {/* progress + escape hatches */}
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
-          <span>
-            Clip {inSet + 1} of {setTotal}
-            <span className="ml-2 opacity-60">({submittedCount} done)</span>
-          </span>
-          <div className="flex items-center gap-3">
-            {index > 0 ? (
-              <button type="button" onClick={goBack} className="hover:text-foreground">
-                Back
-              </button>
-            ) : null}
-            <button type="button" onClick={skip} className="hover:text-foreground">
-              Skip
-            </button>
-            <button
-              type="button"
-              onClick={() => setPhase("gate")}
-              className="hover:text-foreground"
-            >
-              Languages
-            </button>
-          </div>
-        </div>
-        <Progress value={(inSet / setTotal) * 100} className="h-1" />
-      </div>
-
-      {/* the clip */}
-      <Card>
-        <CardContent className="space-y-5 pt-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">{LANGUAGE_NAMES[current.lang] ?? current.lang}</Badge>
-            <Badge variant="outline">{current.voice_name}</Badge>
-            <span className="ml-auto font-mono text-xs text-muted-foreground">
-              {current.audio_s.toFixed(1)}s
-            </span>
-          </div>
-
-          <blockquote className="rounded-md border-l-2 bg-muted/40 px-4 py-3 text-base leading-relaxed">
-            {current.text}
-          </blockquote>
-
-          <audio
-            ref={audioRef}
-            src={current.audio_url}
-            preload="auto"
-            controls
-            className="w-full"
-            onPlay={() => {
-              if (hasPlayedRef.current) replaysRef.current += 1;
-              hasPlayedRef.current = true;
-              playStartRef.current = Date.now();
-              setIsPlaying(true);
-            }}
-            onPause={() => {
-              if (playStartRef.current !== null) {
-                listenedMsRef.current += Date.now() - playStartRef.current;
-                playStartRef.current = null;
-              }
-              setIsPlaying(false);
-            }}
-            onEnded={() => setIsPlaying(false)}
-          />
-
-          <div className="flex items-center gap-3">
-            <Button type="button" variant="outline" size="sm" onClick={togglePlay}>
-              {isPlaying ? "Pause" : hasPlayedRef.current ? "Replay" : "Play"}
-            </Button>
-            {/* Keyboard affordances are noise on a touch device. */}
-            <span className="hidden text-xs text-muted-foreground sm:inline">
-              <kbd className="rounded border px-1 font-mono">space</kbd> play ·{" "}
-              <kbd className="rounded border px-1 font-mono">1-5</kbd> score ·{" "}
-              <kbd className="rounded border px-1 font-mono">s</kbd> skip
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 1. the gut score, the only required field */}
-      <div className="space-y-2">
-        <h2 className="text-sm font-medium">How good does it sound?</h2>
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => setOverall(n)}
-              className={cn(
-                "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
-                overall === n
-                  ? "border-foreground bg-foreground text-background"
-                  : "hover:bg-muted",
-              )}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
-        <div className="flex justify-between gap-2 text-[11px] text-muted-foreground sm:text-xs">
-          <span>1: unusable</span>
-          <span className="text-right">
-            5: <span className="hidden sm:inline">indistinguishable from </span>human
-          </span>
-        </div>
-      </div>
-
-      {/* 2. the targeted probe — the reason a human is in the loop at all */}
-      {targetedProbe ? (
-        <ProbeBlock
-          probe={targetedProbe}
-          value={probeAnswers[targetedProbe.id]}
-          onChange={(v) =>
-            setProbeAnswers((p) => ({ ...p, [targetedProbe.id]: v }))
-          }
-          highlight
-        />
-      ) : null}
-
-      <ProbeBlock
-        probe={ACCENT_PROBE}
-        value={probeAnswers[ACCENT_PROBE.id]}
-        onChange={(v) => setProbeAnswers((p) => ({ ...p, [ACCENT_PROBE.id]: v }))}
-      />
-
-      {/* 3. optional defect tags */}
-      <div className="space-y-3">
-        <div>
-          <h2 className="text-sm font-medium">Anything else wrong? (optional)</h2>
-          <p className="text-xs text-muted-foreground">
-            Skip this if it sounded fine.
-          </p>
-        </div>
-        <div className="space-y-3">
-          {TAG_GROUP_ORDER.map((groupId) => {
-            const group = TAG_GROUPS[groupId];
-            const groupTags = tagsInGroup(groupId);
-            if (groupTags.length === 0) return null;
-            return (
-              <div key={groupId} className="space-y-1.5">
-                <h3 className="text-xs font-semibold tracking-tight text-muted-foreground">
-                  {group.label}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {groupTags.map((t) => {
-                    const on = tags.includes(t.id);
-                    return (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() =>
-                          setTags((prev) =>
-                            on ? prev.filter((x) => x !== t.id) : [...prev, t.id],
-                          )
-                        }
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                          on
-                            ? "border-foreground bg-foreground text-background"
-                            : "hover:bg-muted",
-                        )}
-                      >
-                        {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {tags.includes("other") ? (
-          <textarea
-            value={otherText}
-            onChange={(e) => setOtherText(e.target.value)}
-            placeholder="Describe what you heard…"
-            rows={2}
-            maxLength={500}
-            className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-          />
-        ) : null}
-      </div>
-
-      {error ? (
-        <Alert className="border-red-500/30 bg-red-500/5">
-          <AlertTitle className="text-sm">Could not save that rating</AlertTitle>
-          <AlertDescription className="text-xs">{error}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <div className="flex items-center gap-3">
-        <Button onClick={() => void submit()} disabled={!canSubmit} size="lg">
-          {submitting ? "Saving…" : "Submit"}
-        </Button>
-        <span className="text-xs text-muted-foreground">
-          {overall === null ? "Score the clip to continue" : (
-            <span className="hidden sm:inline">or press enter</span>
-          )}
-        </span>
-      </div>
-    </div>
-  );
+  return null;
 }
 
-/** One targeted question, rendered as single-select chips. */
-function ProbeBlock({
-  probe,
+/** Single-select chips. */
+function ChipGroup({
+  title,
+  hint,
+  options,
   value,
   onChange,
-  highlight = false,
 }: {
-  probe: Probe;
-  value?: string;
+  title: string;
+  hint?: string;
+  options: { id: string; label: string }[];
+  value: string | null;
   onChange: (v: string) => void;
-  highlight?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "space-y-2 rounded-lg p-4",
-        highlight ? "border border-amber-500/40 bg-amber-500/5" : "border bg-card",
-      )}
-    >
+    <div className="space-y-2">
       <div>
-        <h2 className="text-sm font-medium">{probe.question}</h2>
-        {probe.hint ? (
-          <p className="mt-0.5 text-xs text-muted-foreground">{probe.hint}</p>
-        ) : null}
+        <h2 className="text-sm font-medium">{title}</h2>
+        {hint ? <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p> : null}
       </div>
       <div className="flex flex-wrap gap-2">
-        {probe.options.map((o) => (
+        {options.map((o) => (
           <button
-            key={o.value}
+            key={o.id}
             type="button"
-            onClick={() => onChange(o.value)}
+            onClick={() => onChange(o.id)}
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm transition-colors",
-              value === o.value
+              value === o.id
                 ? "border-foreground bg-foreground text-background"
-                : "bg-background hover:bg-muted",
+                : "hover:bg-muted",
             )}
           >
             {o.label}

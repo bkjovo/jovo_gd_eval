@@ -2,7 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ACCENT_PROBE, PROBES, verdictFor } from "@/lib/taxonomy";
+import { verdictFor } from "@/lib/taxonomy";
+import { ACCENT_OPTIONS, PRONUNCIATION_KINDS, type WordFlag } from "@/lib/annotation";
 import { cn } from "@/lib/utils";
 
 export type RevealMetrics = {
@@ -25,13 +26,15 @@ export function RatingReveal({
   sourceText,
   overall,
   metrics,
-  probeAnswers,
+  wordFlags,
+  accent,
   stressCategory,
 }: {
   sourceText: string;
   overall: number;
   metrics: RevealMetrics;
-  probeAnswers: Record<string, string>;
+  wordFlags: WordFlag[];
+  accent: string | null;
   stressCategory: string;
 }) {
   // UTMOS is a 1-5 predicted MOS, the same scale the reviewer just used, so it is the
@@ -44,18 +47,25 @@ export function RatingReveal({
     verdictFor("utmos", metrics.utmos) === "pass" &&
     verdictFor("dnsmos_ovrl", metrics.dnsmos_ovrl) === "pass";
 
-  // Probe answers that are NOT the reading a production system would want. These are
-  // the blind-spot catches: no reference-free metric produces this signal at all.
-  const allProbes = { ...PROBES, [ACCENT_PROBE.id]: ACCENT_PROBE };
-  const caught = Object.entries(probeAnswers)
-    .map(([pid, value]) => {
-      const probe = allProbes[pid];
-      const opt = probe?.options.find((o) => o.value === value);
-      return probe && opt && !opt.expected && value !== "unsure"
-        ? { probe, label: opt.label }
-        : null;
-    })
-    .filter((x): x is { probe: (typeof allProbes)[string]; label: string } => x !== null);
+  // Things the reviewer caught that no reference-free metric produces: a specific word
+  // localised as mispronounced, or an accent judgement. WER cannot point at a word, and
+  // nothing in the stack scores accent at all.
+  const caught: { label: string; why: string }[] = wordFlags
+    .filter((f) => f.issue === "pronunciation")
+    .map((f) => ({
+      label: `“${f.word}” — ${
+        PRONUNCIATION_KINDS.find((k) => k.id === f.kind)?.label ?? "pronunciation"
+      }`,
+      why: "word error rate cannot localise which word broke, only that something did.",
+    }));
+
+  const accentOpt = ACCENT_OPTIONS.find((a) => a.id === accent);
+  if (accentOpt && !accentOpt.expected && accent !== "unsure") {
+    caught.push({
+      label: accentOpt.label,
+      why: "nothing in the automated stack scores accent.",
+    });
+  }
 
   const transcriptDiffers =
     metrics.hypothesis.trim().toLowerCase().replace(/[.,!?¿¡]/g, "") !==
@@ -114,13 +124,11 @@ export function RatingReveal({
               You caught {caught.length === 1 ? "something" : "things"} no metric can measure
             </h3>
             <ul className="mt-2 space-y-1.5">
-              {caught.map((c) => (
-                <li key={c.probe.id} className="text-sm text-muted-foreground">
+              {caught.map((c, i) => (
+                <li key={i} className="text-sm text-muted-foreground">
                   <span className="font-medium text-foreground">{c.label}</span>
-                  {" — "}
-                  {c.probe.id === ACCENT_PROBE.id
-                    ? "nothing in the automated stack scores accent."
-                    : "every possible reading transcribes back identically, so word error rate is blind to it."}
+                  {": "}
+                  {c.why}
                 </li>
               ))}
             </ul>

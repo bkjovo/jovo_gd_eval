@@ -5,14 +5,19 @@ import type { Clip } from "@/lib/clips";
 import { mean, microWer, pooledTtfa } from "@/lib/clips";
 import type { ClipAggregate } from "@/lib/ratings";
 import {
-  ACCENT_PROBE,
   DEFECT_TAGS,
   DIMENSIONS,
   LANGUAGE_NAMES,
-  PROBES,
   TAGS_BY_ID,
   verdictFor,
 } from "@/lib/taxonomy";
+import {
+  ACCENT_OPTIONS,
+  DELIVERY_PROBLEMS,
+  PRONUNCIATION_KINDS,
+  TONES,
+  TONE_FIT,
+} from "@/lib/annotation";
 import { StatTile } from "@/components/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -272,7 +277,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
           </section>
 
           {/* --- Blind-spot probe answers: the signal no metric produces --- */}
-          <ProbeSummary clips={filtered} aggregates={aggregates} />
+          <HumanFindings clips={filtered} aggregates={aggregates} />
 
           {/* --- Per-clip table --- */}
           <section className="space-y-3">
@@ -496,133 +501,207 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
 
 
 /**
- * What reviewers answered on the targeted probes, aggregated.
+ * What only humans could tell us.
  *
- * This is the part of the dashboard that no automated metric could ever fill in. Every
- * answer here describes HOW something was vocalized, or whether the accent is right,
- * both of which are invisible to a WER round-trip. Non-expected answers are surfaced
- * first because those are the actionable ones.
+ * Nothing on this panel is derivable from the automated stack. Word-level flags say
+ * WHICH word failed and how, which no clip-level metric produces. Tone-vs-use-case is
+ * a register judgement nothing measures. And the adjudication column is the one that
+ * corrects our own instrument: it separates "the model said it wrong" from "the
+ * recogniser misheard", which is the difference between a real WER and a raw one.
  */
-function ProbeSummary({
+function HumanFindings({
   clips,
   aggregates,
 }: {
   clips: Clip[];
   aggregates: Record<string, ClipAggregate>;
 }) {
-  const allProbes = { ...PROBES, [ACCENT_PROBE.id]: ACCENT_PROBE };
+  const roll = useMemo(() => {
+    const kinds: Record<string, number> = {};
+    const tones: Record<string, number> = {};
+    const delivery: Record<string, number> = {};
+    const accent: Record<string, number> = {};
+    const adj: Record<string, number> = {};
+    let n = 0, cutOff = 0, audioIssue = 0, toneMismatch = 0, toneTotal = 0;
 
-  const rows = useMemo(() => {
-    const totals: Record<string, Record<string, number>> = {};
     for (const c of clips) {
-      const agg = aggregates[c.id];
-      if (!agg) continue;
-      for (const [pid, counts] of Object.entries(agg.probe_counts ?? {})) {
-        for (const [value, n] of Object.entries(counts)) {
-          ((totals[pid] ??= {})[value] ??= 0);
-          totals[pid][value] += n;
-        }
+      const a = aggregates[c.id];
+      if (!a) continue;
+      n += a.n;
+      cutOff += a.cut_off_yes;
+      audioIssue += a.audio_issue_yes;
+      for (const [k, v] of Object.entries(a.word_kind_counts)) kinds[k] = (kinds[k] ?? 0) + v;
+      for (const [k, v] of Object.entries(a.delivery_counts)) delivery[k] = (delivery[k] ?? 0) + v;
+      for (const [k, v] of Object.entries(a.accent_counts)) accent[k] = (accent[k] ?? 0) + v;
+      for (const [k, v] of Object.entries(a.adjudication_counts)) adj[k] = (adj[k] ?? 0) + v;
+      const fit = TONE_FIT[c.use_case];
+      for (const [k, v] of Object.entries(a.tone_counts)) {
+        tones[k] = (tones[k] ?? 0) + v;
+        toneTotal += v;
+        if (fit && !fit.includes(k) && k !== "other") toneMismatch += v;
       }
     }
-    return Object.entries(totals)
-      .map(([pid, counts]) => {
-        const probe = allProbes[pid];
-        if (!probe) return null;
-        const total = Object.values(counts).reduce((a, b) => a + b, 0);
-        const options = probe.options
-          .map((o) => ({ ...o, n: counts[o.value] ?? 0 }))
-          .filter((o) => o.n > 0)
-          .sort((a, b) => b.n - a.n);
-        const offExpected = options
-          .filter((o) => !o.expected && o.value !== "unsure")
-          .reduce((a, o) => a + o.n, 0);
-        return { probe, options, total, offExpected };
-      })
-      .filter((r): r is NonNullable<typeof r> => r !== null)
-      .sort((a, b) => b.offExpected / b.total - a.offExpected / a.total);
-  }, [clips, aggregates, allProbes]);
+    return { kinds, tones, delivery, accent, adj, n, cutOff, audioIssue, toneMismatch, toneTotal };
+  }, [clips, aggregates]);
 
-  if (rows.length === 0) {
+  if (roll.n === 0) {
     return (
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-medium">Blind spots: what only humans could tell us</h2>
+          <h2 className="text-sm font-medium">What only humans could tell us</h2>
           <p className="text-xs text-muted-foreground">
-            How codes, acronyms and emphasis were actually vocalized, and whether the accent
-            is right. No reference-free metric produces any of this.
+            Word-level failures, register, and whether a flagged error was really the
+            model or really the recogniser. None of this is derivable from the metrics.
           </p>
         </div>
         <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-          No probe answers yet.{" "}
-          <a href="/rate" className="underline underline-offset-2">
-            Review a set
-          </a>{" "}
-          to populate this.
+          No reviews yet.{" "}
+          <a href="/rate" className="underline underline-offset-2">Review a set</a> to
+          populate this.
         </p>
       </section>
     );
   }
 
+  const label = (list: { id: string; label: string }[], id: string) =>
+    list.find((x) => x.id === id)?.label ?? id;
+
+  const bar = (entries: Record<string, number>, list: { id: string; label: string }[]) => {
+    const rows = Object.entries(entries).sort((a, b) => b[1] - a[1]);
+    const max = Math.max(1, ...rows.map((r) => r[1]));
+    return rows.map(([id, count]) => (
+      <div key={id} className="space-y-1">
+        <div className="flex items-baseline gap-2 text-xs">
+          <span>{label(list, id)}</span>
+          <span className="ml-auto tabular-nums text-muted-foreground">{count}</span>
+        </div>
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full rounded-full bg-amber-500" style={{ width: `${(count / max) * 100}%` }} />
+        </div>
+      </div>
+    ));
+  };
+
+  const adjAudio = roll.adj.audio_wrong ?? 0;
+  const adjAsr = roll.adj.asr_wrong ?? 0;
+  const adjTotal = adjAudio + adjAsr + (roll.adj.unsure ?? 0);
+
   return (
     <section className="space-y-3">
       <div>
-        <h2 className="text-sm font-medium">Blind spots: what only humans could tell us</h2>
+        <h2 className="text-sm font-medium">What only humans could tell us</h2>
         <p className="text-xs text-muted-foreground">
-          How codes, acronyms and emphasis were actually vocalized, and whether the accent is
-          right. No reference-free metric produces any of this. Sorted by how often the answer
-          was not what a production system would want.
+          {roll.n} review{roll.n === 1 ? "" : "s"} in this cut. Word-level failures,
+          register, and whether a flagged error was really the model or really the
+          recogniser. None of this is derivable from the metrics.
         </p>
       </div>
-      <Card>
-        <CardContent className="space-y-5 pt-6">
-          {rows.map(({ probe, options, total, offExpected }) => (
-            <div key={probe.id} className="space-y-2">
-              <div className="flex items-baseline gap-2">
-                <h3 className="text-sm font-medium">{probe.question}</h3>
-                <span className="ml-auto text-xs text-muted-foreground">
-                  n={total}
-                  {offExpected > 0 ? (
-                    <span className="ml-2 font-medium text-amber-600 dark:text-amber-400">
-                      {Math.round((offExpected / total) * 100)}% not as wanted
-                    </span>
-                  ) : null}
-                </span>
-              </div>
-              {options.map((o) => (
-                <div key={o.value} className="space-y-1">
-                  <div className="flex items-baseline gap-2 text-xs">
-                    <span className={cn(!o.expected && o.value !== "unsure" && "font-medium")}>
-                      {o.label}
-                    </span>
-                    {o.expected ? (
-                      <span className="text-[10px] text-muted-foreground">wanted</span>
-                    ) : null}
-                    <span className="ml-auto tabular-nums text-muted-foreground">{o.n}</span>
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        {/* the instrument-correcting one */}
+        {adjTotal > 0 ? (
+          <Card className="lg:col-span-2">
+            <CardContent className="pt-6">
+              <h3 className="text-sm font-medium">Was the flagged error real?</h3>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Reviewers adjudicated {adjTotal} word{adjTotal === 1 ? "" : "s"} where the
+                recogniser disagreed with the source.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-6">
+                <div>
+                  <div className="text-2xl font-semibold tabular-nums text-red-600 dark:text-red-400">
+                    {adjAudio}
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className={cn(
-                        "h-full rounded-full",
-                        o.expected
-                          ? "bg-emerald-500"
-                          : o.value === "unsure"
-                            ? "bg-muted-foreground/40"
-                            : "bg-amber-500",
-                      )}
-                      style={{ width: `${(o.n / total) * 100}%` }}
-                    />
-                  </div>
+                  <div className="text-xs text-muted-foreground">the audio really was wrong</div>
                 </div>
-              ))}
-              {total < 3 ? (
-                <p className="text-[10px] text-amber-600 dark:text-amber-400">
-                  Low sample. Not enough answers to draw a conclusion.
-                </p>
-              ) : null}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+                <div>
+                  <div className="text-2xl font-semibold tabular-nums text-amber-600 dark:text-amber-400">
+                    {adjAsr}
+                  </div>
+                  <div className="text-xs text-muted-foreground">the recogniser misheard</div>
+                </div>
+                {adjTotal > 0 ? (
+                  <div>
+                    <div className="text-2xl font-semibold tabular-nums">
+                      {Math.round((adjAsr / adjTotal) * 100)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      of flagged errors were our instrument, not the model
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {Object.keys(roll.kinds).length ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Word-level pronunciation failures</h3>
+              <p className="text-xs text-muted-foreground">
+                Which kind of word broke. WER cannot localise this.
+              </p>
+              <div className="space-y-2 pt-1">{bar(roll.kinds, PRONUNCIATION_KINDS)}</div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {roll.toneTotal > 0 ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Tone heard</h3>
+              <p className="text-xs text-muted-foreground">
+                {roll.toneMismatch > 0 ? (
+                  <span className="font-medium text-amber-600 dark:text-amber-400">
+                    {Math.round((roll.toneMismatch / roll.toneTotal) * 100)}% did not fit the
+                    clip&apos;s use case.
+                  </span>
+                ) : (
+                  <>Register matched the use case throughout.</>
+                )}
+              </p>
+              <div className="space-y-2 pt-1">{bar(roll.tones, TONES)}</div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {Object.keys(roll.delivery).length ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Delivery problems</h3>
+              <div className="space-y-2 pt-1">{bar(roll.delivery, DELIVERY_PROBLEMS)}</div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {Object.keys(roll.accent).length ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Accent</h3>
+              <p className="text-xs text-muted-foreground">
+                Nothing in the automated stack scores accent at all.
+              </p>
+              <div className="space-y-2 pt-1">
+                {bar(roll.accent, ACCENT_OPTIONS.map((a) => ({ id: a.id, label: a.label })))}
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {roll.cutOff > 0 || roll.audioIssue > 0 ? (
+          <Card>
+            <CardContent className="space-y-1 pt-6">
+              <h3 className="text-sm font-medium">Reported by ear</h3>
+              <p className="text-xs text-muted-foreground">
+                {roll.cutOff} said the audio cut off words; {roll.audioIssue} heard buzzing,
+                garbling or glitches. The truncation detector has flagged 0 clips, so these
+                answers are the only check on it.
+              </p>
+            </CardContent>
+          </Card>
+        ) : null}
+      </div>
     </section>
   );
 }
