@@ -28,7 +28,7 @@ export type Rating = {
   other_text?: string | null;
   /**
    * The structured annotation payload: word-level flags, cut-off, audio issues, tone,
-   * delivery problems, clip-level accent, and ASR adjudication. Stored in one jsonb
+   * delivery problems, and ASR adjudication. Stored in one jsonb
    * column so the review flow can evolve without a migration per question.
    */
   probes?: Annotation;
@@ -173,7 +173,6 @@ export type ClipAggregate = {
   word_issue_counts: Record<string, number>;
   tone_counts: Record<string, number>;
   delivery_counts: Record<string, number>;
-  accent_counts: Record<string, number>;
   cut_off_yes: number;
   audio_issue_yes: number;
   /** ASR adjudication tallies: was the audio wrong, or the transcript? */
@@ -193,7 +192,6 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
       word_issue_counts: {},
       tone_counts: {},
       delivery_counts: {},
-      accent_counts: {},
       cut_off_yes: 0,
       audio_issue_yes: 0,
       adjudication_counts: {},
@@ -213,7 +211,6 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
     for (const d of ann.delivery_problems ?? []) {
       a.delivery_counts[d] = (a.delivery_counts[d] ?? 0) + 1;
     }
-    if (ann.accent) a.accent_counts[ann.accent] = (a.accent_counts[ann.accent] ?? 0) + 1;
     if (ann.cut_off) a.cut_off_yes += 1;
     if (ann.audio_issue) a.audio_issue_yes += 1;
     for (const v of Object.values(ann.adjudication ?? {})) {

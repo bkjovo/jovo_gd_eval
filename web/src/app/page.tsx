@@ -289,8 +289,8 @@ export default async function ExecutiveSummaryPage() {
                 </AlertTitle>
                 <AlertDescription className="text-xs">
                   The database predates the <code className="font-mono">probes</code>{" "}
-                  column, so blind-spot answers (how codes were vocalized, whether the
-                  accent is right) are dropped on write. Scores and tags are still saved.
+                  column, so the whole annotation (flagged words, tone, delivery problems,
+                  ASR adjudication) is dropped on write. Scores and tags are still saved.
                   Run{" "}
                   <code className="font-mono">
                     alter table public.ratings add column if not exists probes jsonb not

@@ -12,7 +12,6 @@ import {
   verdictFor,
 } from "@/lib/taxonomy";
 import {
-  ACCENT_OPTIONS,
   DELIVERY_PROBLEMS,
   PRONUNCIATION_KINDS,
   TONES,
@@ -520,7 +519,6 @@ function HumanFindings({
     const kinds: Record<string, number> = {};
     const tones: Record<string, number> = {};
     const delivery: Record<string, number> = {};
-    const accent: Record<string, number> = {};
     const adj: Record<string, number> = {};
     let n = 0, cutOff = 0, audioIssue = 0, toneMismatch = 0, toneTotal = 0;
 
@@ -532,7 +530,6 @@ function HumanFindings({
       audioIssue += a.audio_issue_yes;
       for (const [k, v] of Object.entries(a.word_kind_counts)) kinds[k] = (kinds[k] ?? 0) + v;
       for (const [k, v] of Object.entries(a.delivery_counts)) delivery[k] = (delivery[k] ?? 0) + v;
-      for (const [k, v] of Object.entries(a.accent_counts)) accent[k] = (accent[k] ?? 0) + v;
       for (const [k, v] of Object.entries(a.adjudication_counts)) adj[k] = (adj[k] ?? 0) + v;
       const fit = TONE_FIT[c.use_case];
       for (const [k, v] of Object.entries(a.tone_counts)) {
@@ -541,7 +538,7 @@ function HumanFindings({
         if (fit && !fit.includes(k) && k !== "other") toneMismatch += v;
       }
     }
-    return { kinds, tones, delivery, accent, adj, n, cutOff, audioIssue, toneMismatch, toneTotal };
+    return { kinds, tones, delivery, adj, n, cutOff, audioIssue, toneMismatch, toneTotal };
   }, [clips, aggregates]);
 
   if (roll.n === 0) {
@@ -671,20 +668,6 @@ function HumanFindings({
             <CardContent className="space-y-2 pt-6">
               <h3 className="text-sm font-medium">Delivery problems</h3>
               <div className="space-y-2 pt-1">{bar(roll.delivery, DELIVERY_PROBLEMS)}</div>
-            </CardContent>
-          </Card>
-        ) : null}
-
-        {Object.keys(roll.accent).length ? (
-          <Card>
-            <CardContent className="space-y-2 pt-6">
-              <h3 className="text-sm font-medium">Accent</h3>
-              <p className="text-xs text-muted-foreground">
-                Nothing in the automated stack scores accent at all.
-              </p>
-              <div className="space-y-2 pt-1">
-                {bar(roll.accent, ACCENT_OPTIONS.map((a) => ({ id: a.id, label: a.label })))}
-              </div>
             </CardContent>
           </Card>
         ) : null}

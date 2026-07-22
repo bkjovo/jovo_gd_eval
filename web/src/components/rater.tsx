@@ -5,7 +5,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RaterClip } from "@/lib/clips";
 import { LANGUAGE_NAMES } from "@/lib/taxonomy";
 import {
-  ACCENT_OPTIONS,
   ADJUDICATION,
   DELIVERY_PROBLEMS,
   TONES,
@@ -14,7 +13,6 @@ import {
 } from "@/lib/annotation";
 import { diffWords } from "@/lib/word-diff";
 import { WordTagger } from "@/components/word-tagger";
-import { RatingReveal, type RevealMetrics } from "@/components/rating-reveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +22,12 @@ import { cn } from "@/lib/utils";
 
 /**
  * Blind review flow, in three passes.
+ *
+ * There is deliberately NO reveal of machine scores between clips. Showing a reviewer
+ * what UTMOS said after each clip would let them calibrate to it over a session:
+ * clip 1's score quietly teaching them what a "4" is supposed to mean by clip 5. The
+ * comparison belongs on the dashboard, computed across many reviewers, not in the
+ * reviewer's own feedback loop.
  *
  *   1. ACCURACY   — source text on screen; tap the words that went wrong.
  *   2. IMPRESSION — how it sounds, judged holistically. Deliberately separated from
@@ -38,9 +42,8 @@ import { cn } from "@/lib/utils";
  * recogniser's own errors, which a reviewer would faithfully attribute to the model.
  * The transcript appears in pass 3 and in the reveal, where the contrast is the point.
  *
- * No quality metric reaches this component before submission: /rate is served a
- * metrics-stripped payload, /api/clip-transcript returns only the transcript, and
- * /api/clip-metrics is called after the rating is saved.
+ * No quality metric reaches this component at all: /rate is served a metrics-stripped
+ * payload and /api/clip-transcript returns only the transcript, never a score.
  */
 
 const SESSION_KEY = "soundcheck.session_id";
@@ -57,7 +60,7 @@ function getSessionId(): string {
   return id;
 }
 
-type Phase = "gate" | "accuracy" | "impression" | "adjudication" | "reveal" | "setdone";
+type Phase = "gate" | "accuracy" | "impression" | "adjudication" | "setdone";
 
 type Transcript = { hypothesis: string; wer_pct: number };
 
@@ -78,7 +81,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const [humanScore, setHumanScore] = useState<number | null>(null);
   const [tone, setTone] = useState<string | null>(null);
   const [delivery, setDelivery] = useState<string[]>([]);
-  const [accent, setAccent] = useState<string | null>(null);
   // pass 3
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [adjudication, setAdjudication] = useState<Record<string, string>>({});
@@ -87,7 +89,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const [error, setError] = useState<string | null>(null);
   const [submittedCount, setSubmittedCount] = useState(0);
   const [skipped, setSkipped] = useState(0);
-  const [reveal, setReveal] = useState<RevealMetrics | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const listenedMsRef = useRef(0);
@@ -115,11 +116,9 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     setHumanScore(null);
     setTone(null);
     setDelivery([]);
-    setAccent(null);
     setTranscript(null);
     setAdjudication({});
     setError(null);
-    setReveal(null);
     listenedMsRef.current = 0;
     playStartRef.current = null;
     hasPlayedRef.current = false;
@@ -209,7 +208,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         audio_issue: audioIssue,
         tone,
         ...(delivery.length ? { delivery_problems: delivery } : {}),
-        accent,
         ...(Object.keys(adj).length ? { adjudication: adj } : {}),
       };
 
@@ -233,23 +231,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         }
         setSubmittedCount((n) => n + 1);
         audioRef.current?.pause();
-
-        try {
-          const mr = await fetch(`/api/clip-metrics?id=${encodeURIComponent(current.id)}`, {
-            cache: "no-store",
-          });
-          if (mr.ok) {
-            const { metrics } = (await mr.json()) as { metrics: RevealMetrics };
-            setReveal(metrics);
-            setPhase("reveal");
-            requestAnimationFrame(() =>
-              topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-            );
-            return;
-          }
-        } catch {
-          /* the rating is saved; a failed reveal must not lose it */
-        }
         advance();
       } catch (err) {
         setError(err instanceof Error ? err.message : "submit failed");
@@ -257,7 +238,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         setSubmitting(false);
       }
     },
-    [current, humanScore, wordFlags, cutOff, audioIssue, tone, delivery, accent, advance],
+    [current, humanScore, wordFlags, cutOff, audioIssue, tone, delivery, advance],
   );
 
   /** Pass 1 -> 2. Scrolling to the top is the deliberate cognitive reset. */
@@ -296,15 +277,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     void submitAll({});
   }, [current, submitAll]);
 
-  const nextFromReveal = useCallback(() => {
-    if (inSet + 1 >= SET_SIZE) {
-      audioRef.current?.pause();
-      setPhase("setdone");
-      return;
-    }
-    advance();
-  }, [inSet, advance]);
-
   const continueSet = useCallback(() => {
     if (index + 1 >= queue.length) return;
     setSetStart(index + 1);
@@ -318,11 +290,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(t.tagName)) return;
-      if (phase === "reveal" && (e.key === "Enter" || e.code === "Space")) {
-        e.preventDefault();
-        nextFromReveal();
-        return;
-      }
       if (phase !== "accuracy" && phase !== "impression") return;
       if (e.code === "Space") {
         e.preventDefault();
@@ -333,7 +300,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, togglePlay, nextFromReveal]);
+  }, [phase, togglePlay]);
 
   // ---------- Gate ----------
   if (phase === "gate") {
@@ -610,14 +577,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           onChange={setTone}
         />
 
-        <ChipGroup
-          title="Does the accent sound right for this language?"
-          hint="Nothing in the automated stack scores accent, so this is the only record of it."
-          options={ACCENT_OPTIONS.map((a) => ({ id: a.id, label: a.label }))}
-          value={accent}
-          onChange={setAccent}
-        />
-
         {humanScore !== null && humanScore < 5 ? (
           <div className="space-y-2">
             <h2 className="text-sm font-medium">What made it sound off? (optional)</h2>
@@ -757,36 +716,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
               You can skip any you are unsure about
             </span>
           ) : null}
-        </div>
-      </div>
-    );
-  }
-
-  // ---------- Reveal ----------
-  if (phase === "reveal" && reveal) {
-    return (
-      <div className="mx-auto max-w-2xl space-y-6 pb-8">
-        <div ref={topRef} className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="font-mono">{current.id}</span>
-          <span>
-            {inSet + 1} of {setTotal} in this set
-          </span>
-        </div>
-        <RatingReveal
-          sourceText={current.text}
-          overall={humanScore ?? 0}
-          metrics={reveal}
-          wordFlags={wordFlags}
-          accent={accent}
-          stressCategory={current.stress_category}
-        />
-        <div className="flex items-center gap-3">
-          <Button size="lg" onClick={nextFromReveal}>
-            {inSet + 1 >= SET_SIZE || index + 1 >= queue.length ? "Finish set" : "Next clip"}
-          </Button>
-          <span className="hidden text-xs text-muted-foreground sm:inline">
-            or press <kbd className="rounded border px-1 font-mono">enter</kbd>
-          </span>
         </div>
       </div>
     );

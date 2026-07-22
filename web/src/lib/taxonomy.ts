@@ -139,7 +139,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     dimension: "nat",
     metricKeys: [],
     probeOnly: true,
-    note: "BLIND SPOT. No reference-free metric in the stack scores accent appropriateness. Collected via the accent probe, which asks how it is wrong (wrong region vs. non-native), not just that it is.",
+    note: "BLIND SPOT. No reference-free metric in the stack scores accent appropriateness, and it is only partly covered by review. A reviewer can flag an individual code-switched word as carrying the wrong accent; whether the voice as a whole sounds native for its market is not collected, because a per-clip question answered identically fifty times produces agreement rather than information.",
   },
   {
     id: "robotic",
@@ -345,23 +345,6 @@ export function probeFor(stressCategory: string): Probe | null {
   const id = PROBE_BY_STRESS[stressCategory];
   return id ? PROBES[id] ?? null : null;
 }
-
-/**
- * Asked on every clip, from a reviewer who speaks the language. Accent is the other
- * declared blind spot: nothing in the automated stack scores it at all.
- */
-export const ACCENT_PROBE: Probe = {
-  id: "accent_probe",
-  question: "Does the accent sound right for this language?",
-  hint: "No automated metric in this stack scores accent. This answer is the only source.",
-  options: [
-    { value: "native", label: "Sounds native", expected: true },
-    { value: "slight", label: "Slightly off, but fine" },
-    { value: "wrong_region", label: "Wrong region for the language" },
-    { value: "non_native", label: "Sounds non-native" },
-    { value: "unsure", label: "Couldn’t tell" },
-  ],
-};
 
 export const LANGUAGE_NAMES: Record<string, string> = {
   en: "English",

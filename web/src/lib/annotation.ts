@@ -33,9 +33,11 @@ export const PRONUNCIATION_KINDS: { id: string; label: string }[] = [
   { id: "code", label: "Code mispronounced" },
   { id: "proper_noun", label: "Mispronounced name or place" },
   { id: "homograph", label: "Homograph (read vs read)" },
-  // Word-level accent is about code-switching: a French word inside an English
-  // sentence, "lag" inside German. Distinct from the clip-level accent question,
-  // which asks whether the whole voice sounds native.
+  // Accent at the WORD level only: a French word inside an English sentence, "lag"
+  // inside German. A clip-level "does the whole voice sound native" question existed
+  // briefly and was removed, because asking it on every clip returns the same answer
+  // fifty times, which is agreement rather than information. A single code-switched
+  // word is a specific, checkable claim.
   { id: "accent", label: "Wrong accent for this word" },
   { id: "other", label: "Something else" },
 ];
@@ -83,19 +85,6 @@ export const DELIVERY_PROBLEMS: { id: string; label: string }[] = [
 ];
 
 /**
- * Clip-level accent, distinct from the word-level accent kind above. Accent is the
- * blind spot with no objective counterpart anywhere in the stack, so this answer is
- * the only record of it.
- */
-export const ACCENT_OPTIONS: { id: string; label: string; expected?: boolean }[] = [
-  { id: "native", label: "Sounds native", expected: true },
-  { id: "slight", label: "Slightly off, but fine" },
-  { id: "wrong_region", label: "Wrong region for the language" },
-  { id: "non_native", label: "Sounds non-native" },
-  { id: "unsure", label: "Couldn’t tell" },
-];
-
-/**
  * Pass 3. The disputed word is one the recogniser transcribed differently from the
  * source; the reviewer decides which side was actually wrong. This is what turns a
  * raw WER into a corrected one, and it is the only way to measure our own instrument.
@@ -115,12 +104,10 @@ export type Annotation = {
   audio_issue?: boolean | null;
   tone?: string | null;
   delivery_problems?: string[];
-  accent?: string | null;
   /** {source_word_index: adjudication_id} */
   adjudication?: Record<string, string>;
 };
 
 export const TONE_IDS = new Set(TONES.map((t) => t.id));
 export const DELIVERY_IDS = new Set(DELIVERY_PROBLEMS.map((d) => d.id));
-export const ACCENT_IDS = new Set(ACCENT_OPTIONS.map((a) => a.id));
 export const WORD_ISSUE_IDS = new Set(WORD_ISSUES.map((w) => w.id));

@@ -341,13 +341,21 @@ export default function MethodPage() {
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               Naming a blind spot is not the same as covering it, so the review flow{" "}
-              <span className="font-medium text-foreground">asks directly</span>. Every clip
-              declares a stress category, and that category selects one targeted question:
-              a clip containing a code is asked how the code was read, a clip with an
-              ALL-CAPS word is asked whether it was emphasized or spelled out, and every
-              clip is asked about accent. Those answers are the only record of these
-              dimensions anywhere in the system, and they surface on the deep dive sorted by
-              how often the reading was not what a production system would want.
+              <span className="font-medium text-foreground">asks directly</span>. Reviewers
+              tap the individual word that went wrong and say what kind of failure it was:
+              a mispronounced code, a botched acronym, a homograph read the wrong way, a
+              name mangled. That is a level of detail no clip-level metric produces, since
+              word error rate can tell you something broke but never which word.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Accent is only partly covered.</span>{" "}
+              A code-switched word can be flagged for a wrong accent, so a French word
+              inside an English sentence is caught. Whether the voice as a whole sounds
+              native for its market is currently not collected: it was asked for a while and
+              removed, because a per-clip question that a reviewer answers the same way
+              fifty times in a row produces agreement rather than information. It remains a
+              real blind spot with no measurement behind it, which is worth stating plainly
+              rather than implying the taxonomy covers it.
             </p>
           </div>
         </div>
