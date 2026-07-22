@@ -33,11 +33,10 @@ export const PRONUNCIATION_KINDS: { id: string; label: string }[] = [
   { id: "code", label: "Code mispronounced" },
   { id: "proper_noun", label: "Mispronounced name or place" },
   { id: "homograph", label: "Homograph (read vs read)" },
-  // Accent at the WORD level only: a French word inside an English sentence, "lag"
-  // inside German. A clip-level "does the whole voice sound native" question existed
-  // briefly and was removed, because asking it on every clip returns the same answer
-  // fifty times, which is agreement rather than information. A single code-switched
-  // word is a specific, checkable claim.
+  // Accent at the WORD level: a French word inside an English sentence, "lag" inside
+  // German. Distinct from the clip-level ACCENT_OPTIONS question, which asks whether
+  // the voice as a whole sounds native. This one is a specific, checkable claim about
+  // one word; that one is a general impression.
   { id: "accent", label: "Wrong accent for this word" },
   { id: "other", label: "Something else" },
 ];
@@ -74,14 +73,73 @@ export const TONE_FIT: Record<string, string[]> = {
   gaming_npc: ["excited", "urgent", "serious", "warm_friendly"],
 };
 
-/** Only asked when the human score is below 5. */
-export const DELIVERY_PROBLEMS: { id: string; label: string }[] = [
-  { id: "robotic", label: "Robotic / monotone" },
-  { id: "odd_pauses", label: "Odd pauses or choppy delivery" },
-  { id: "running_together", label: "Words running together" },
-  { id: "too_fast", label: "Too fast" },
-  { id: "too_slow", label: "Too slow" },
-  { id: "voice_drift", label: "Voice drifted" },
+/**
+ * Only asked when the reviewer says it did not sound fully human.
+ *
+ * Two levels. The top level is what a listener notices ("the timing is off"); the
+ * second says which way, which is what a fix needs. Both levels are multi-select and
+ * both are stored flat in delivery_problems, so a row reads
+ * ["spacing", "choppy", "speed", "too_fast"].
+ *
+ * Several ids are carried over from the previous flat list (robotic, odd_pauses,
+ * running_together, too_fast, too_slow, voice_drift) so the answers already collected
+ * still resolve to a label instead of rendering as raw ids.
+ */
+export const DELIVERY_PROBLEMS: {
+  id: string;
+  label: string;
+  kinds: { id: string; label: string }[];
+}[] = [
+  {
+    id: "stress",
+    label: "Stress / emphasis",
+    kinds: [
+      { id: "robotic", label: "The voice sounds robotic, there's not enough variation" },
+      { id: "missed_stress", label: "The voice missed opportunities to stress words" },
+      { id: "wrong_stress", label: "Emphasized the wrong word" },
+    ],
+  },
+  {
+    id: "spacing",
+    label: "Spacing",
+    kinds: [
+      { id: "odd_pauses", label: "Too much pausing" },
+      { id: "choppy", label: "Choppy delivery: feels mechanical" },
+      {
+        id: "running_together",
+        label: "Words running together: not enough space between words",
+      },
+    ],
+  },
+  {
+    id: "speed",
+    label: "Speed",
+    kinds: [
+      { id: "too_fast", label: "Too fast" },
+      { id: "too_slow", label: "Too slow" },
+    ],
+  },
+  { id: "voice_drift", label: "The voice drifting", kinds: [] },
+];
+
+/** Flattened, for label lookup and validation across both levels. */
+export const DELIVERY_ALL: { id: string; label: string }[] = DELIVERY_PROBLEMS.flatMap((d) => [
+  { id: d.id, label: d.label },
+  ...d.kinds,
+]);
+
+/**
+ * Clip-level accent. Reinstated after being removed: the earlier objection was that a
+ * reviewer answers it the same way every clip, which is still a risk, so it is read as
+ * a share across many clips rather than as a per-clip verdict. Nothing in the automated
+ * stack scores accent at all, which is why it is worth collecting even noisily.
+ */
+export const ACCENT_OPTIONS: { id: string; label: string }[] = [
+  { id: "native", label: "Sounds native" },
+  { id: "slight", label: "Slightly off, but fine" },
+  { id: "wrong_region", label: "Wrong region for the language" },
+  { id: "non_native", label: "Sounds non-native" },
+  { id: "unsure", label: "Couldn't tell" },
 ];
 
 /**
@@ -102,12 +160,20 @@ export type Annotation = {
   word_flags?: WordFlag[];
   cut_off?: boolean | null;
   audio_issue?: boolean | null;
+  /**
+   * "Did this sound 100% human?" This is the real answer to the naturalness question.
+   * The `overall` column is a 1-5 smallint with a NOT NULL check constraint, so it
+   * cannot hold a boolean; it carries a shim value instead. See submitAll in rater.tsx.
+   */
+  sounded_human?: boolean | null;
   tone?: string | null;
   delivery_problems?: string[];
+  accent?: string | null;
   /** {source_word_index: adjudication_id} */
   adjudication?: Record<string, string>;
 };
 
 export const TONE_IDS = new Set(TONES.map((t) => t.id));
-export const DELIVERY_IDS = new Set(DELIVERY_PROBLEMS.map((d) => d.id));
+export const DELIVERY_IDS = new Set(DELIVERY_ALL.map((d) => d.id));
+export const ACCENT_IDS = new Set(ACCENT_OPTIONS.map((a) => a.id));
 export const WORD_ISSUE_IDS = new Set(WORD_ISSUES.map((w) => w.id));

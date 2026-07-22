@@ -15,7 +15,8 @@ import {
   verdictFor,
 } from "@/lib/taxonomy";
 import {
-  DELIVERY_PROBLEMS,
+  ACCENT_OPTIONS,
+  DELIVERY_ALL,
   PRONUNCIATION_KINDS,
   TONES,
   TONE_FIT,
@@ -739,14 +740,15 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
                 <span className="text-muted-foreground">n </span>
                 <span className="font-mono">{agg.n}</span>
               </span>
-              <span>
-                <span className="text-muted-foreground">mean overall </span>
-                <span className="font-mono">{agg.mean_overall.toFixed(2)}</span>
-              </span>
-              <span>
-                <span className="text-muted-foreground">scored below 3 </span>
-                <span className="font-mono">{(agg.reject_rate * 100).toFixed(0)}%</span>
-              </span>
+
+              {agg.human_yes + agg.human_no > 0 ? (
+                <span>
+                  <span className="text-muted-foreground">sounded 100% human </span>
+                  <span className="font-mono">
+                    {agg.human_yes}/{agg.human_yes + agg.human_no}
+                  </span>
+                </span>
+              ) : null}
               {Object.entries(agg.tag_counts).length ? (
                 <span className="flex flex-wrap gap-1">
                   {Object.entries(agg.tag_counts)
@@ -793,7 +795,9 @@ function HumanFindings({
     const tones: Record<string, number> = {};
     const delivery: Record<string, number> = {};
     const adj: Record<string, number> = {};
+    const accents: Record<string, number> = {};
     let n = 0, cutOff = 0, audioIssue = 0, toneMismatch = 0, toneTotal = 0;
+    let humanYes = 0, humanNo = 0;
 
     for (const c of clips) {
       const a = aggregates[c.id];
@@ -801,6 +805,9 @@ function HumanFindings({
       n += a.n;
       cutOff += a.cut_off_yes;
       audioIssue += a.audio_issue_yes;
+      humanYes += a.human_yes;
+      humanNo += a.human_no;
+      for (const [k, v] of Object.entries(a.accent_counts)) accents[k] = (accents[k] ?? 0) + v;
       for (const [k, v] of Object.entries(a.word_kind_counts)) kinds[k] = (kinds[k] ?? 0) + v;
       for (const [k, v] of Object.entries(a.delivery_counts)) delivery[k] = (delivery[k] ?? 0) + v;
       for (const [k, v] of Object.entries(a.adjudication_counts)) adj[k] = (adj[k] ?? 0) + v;
@@ -811,7 +818,7 @@ function HumanFindings({
         if (fit && !fit.includes(k) && k !== "other") toneMismatch += v;
       }
     }
-    return { kinds, tones, delivery, adj, n, cutOff, audioIssue, toneMismatch, toneTotal };
+    return { kinds, tones, delivery, adj, accents, n, cutOff, audioIssue, toneMismatch, toneTotal, humanYes, humanNo };
   }, [clips, aggregates]);
 
   if (roll.n === 0) {
@@ -892,6 +899,44 @@ function HumanFindings({
           </Card>
         ) : null}
 
+        {roll.humanYes + roll.humanNo > 0 ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Sounded 100% human?</h3>
+              <div className="flex flex-wrap gap-6 pt-1">
+                <div>
+                  <div className="text-2xl font-semibold tabular-nums">{roll.humanYes}</div>
+                  <div className="text-xs text-muted-foreground">yes</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-semibold tabular-nums text-amber-600 dark:text-amber-400">
+                    {roll.humanNo}
+                  </div>
+                  <div className="text-xs text-muted-foreground">no</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-semibold tabular-nums">
+                    {Math.round((roll.humanNo / (roll.humanYes + roll.humanNo)) * 100)}%
+                  </div>
+                  <div className="text-xs text-muted-foreground">did not</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
+        {Object.keys(roll.accents).length ? (
+          <Card>
+            <CardContent className="space-y-2 pt-6">
+              <h3 className="text-sm font-medium">Accent</h3>
+              <p className="text-xs text-muted-foreground">
+                No metric in the stack scores accent. This panel is the only source.
+              </p>
+              <div className="space-y-2 pt-1">{bar(roll.accents, ACCENT_OPTIONS)}</div>
+            </CardContent>
+          </Card>
+        ) : null}
+
         {Object.keys(roll.kinds).length ? (
           <Card>
             <CardContent className="space-y-2 pt-6">
@@ -927,7 +972,7 @@ function HumanFindings({
           <Card>
             <CardContent className="space-y-2 pt-6">
               <h3 className="text-sm font-medium">Delivery problems</h3>
-              <div className="space-y-2 pt-1">{bar(roll.delivery, DELIVERY_PROBLEMS)}</div>
+              <div className="space-y-2 pt-1">{bar(roll.delivery, DELIVERY_ALL)}</div>
             </CardContent>
           </Card>
         ) : null}

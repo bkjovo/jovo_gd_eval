@@ -175,6 +175,10 @@ export type ClipAggregate = {
   delivery_counts: Record<string, number>;
   cut_off_yes: number;
   audio_issue_yes: number;
+  accent_counts: Record<string, number>;
+  /** "Did this sound 100% human?" Yes/No tallies. */
+  human_yes: number;
+  human_no: number;
   /** ASR adjudication tallies: was the audio wrong, or the transcript? */
   adjudication_counts: Record<string, number>;
 };
@@ -194,6 +198,9 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
       delivery_counts: {},
       cut_off_yes: 0,
       audio_issue_yes: 0,
+      accent_counts: {},
+      human_yes: 0,
+      human_no: 0,
       adjudication_counts: {},
     });
     a.n += 1;
@@ -213,6 +220,9 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
     }
     if (ann.cut_off) a.cut_off_yes += 1;
     if (ann.audio_issue) a.audio_issue_yes += 1;
+    if (ann.accent) a.accent_counts[ann.accent] = (a.accent_counts[ann.accent] ?? 0) + 1;
+    if (ann.sounded_human === true) a.human_yes += 1;
+    if (ann.sounded_human === false) a.human_no += 1;
     for (const v of Object.values(ann.adjudication ?? {})) {
       a.adjudication_counts[v] = (a.adjudication_counts[v] ?? 0) + 1;
     }

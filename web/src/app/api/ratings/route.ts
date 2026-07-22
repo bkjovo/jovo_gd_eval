@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { insertRating, isPersisted, listRatings, probesDropped, type Rating } from "@/lib/ratings";
 import { TAGS_BY_ID } from "@/lib/taxonomy";
 import {
+  ACCENT_IDS,
   ADJUDICATION_IDS,
   DELIVERY_IDS,
   PRONUNCIATION_KIND_IDS,
@@ -120,7 +121,9 @@ function parseAnnotation(raw: unknown): Annotation {
 
   if (typeof b.cut_off === "boolean") out.cut_off = b.cut_off;
   if (typeof b.audio_issue === "boolean") out.audio_issue = b.audio_issue;
+  if (typeof b.sounded_human === "boolean") out.sounded_human = b.sounded_human;
   if (typeof b.tone === "string" && TONE_IDS.has(b.tone)) out.tone = b.tone;
+  if (typeof b.accent === "string" && ACCENT_IDS.has(b.accent)) out.accent = b.accent;
 
   if (Array.isArray(b.delivery_problems)) {
     const d = b.delivery_problems.filter(

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RaterClip } from "@/lib/clips";
 import { LANGUAGE_NAMES } from "@/lib/taxonomy";
 import {
+  ACCENT_OPTIONS,
   ADJUDICATION,
   DELIVERY_PROBLEMS,
   TONES,
@@ -78,9 +79,10 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const [cutOff, setCutOff] = useState<boolean | null>(null);
   // pass 2
   const [audioIssue, setAudioIssue] = useState<boolean | null>(null);
-  const [humanScore, setHumanScore] = useState<number | null>(null);
+  const [soundedHuman, setSoundedHuman] = useState<boolean | null>(null);
   const [tone, setTone] = useState<string | null>(null);
   const [delivery, setDelivery] = useState<string[]>([]);
+  const [accent, setAccent] = useState<string | null>(null);
   // pass 3
   const [transcript, setTranscript] = useState<Transcript | null>(null);
   const [adjudication, setAdjudication] = useState<Record<string, string>>({});
@@ -113,9 +115,10 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     setWordFlags([]);
     setCutOff(null);
     setAudioIssue(null);
-    setHumanScore(null);
+    setSoundedHuman(null);
     setTone(null);
     setDelivery([]);
+    setAccent(null);
     setTranscript(null);
     setAdjudication({});
     setError(null);
@@ -197,7 +200,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
 
   const submitAll = useCallback(
     async (adj: Record<string, string>) => {
-      if (!current || humanScore === null) return;
+      if (!current || soundedHuman === null) return;
       flushListening();
       setSubmitting(true);
       setError(null);
@@ -206,8 +209,10 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         ...(wordFlags.length ? { word_flags: wordFlags } : {}),
         cut_off: cutOff,
         audio_issue: audioIssue,
+        sounded_human: soundedHuman,
         tone,
         ...(delivery.length ? { delivery_problems: delivery } : {}),
+        accent,
         ...(Object.keys(adj).length ? { adjudication: adj } : {}),
       };
 
@@ -218,7 +223,12 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           body: JSON.stringify({
             session_id: getSessionId(),
             clip_id: current.id,
-            overall: humanScore,
+            // `overall` is a 1-5 smallint with a NOT NULL check constraint, so it
+            // cannot hold the boolean the flow now asks for. sounded_human above is the
+            // real answer; this is a shim. "No" maps to 3 rather than 1 on purpose:
+            // 3 does not cross HUMAN_REJECT_BELOW, so a binary "not fully human" cannot
+            // masquerade as a rejection in aggregates built for the old 1-5 scale.
+            overall: soundedHuman ? 5 : 3,
             defect_tags: [],
             probes: annotation,
             listened_ms: listenedMsRef.current,
@@ -238,7 +248,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         setSubmitting(false);
       }
     },
-    [current, humanScore, wordFlags, cutOff, audioIssue, tone, delivery, advance],
+    [current, soundedHuman, wordFlags, cutOff, audioIssue, tone, delivery, accent, advance],
   );
 
   /**
@@ -250,12 +260,28 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
    * question only exists below 5. Without this they would stay in state after the panel
    * hid itself and get submitted as problems on a clip the reviewer called perfect.
    */
-  const chooseHumanScore = useCallback((n: number) => {
-    setHumanScore((prev) => {
-      const next = prev === n ? null : n;
-      if (next === null || next === 5) setDelivery([]);
+  const chooseSoundedHuman = useCallback((v: boolean) => {
+    setSoundedHuman((prev) => {
+      const next = prev === v ? null : v;
+      // The follow-up only exists for "No", so clearing or flipping to "Yes" drops it.
+      // Without this the answers stay in state after the panel hides and get submitted
+      // against a clip the reviewer just called fully human.
+      if (next !== false) setDelivery([]);
       return next;
     });
+  }, []);
+
+  /**
+   * Top level and sub-options are both multi-select and both live in one flat list.
+   * Turning a top-level option off takes its sub-options with it, so the payload can
+   * never carry "too fast" without "speed".
+   */
+  const toggleDelivery = useCallback((id: string, childIds: string[]) => {
+    setDelivery((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id && !childIds.includes(x))
+        : [...prev, id],
+    );
   }, []);
 
   /** Pass 1 -> 2. Scrolling to the top is the deliberate cognitive reset. */
@@ -311,15 +337,15 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
       if (e.code === "Space") {
         e.preventDefault();
         togglePlay();
-      } else if (phase === "impression" && ["1", "2", "3", "4", "5"].includes(e.key)) {
+      } else if (phase === "impression" && (e.key === "y" || e.key === "n")) {
         // e.repeat guard: a held key fires keydown continuously, which on a toggle
-        // would flicker the score on and off rather than simply setting it.
-        if (!e.repeat) chooseHumanScore(Number(e.key));
+        // would flicker the answer on and off rather than simply setting it.
+        if (!e.repeat) chooseSoundedHuman(e.key === "y");
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, togglePlay, chooseHumanScore]);
+  }, [phase, togglePlay, chooseSoundedHuman]);
 
   // ---------- Gate ----------
   if (phase === "gate") {
@@ -357,7 +383,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <p className="mt-1">
             {SET_SIZE} clips per set. For each one you listen twice: first tapping any words
             that came out wrong, then judging how it sounds overall. You are not shown what
-            the machine scored — that comparison is the finding, and seeing it mid-set would
+            the machine scored. That comparison is the finding, and seeing it mid-set would
             train you toward it. Your answers and the metrics meet on the dashboard.
           </p>
         </div>
@@ -538,6 +564,104 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         </blockquote>
 
         <div className="space-y-2">
+          <h2 className="text-sm font-medium">Did this sound 100% human?</h2>
+          <div className="flex gap-2">
+            {[
+              { v: true, label: "Yes" },
+              { v: false, label: "No" },
+            ].map((o) => (
+              <button
+                key={String(o.v)}
+                type="button"
+                aria-pressed={soundedHuman === o.v}
+                onClick={() => chooseSoundedHuman(o.v)}
+                className={cn(
+                  "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
+                  soundedHuman === o.v
+                    ? "border-foreground bg-foreground text-background"
+                    : "hover:bg-muted",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {soundedHuman === false ? (
+          <div className="space-y-3">
+            <h2 className="text-sm font-medium">What made it sound off?</h2>
+            <div className="space-y-3">
+              {DELIVERY_PROBLEMS.map((d) => {
+                const on = delivery.includes(d.id);
+                const childIds = d.kinds.map((k) => k.id);
+                return (
+                  <div key={d.id} className="space-y-2">
+                    <button
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleDelivery(d.id, childIds)}
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                        on
+                          ? "border-foreground bg-foreground text-background"
+                          : "hover:bg-muted",
+                      )}
+                    >
+                      {d.label}
+                    </button>
+                    {on && d.kinds.length ? (
+                      <div className="ml-3 flex flex-wrap gap-2 border-l pl-3">
+                        {d.kinds.map((k) => {
+                          const kOn = delivery.includes(k.id);
+                          return (
+                            <button
+                              key={k.id}
+                              type="button"
+                              aria-pressed={kOn}
+                              onClick={() =>
+                                setDelivery((prev) =>
+                                  kOn
+                                    ? prev.filter((x) => x !== k.id)
+                                    : [...prev, k.id],
+                                )
+                              }
+                              className={cn(
+                                "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                                kOn
+                                  ? "border-foreground bg-foreground text-background"
+                                  : "bg-background hover:bg-muted",
+                              )}
+                            >
+                              {k.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
+        <ChipGroup
+          title="What tone did you hear?"
+          options={TONES}
+          value={tone}
+          onChange={setTone}
+        />
+
+        <ChipGroup
+          title="Does the accent sound right for this language?"
+          hint="No automated metric scores accent. This answer is the only source."
+          options={ACCENT_OPTIONS}
+          value={accent}
+          onChange={setAccent}
+        />
+
+        <div className="space-y-2">
           <h2 className="text-sm font-medium">Were there any audio issues?</h2>
           <div className="flex gap-2">
             {[
@@ -562,70 +686,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <h2 className="text-sm font-medium">
-            Does this sound like a real human, or like a machine?
-          </h2>
-          <div className="flex gap-2">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                aria-pressed={humanScore === n}
-                onClick={() => chooseHumanScore(n)}
-                className={cn(
-                  "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
-                  humanScore === n
-                    ? "border-foreground bg-foreground text-background"
-                    : "hover:bg-muted",
-                )}
-              >
-                {n}
-              </button>
-            ))}
-          </div>
-          <div className="flex justify-between gap-2 text-[11px] text-muted-foreground sm:text-xs">
-            <span>1: pure robot</span>
-            <span>5: real human</span>
-          </div>
-        </div>
-
-        <ChipGroup
-          title="What tone did you hear?"
-          options={TONES}
-          value={tone}
-          onChange={setTone}
-        />
-
-        {humanScore !== null && humanScore < 5 ? (
-          <div className="space-y-2">
-            <h2 className="text-sm font-medium">What made it sound off? (optional)</h2>
-            <div className="flex flex-wrap gap-2">
-              {DELIVERY_PROBLEMS.map((d) => {
-                const on = delivery.includes(d.id);
-                return (
-                  <button
-                    key={d.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() =>
-                      setDelivery((prev) =>
-                        on ? prev.filter((x) => x !== d.id) : [...prev, d.id],
-                      )
-                    }
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                      on ? "border-foreground bg-foreground text-background" : "hover:bg-muted",
-                    )}
-                  >
-                    {d.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
         {error ? (
           <Alert className="border-red-500/30 bg-red-500/5">
             <AlertTitle className="text-sm">Could not save that rating</AlertTitle>
@@ -637,13 +697,13 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <Button
             size="lg"
             onClick={() => void afterImpression()}
-            disabled={humanScore === null || audioIssue === null || submitting}
+            disabled={soundedHuman === null || audioIssue === null || submitting}
           >
             {submitting ? "Saving…" : "Submit"}
           </Button>
           <span className="text-xs text-muted-foreground">
-            {humanScore === null || audioIssue === null
-              ? "Answer the audio and human-likeness questions"
+            {soundedHuman === null || audioIssue === null
+              ? "Answer the human-likeness and audio questions"
               : ""}
           </span>
         </div>
@@ -664,7 +724,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             <div>
               <h2 className="text-sm font-medium">One last thing: was the metric right?</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                A second machine — speech-to-text, not the voice you just heard — wrote
+                A second machine (speech-to-text, not the voice you just heard) wrote
                 down this clip differently from the source text, which counted as an
                 error. That machine makes its own mistakes, so your ear is the tiebreaker.
                 This is asked last, on purpose, so it could not influence the score you
