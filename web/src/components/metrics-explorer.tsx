@@ -173,83 +173,6 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
           {/* --- Blind-spot probe answers: the signal no metric produces --- */}
           <HumanFindings clips={filtered} aggregates={aggregates} />
 
-          {/* --- Per-clip table. Rows expand in place: a detail panel rendered at the
-               bottom of a 145-row table is off-screen from the row that opened it. --- */}
-          <section className="space-y-3">
-            <h2 className="text-sm font-medium">Per-clip detail</h2>
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Clip</TableHead>
-                        <TableHead>Stress case</TableHead>
-                        <TableHead className="text-right">WER %</TableHead>
-                        <TableHead className="text-right">TTFA p90</TableHead>
-                        <TableHead className="text-right"># annotations</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filtered.map((c) => {
-                        const agg = aggregates[c.id];
-                        const isOpen = selected === c.id;
-                        return (
-                          <Fragment key={c.id}>
-                            <TableRow
-                              onClick={() => setSelected(isOpen ? null : c.id)}
-                              className={cn("cursor-pointer", isOpen && "bg-muted/50")}
-                            >
-                              <TableCell>
-                                <div className="flex items-center gap-1.5">
-                                  <ChevronRight
-                                    className={cn(
-                                      "size-3 shrink-0 text-muted-foreground transition-transform",
-                                      isOpen && "rotate-90",
-                                    )}
-                                  />
-                                  <div>
-                                    <div className="font-mono text-xs">{c.id}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                      {LANGUAGE_NAMES[c.lang] ?? c.lang}
-                                    </div>
-                                  </div>
-                                </div>
-                              </TableCell>
-                              <TableCell className="text-xs text-muted-foreground">
-                                {c.stress_category.replace(/_/g, " ")}
-                              </TableCell>
-                              <TableCell className="text-right tabular-nums">
-                                {c.metrics.int.wer_pct.toFixed(1)}
-                              </TableCell>
-                              <TableCell className="text-right tabular-nums">
-                                {c.metrics.lat.ttfa_p90_ms.toFixed(0)} ms
-                              </TableCell>
-                              <TableCell className="text-right tabular-nums text-muted-foreground">
-                                {agg?.n ?? 0}
-                              </TableCell>
-                            </TableRow>
-                            {isOpen ? (
-                              <TableRow className="hover:bg-transparent">
-                                <TableCell colSpan={5} className="bg-muted/30 p-4">
-                                  <ClipDetail clip={c} agg={agg} />
-                                </TableCell>
-                              </TableRow>
-                            ) : null}
-                          </Fragment>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-            <p className="text-xs text-muted-foreground">
-              Select a row to expand it. # annotations counts submitted reviews from the
-              Annotate tab.
-            </p>
-          </section>
-
           {/* --- Per-language objective breakdown, moved from the archived summary --- */}
           <section className="space-y-3">
             <h2 className="text-sm font-medium">By language (objective metrics only)</h2>
@@ -341,6 +264,83 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
               </CardContent>
             </Card>
           </section>
+          {/* --- Per-clip table. Rows expand in place: a detail panel rendered at the
+               bottom of a 145-row table is off-screen from the row that opened it. --- */}
+          <section className="space-y-3">
+            <h2 className="text-sm font-medium">Per-clip detail</h2>
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Clip</TableHead>
+                        <TableHead>Stress case</TableHead>
+                        <TableHead className="text-right">WER %</TableHead>
+                        <TableHead className="text-right">TTFA p90</TableHead>
+                        <TableHead className="text-right"># annotations</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filtered.map((c) => {
+                        const agg = aggregates[c.id];
+                        const isOpen = selected === c.id;
+                        return (
+                          <Fragment key={c.id}>
+                            <TableRow
+                              onClick={() => setSelected(isOpen ? null : c.id)}
+                              className={cn("cursor-pointer", isOpen && "bg-muted/50")}
+                            >
+                              <TableCell>
+                                <div className="flex items-center gap-1.5">
+                                  <ChevronRight
+                                    className={cn(
+                                      "size-3 shrink-0 text-muted-foreground transition-transform",
+                                      isOpen && "rotate-90",
+                                    )}
+                                  />
+                                  <div>
+                                    <div className="font-mono text-xs">{c.id}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {LANGUAGE_NAMES[c.lang] ?? c.lang}
+                                    </div>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs text-muted-foreground">
+                                {c.stress_category.replace(/_/g, " ")}
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums">
+                                {c.metrics.int.wer_pct.toFixed(1)}
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums">
+                                {c.metrics.lat.ttfa_p90_ms.toFixed(0)} ms
+                              </TableCell>
+                              <TableCell className="text-right tabular-nums text-muted-foreground">
+                                {agg?.n ?? 0}
+                              </TableCell>
+                            </TableRow>
+                            {isOpen ? (
+                              <TableRow className="hover:bg-transparent">
+                                <TableCell colSpan={5} className="bg-muted/30 p-4">
+                                  <ClipDetail clip={c} agg={agg} />
+                                </TableCell>
+                              </TableRow>
+                            ) : null}
+                          </Fragment>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+            <p className="text-xs text-muted-foreground">
+              Select a row to expand it. # annotations counts submitted reviews from the
+              Annotate tab.
+            </p>
+          </section>
+
         </>
       )}
     </div>

@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 // last item off the edge.
 // The executive summary is archived: still served at /summary, no longer linked.
 const LINKS = [
-  { href: "/metrics", label: "Metrics Deep Dive", short: "Metrics" },
   { href: "/rate", label: "Annotate!", short: "Annotate!" },
+  { href: "/metrics", label: "Metrics Deep Dive", short: "Metrics" },
   { href: "/samples", label: "Samples", short: "Samples" },
   { href: "/method", label: "Methodology", short: "Method" },
   { href: "/gtm", label: "Go-to-market", short: "GTM" },
