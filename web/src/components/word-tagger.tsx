@@ -108,9 +108,21 @@ export function WordTagger({
                   <button
                     key={issue.id}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => {
+                      // "Pronunciation" is a doorway to the kind submenu, not an answer
+                      // in itself, so it always opens even when already chosen: a
+                      // reviewer tapping it on a flagged word wants to change acronym to
+                      // number, not to lose the flag. Clearing happens on the kind.
                       if (issue.id === "pronunciation") {
                         setPronOpen(true);
+                        return;
+                      }
+                      // The other two are terminal answers, so tapping the chosen one
+                      // again unflags the word: a mis-tap is undone the same way it was
+                      // made, rather than sending the reviewer hunting for "Remove flag".
+                      if (active) {
+                        clearFlag(open);
                         return;
                       }
                       setFlag(open, words[open], issue.id);
@@ -141,25 +153,33 @@ export function WordTagger({
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">What kind of problem?</p>
               <div className="flex flex-wrap gap-2">
-                {PRONUNCIATION_KINDS.map((k) => (
-                  <button
-                    key={k.id}
-                    type="button"
-                    onClick={() => {
-                      setFlag(open, words[open], "pronunciation", k.id);
-                      setOpen(null);
-                      setPronOpen(false);
-                    }}
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-sm transition-colors",
-                      flagFor(open)?.kind === k.id
-                        ? "border-foreground bg-foreground text-background"
-                        : "hover:bg-muted",
-                    )}
-                  >
-                    {k.label}
-                  </button>
-                ))}
+                {PRONUNCIATION_KINDS.map((k) => {
+                  const active = flagFor(open)?.kind === k.id;
+                  return (
+                    <button
+                      key={k.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => {
+                        if (active) {
+                          clearFlag(open);
+                          return;
+                        }
+                        setFlag(open, words[open], "pronunciation", k.id);
+                        setOpen(null);
+                        setPronOpen(false);
+                      }}
+                      className={cn(
+                        "rounded-full border px-3 py-1.5 text-sm transition-colors",
+                        active
+                          ? "border-foreground bg-foreground text-background"
+                          : "hover:bg-muted",
+                      )}
+                    >
+                      {k.label}
+                    </button>
+                  );
+                })}
               </div>
               <button
                 type="button"

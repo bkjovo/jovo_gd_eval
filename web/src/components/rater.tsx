@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils";
  * Pass 1 shows the SOURCE text, never the transcript. A dropped word does not appear
  * in a transcript at all, so it could not be tapped; and the transcript carries the
  * recogniser's own errors, which a reviewer would faithfully attribute to the model.
- * The transcript appears in pass 3 and in the reveal, where the contrast is the point.
+ * The transcript appears only in pass 3, where the contrast is the point.
  *
  * No quality metric reaches this component at all: /rate is served a metrics-stripped
  * payload and /api/clip-transcript returns only the transcript, never a score.
@@ -241,6 +241,23 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     [current, humanScore, wordFlags, cutOff, audioIssue, tone, delivery, advance],
   );
 
+  /**
+   * Every answer in this flow is deselectable: tapping the chosen option again clears
+   * it. A reviewer who mis-taps otherwise has no way back, and the honest recovery —
+   * leaving a wrong answer in — is the one that quietly corrupts the data.
+   *
+   * Clearing or raising the score to 5 also drops the delivery problems, because that
+   * question only exists below 5. Without this they would stay in state after the panel
+   * hid itself and get submitted as problems on a clip the reviewer called perfect.
+   */
+  const chooseHumanScore = useCallback((n: number) => {
+    setHumanScore((prev) => {
+      const next = prev === n ? null : n;
+      if (next === null || next === 5) setDelivery([]);
+      return next;
+    });
+  }, []);
+
   /** Pass 1 -> 2. Scrolling to the top is the deliberate cognitive reset. */
   const toImpression = useCallback(() => {
     setPhase("impression");
@@ -295,12 +312,14 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         e.preventDefault();
         togglePlay();
       } else if (phase === "impression" && ["1", "2", "3", "4", "5"].includes(e.key)) {
-        setHumanScore(Number(e.key));
+        // e.repeat guard: a held key fires keydown continuously, which on a toggle
+        // would flicker the score on and off rather than simply setting it.
+        if (!e.repeat) chooseHumanScore(Number(e.key));
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [phase, togglePlay]);
+  }, [phase, togglePlay, chooseHumanScore]);
 
   // ---------- Gate ----------
   if (phase === "gate") {
@@ -323,6 +342,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
               <button
                 key={l}
                 type="button"
+                aria-pressed={on}
                 onClick={() =>
                   setLangs((prev) => (on ? prev.filter((x) => x !== l) : [...prev, l]))
                 }
@@ -340,8 +360,9 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <p className="font-medium text-foreground">How it works</p>
           <p className="mt-1">
             {SET_SIZE} clips per set. For each one you listen twice: first tapping any words
-            that came out wrong, then judging how it sounds overall. At the end you see what
-            the machine scored it, so you can tell where you and the model disagree.
+            that came out wrong, then judging how it sounds overall. You are not shown what
+            the machine scored — that comparison is the finding, and seeing it mid-set would
+            train you toward it. Your answers and the metrics meet on the dashboard.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -483,7 +504,8 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
               <button
                 key={String(o.v)}
                 type="button"
-                onClick={() => setCutOff(o.v)}
+                aria-pressed={cutOff === o.v}
+                onClick={() => setCutOff(cutOff === o.v ? null : o.v)}
                 className={cn(
                   "h-11 flex-1 rounded-md border text-sm font-medium transition-colors",
                   cutOff === o.v
@@ -529,7 +551,8 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
               <button
                 key={String(o.v)}
                 type="button"
-                onClick={() => setAudioIssue(o.v)}
+                aria-pressed={audioIssue === o.v}
+                onClick={() => setAudioIssue(audioIssue === o.v ? null : o.v)}
                 className={cn(
                   "h-11 flex-1 rounded-md border px-2 text-sm font-medium transition-colors",
                   audioIssue === o.v
@@ -552,7 +575,8 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
               <button
                 key={n}
                 type="button"
-                onClick={() => setHumanScore(n)}
+                aria-pressed={humanScore === n}
+                onClick={() => chooseHumanScore(n)}
                 className={cn(
                   "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
                   humanScore === n
@@ -587,6 +611,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                   <button
                     key={d.id}
                     type="button"
+                    aria-pressed={on}
                     onClick={() =>
                       setDelivery((prev) =>
                         on ? prev.filter((x) => x !== d.id) : [...prev, d.id],
@@ -632,7 +657,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
 
   // ---------- Pass 3: adjudication ----------
   if (phase === "adjudication" && transcript) {
-    const { srcMarks, src } = diffWords(current.text, transcript.hypothesis);
+    const { srcMarks, src, hyp, hypMarks } = diffWords(current.text, transcript.hypothesis);
     const disputed = srcMarks.flatMap((m, i) => (m ? [i] : []));
     const answered = disputed.every((i) => adjudication[String(i)]);
     return (
@@ -643,10 +668,11 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             <div>
               <h2 className="text-sm font-medium">One last thing: was the metric right?</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                Our speech recogniser transcribed this clip differently from the source
-                text, which counted as an error. The recogniser makes its own mistakes, so
-                your ear is the tiebreaker. This is asked last, on purpose, so it could not
-                influence the score you just gave.
+                A second machine — speech-to-text, not the voice you just heard — wrote
+                down this clip differently from the source text, which counted as an
+                error. That machine makes its own mistakes, so your ear is the tiebreaker.
+                This is asked last, on purpose, so it could not influence the score you
+                just gave.
               </p>
             </div>
 
@@ -655,13 +681,13 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                 <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
                   Text it was asked to read
                 </div>
-                <p className="text-sm">{current.text}</p>
+                <MarkedText words={src} marks={srcMarks} />
               </div>
               <div className="rounded-md border bg-background p-3">
                 <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  What the recogniser wrote
+                  What the machine wrote
                 </div>
-                <p className="text-sm">{transcript.hypothesis}</p>
+                <MarkedText words={hyp} marks={hypMarks} />
               </div>
             </div>
 
@@ -672,7 +698,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                 <div key={i} className="space-y-1.5">
                   <p className="text-sm">
                     <span className="text-muted-foreground">The word </span>
-                    <span className="rounded bg-amber-500/20 px-1 font-medium">{src[i]}</span>
+                    <span className={MARK_CLASS}>{src[i]}</span>
                     <span className="text-muted-foreground"> did not match.</span>
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -680,8 +706,14 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                       <button
                         key={a.id}
                         type="button"
+                        aria-pressed={adjudication[String(i)] === a.id}
                         onClick={() =>
-                          setAdjudication((prev) => ({ ...prev, [String(i)]: a.id }))
+                          setAdjudication((prev) => {
+                            const next = { ...prev };
+                            if (next[String(i)] === a.id) delete next[String(i)];
+                            else next[String(i)] = a.id;
+                            return next;
+                          })
                         }
                         className={cn(
                           "rounded-full border px-3 py-1.5 text-sm transition-colors",
@@ -724,7 +756,29 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   return null;
 }
 
-/** Single-select chips. */
+/**
+ * The highlight used for a disputed word, shared by both diff panels and by the
+ * per-word question below them. Same treatment in all three places on purpose: the
+ * reviewer has to find the same word in two texts, and matching the styling is what
+ * makes "the word anytime did not match" locatable at a glance instead of read-and-scan.
+ */
+const MARK_CLASS = "rounded bg-amber-500/25 px-1 font-medium ring-1 ring-amber-500/40";
+
+/** Renders a text with the words the alignment disagreed about highlighted. */
+function MarkedText({ words, marks }: { words: string[]; marks: boolean[] }) {
+  return (
+    <p className="text-sm leading-7">
+      {words.map((w, i) => (
+        <span key={i}>
+          {i > 0 ? " " : ""}
+          <span className={cn(marks[i] && MARK_CLASS)}>{w}</span>
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/** Single-select chips. Tapping the selected chip again clears the answer. */
 function ChipGroup({
   title,
   hint,
@@ -736,7 +790,7 @@ function ChipGroup({
   hint?: string;
   options: { id: string; label: string }[];
   value: string | null;
-  onChange: (v: string) => void;
+  onChange: (v: string | null) => void;
 }) {
   return (
     <div className="space-y-2">
@@ -749,7 +803,8 @@ function ChipGroup({
           <button
             key={o.id}
             type="button"
-            onClick={() => onChange(o.id)}
+            aria-pressed={value === o.id}
+            onClick={() => onChange(value === o.id ? null : o.id)}
             className={cn(
               "rounded-full border px-3 py-1.5 text-sm transition-colors",
               value === o.id
