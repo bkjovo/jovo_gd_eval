@@ -401,7 +401,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           <Button size="lg" onClick={nextFromReveal}>
             {inSet + 1 >= SET_SIZE || index + 1 >= queue.length ? "Finish set" : "Next clip"}
           </Button>
-          <span className="text-xs text-muted-foreground">
+          <span className="hidden text-xs text-muted-foreground sm:inline">
             or press <kbd className="rounded border px-1 font-mono">enter</kbd>
           </span>
         </div>
@@ -417,10 +417,10 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     <div className="mx-auto max-w-2xl space-y-6 pb-10">
       {/* progress + escape hatches */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span>
             Clip {inSet + 1} of {setTotal}
-            <span className="ml-2 opacity-60">({submittedCount} done overall)</span>
+            <span className="ml-2 opacity-60">({submittedCount} done)</span>
           </span>
           <div className="flex items-center gap-3">
             {index > 0 ? (
@@ -484,7 +484,8 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             <Button type="button" variant="outline" size="sm" onClick={togglePlay}>
               {isPlaying ? "Pause" : hasPlayedRef.current ? "Replay" : "Play"}
             </Button>
-            <span className="text-xs text-muted-foreground">
+            {/* Keyboard affordances are noise on a touch device. */}
+            <span className="hidden text-xs text-muted-foreground sm:inline">
               <kbd className="rounded border px-1 font-mono">space</kbd> play ·{" "}
               <kbd className="rounded border px-1 font-mono">1-5</kbd> score ·{" "}
               <kbd className="rounded border px-1 font-mono">s</kbd> skip
@@ -513,9 +514,11 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             </button>
           ))}
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between gap-2 text-[11px] text-muted-foreground sm:text-xs">
           <span>1: unusable</span>
-          <span>5: indistinguishable from human</span>
+          <span className="text-right">
+            5: <span className="hidden sm:inline">indistinguishable from </span>human
+          </span>
         </div>
       </div>
 
@@ -607,7 +610,9 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           {submitting ? "Saving…" : "Submit"}
         </Button>
         <span className="text-xs text-muted-foreground">
-          {overall === null ? "Score the clip to continue" : "or press enter"}
+          {overall === null ? "Score the clip to continue" : (
+            <span className="hidden sm:inline">or press enter</span>
+          )}
         </span>
       </div>
     </div>

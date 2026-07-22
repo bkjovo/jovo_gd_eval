@@ -52,6 +52,11 @@ create table if not exists public.ratings (
   constraint ratings_session_clip_unique unique (session_id, clip_id)
 );
 
+-- Upgrades for tables created by an earlier version of this file. `create table if
+-- not exists` above is a no-op on an existing table, so new columns must be added
+-- explicitly. Both statements are idempotent and safe to re-run.
+alter table public.ratings add column if not exists probes jsonb not null default '{}'::jsonb;
+
 -- Aggregation is per-clip; the listing endpoint orders by recency.
 create index if not exists ratings_clip_id_idx    on public.ratings (clip_id);
 create index if not exists ratings_created_at_idx on public.ratings (created_at desc);

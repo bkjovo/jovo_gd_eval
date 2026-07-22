@@ -20,7 +20,7 @@ export function SiteNav() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:gap-6 sm:px-6">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="flex h-6 w-6 items-center justify-center rounded bg-foreground text-background text-[11px] font-bold">
             S
@@ -28,7 +28,7 @@ export function SiteNav() {
           <span className="font-semibold tracking-tight">Soundcheck</span>
         </Link>
 
-        <nav className="flex items-center gap-1 overflow-x-auto">
+        <nav className="relative flex items-center gap-0.5 overflow-x-auto [scrollbar-width:none] after:pointer-events-none after:sticky after:right-0 after:h-full after:w-6 after:shrink-0 after:bg-gradient-to-l after:from-background sm:gap-1 sm:after:hidden">
           {LINKS.map((l) => {
             const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
             return (
@@ -36,7 +36,7 @@ export function SiteNav() {
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm whitespace-nowrap transition-colors",
+                  "rounded-md px-2 py-1.5 text-sm whitespace-nowrap transition-colors sm:px-3",
                   active
                     ? "bg-muted font-medium text-foreground"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60",

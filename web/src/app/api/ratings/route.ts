@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { insertRating, isPersisted, listRatings, type Rating } from "@/lib/ratings";
+import { insertRating, isPersisted, listRatings, probesDropped, type Rating } from "@/lib/ratings";
 import { ACCENT_PROBE, PROBES, TAGS_BY_ID } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true, persisted: isPersisted() });
+  return NextResponse.json({ ok: true, persisted: isPersisted(), probesDropped: probesDropped() });
 }
 
 export async function GET() {

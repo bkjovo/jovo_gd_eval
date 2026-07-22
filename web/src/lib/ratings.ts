@@ -46,6 +46,42 @@ export function isPersisted(): boolean {
   return Boolean(SUPABASE_URL && SUPABASE_KEY);
 }
 
+/**
+ * Set when a write had to drop probe answers because the database predates the
+ * `probes` column. Surfaced in the UI so missing blind-spot data is never silent.
+ * Clears itself as soon as a write succeeds with probes intact.
+ */
+let probesColumnMissing = false;
+
+export function probesDropped(): boolean {
+  return probesColumnMissing;
+}
+
+/**
+ * Ask the database directly whether the `probes` column exists.
+ *
+ * The flag above only knows about writes this particular process handled, which on
+ * serverless means a page render usually cannot see it. This asks once per process and
+ * caches, so the banner is trustworthy no matter which instance renders the page.
+ * Returns true when unknown, so a transient network failure never produces a false alarm.
+ */
+let probesColumnKnown: boolean | null = null;
+
+export async function probesColumnAvailable(): Promise<boolean> {
+  if (!isPersisted()) return true;
+  if (probesColumnKnown !== null) return probesColumnKnown;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/ratings?select=probes&limit=1`, {
+      headers: headers(),
+      cache: "no-store",
+    });
+    probesColumnKnown = res.ok;
+  } catch {
+    probesColumnKnown = true; // unknown: do not cry wolf
+  }
+  return probesColumnKnown;
+}
+
 function headers() {
   return {
     "Content-Type": "application/json",
@@ -68,21 +104,42 @@ export async function insertRating(rating: Rating): Promise<void> {
 
   // Upsert against ratings_session_clip_unique: a retried submit is absorbed, and a
   // genuine re-review replaces the earlier row instead of erroring.
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/ratings?on_conflict=session_id,clip_id`,
-    {
+  const send = (body: Rating | Omit<Rating, "probes">) =>
+    fetch(`${SUPABASE_URL}/rest/v1/ratings?on_conflict=session_id,clip_id`, {
       method: "POST",
-      headers: {
-        ...headers(),
-        Prefer: "resolution=merge-duplicates,return=minimal",
-      },
-      body: JSON.stringify(rating),
+      headers: { ...headers(), Prefer: "resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify(body),
       cache: "no-store",
-    },
-  );
-  if (!res.ok) {
-    throw new Error(`Supabase upsert failed (${res.status}): ${await res.text()}`);
+    });
+
+  const res = await send(rating);
+  if (res.ok) {
+    probesColumnMissing = false;
+    return;
   }
+
+  // The `probes` column was added after the table shipped. If a deployment points at a
+  // database that predates it, the rating itself is still worth keeping: drop the probe
+  // answers and save the rest rather than losing the whole submission. The gap is
+  // recorded and surfaced in the UI so it is never silently wrong, and the moment the
+  // column is added the next write succeeds on the first attempt with no redeploy.
+  // Two different errors mean the same thing here, so both are matched: a SELECT
+  // surfaces Postgres's own 42703 ("column ... does not exist"), while an INSERT is
+  // rejected earlier by PostgREST's schema cache as PGRST204 ("could not find the
+  // 'probes' column ... in the schema cache").
+  const detail = await res.text();
+  if (
+    res.status === 400 &&
+    /probes/.test(detail) &&
+    /does not exist|42703|PGRST204|schema cache/i.test(detail)
+  ) {
+    probesColumnMissing = true;
+    const { probes: _dropped, ...withoutProbes } = rating;
+    const retry = await send(withoutProbes);
+    if (retry.ok) return;
+    throw new Error(`Supabase upsert failed (${retry.status}): ${await retry.text()}`);
+  }
+  throw new Error(`Supabase upsert failed (${res.status}): ${detail}`);
 }
 
 export async function listRatings(): Promise<Rating[]> {

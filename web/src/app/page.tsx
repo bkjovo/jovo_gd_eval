@@ -2,7 +2,7 @@ import Link from "next/link";
 import { mean, microWer, pooledTtfa, type Clip } from "@/lib/clips";
 import { loadClips } from "@/lib/load-clips";
 import { deriveActionItems } from "@/lib/actions";
-import { aggregateByClip, isPersisted, listRatings, type Rating } from "@/lib/ratings";
+import { aggregateByClip, isPersisted, listRatings, probesColumnAvailable, type Rating } from "@/lib/ratings";
 import { DIMENSIONS, LANGUAGE_NAMES, verdictFor } from "@/lib/taxonomy";
 import { StatTile } from "@/components/stat-tile";
 import { ReadyToShip } from "@/components/ready-to-ship";
@@ -56,6 +56,7 @@ export default async function ExecutiveSummaryPage() {
   }
   const aggregates = aggregateByClip(ratings);
   const actions = deriveActionItems(clips, aggregates);
+  const probesOk = await probesColumnAvailable();
 
   const corpusWer = microWer(clips);
   const worstWer = Math.max(...clips.map((c) => c.metrics.int.wer_pct));
@@ -281,6 +282,24 @@ export default async function ExecutiveSummaryPage() {
                 <div className="text-xs text-muted-foreground">distinct rater sessions</div>
               </div>
             </div>
+            {!probesOk ? (
+              <Alert className="border-amber-500/30 bg-amber-500/5">
+                <AlertTitle className="text-sm">
+                  Probe answers are being discarded
+                </AlertTitle>
+                <AlertDescription className="text-xs">
+                  The database predates the <code className="font-mono">probes</code>{" "}
+                  column, so blind-spot answers (how codes were vocalized, whether the
+                  accent is right) are dropped on write. Scores and tags are still saved.
+                  Run{" "}
+                  <code className="font-mono">
+                    alter table public.ratings add column if not exists probes jsonb not
+                    null default &apos;&#123;&#125;&apos;::jsonb;
+                  </code>{" "}
+                  and collection resumes immediately, with no redeploy.
+                </AlertDescription>
+              </Alert>
+            ) : null}
             {!isPersisted() ? (
               <Alert className="border-amber-500/30 bg-amber-500/5">
                 <AlertTitle className="text-sm">Ratings are not being persisted</AlertTitle>
