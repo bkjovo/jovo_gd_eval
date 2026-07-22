@@ -31,6 +31,14 @@ create table if not exists public.ratings (
   -- Free text, only populated when the "other" tag is selected.
   other_text  text        check (other_text is null or length(other_text) <= 500),
 
+  -- Answers to the targeted probes, as {probe_id: option_value}. These capture the
+  -- things no reference-free metric can see: HOW a code/acronym/ALL-CAPS word was
+  -- vocalized (every reading transcribes back identically, so WER is blind), and
+  -- whether the accent is right (nothing in the stack scores it at all).
+  -- Stored as jsonb rather than columns because the probe set is driven by each
+  -- clip's stress_category and will grow as the corpus does.
+  probes      jsonb       not null default '{}'::jsonb,
+
   -- Quality-control signals. Lets low-effort submissions be filtered after the fact,
   -- and replay count is itself evidence of a confusing clip.
   listened_ms integer     not null default 0 check (listened_ms >= 0),

@@ -5,9 +5,11 @@ import type { Clip } from "@/lib/clips";
 import { mean, microWer, pooledTtfa } from "@/lib/clips";
 import type { ClipAggregate } from "@/lib/ratings";
 import {
+  ACCENT_PROBE,
   DEFECT_TAGS,
   DIMENSIONS,
   LANGUAGE_NAMES,
+  PROBES,
   TAGS_BY_ID,
   verdictFor,
 } from "@/lib/taxonomy";
@@ -269,6 +271,9 @@ export function MetricsExplorer({ clips, aggregates, totalRatings }: Props) {
             )}
           </section>
 
+          {/* --- Blind-spot probe answers: the signal no metric produces --- */}
+          <ProbeSummary clips={filtered} aggregates={aggregates} />
+
           {/* --- Per-clip table --- */}
           <section className="space-y-3">
             <h2 className="text-sm font-medium">Per-clip detail</h2>
@@ -486,5 +491,138 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+
+/**
+ * What reviewers answered on the targeted probes, aggregated.
+ *
+ * This is the part of the dashboard that no automated metric could ever fill in. Every
+ * answer here describes HOW something was vocalized, or whether the accent is right,
+ * both of which are invisible to a WER round-trip. Non-expected answers are surfaced
+ * first because those are the actionable ones.
+ */
+function ProbeSummary({
+  clips,
+  aggregates,
+}: {
+  clips: Clip[];
+  aggregates: Record<string, ClipAggregate>;
+}) {
+  const allProbes = { ...PROBES, [ACCENT_PROBE.id]: ACCENT_PROBE };
+
+  const rows = useMemo(() => {
+    const totals: Record<string, Record<string, number>> = {};
+    for (const c of clips) {
+      const agg = aggregates[c.id];
+      if (!agg) continue;
+      for (const [pid, counts] of Object.entries(agg.probe_counts ?? {})) {
+        for (const [value, n] of Object.entries(counts)) {
+          ((totals[pid] ??= {})[value] ??= 0);
+          totals[pid][value] += n;
+        }
+      }
+    }
+    return Object.entries(totals)
+      .map(([pid, counts]) => {
+        const probe = allProbes[pid];
+        if (!probe) return null;
+        const total = Object.values(counts).reduce((a, b) => a + b, 0);
+        const options = probe.options
+          .map((o) => ({ ...o, n: counts[o.value] ?? 0 }))
+          .filter((o) => o.n > 0)
+          .sort((a, b) => b.n - a.n);
+        const offExpected = options
+          .filter((o) => !o.expected && o.value !== "unsure")
+          .reduce((a, o) => a + o.n, 0);
+        return { probe, options, total, offExpected };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null)
+      .sort((a, b) => b.offExpected / b.total - a.offExpected / a.total);
+  }, [clips, aggregates, allProbes]);
+
+  if (rows.length === 0) {
+    return (
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-sm font-medium">Blind spots: what only humans could tell us</h2>
+          <p className="text-xs text-muted-foreground">
+            How codes, acronyms and emphasis were actually vocalized, and whether the accent
+            is right. No reference-free metric produces any of this.
+          </p>
+        </div>
+        <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+          No probe answers yet.{" "}
+          <a href="/rate" className="underline underline-offset-2">
+            Review a set
+          </a>{" "}
+          to populate this.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-3">
+      <div>
+        <h2 className="text-sm font-medium">Blind spots: what only humans could tell us</h2>
+        <p className="text-xs text-muted-foreground">
+          How codes, acronyms and emphasis were actually vocalized, and whether the accent is
+          right. No reference-free metric produces any of this. Sorted by how often the answer
+          was not what a production system would want.
+        </p>
+      </div>
+      <Card>
+        <CardContent className="space-y-5 pt-6">
+          {rows.map(({ probe, options, total, offExpected }) => (
+            <div key={probe.id} className="space-y-2">
+              <div className="flex items-baseline gap-2">
+                <h3 className="text-sm font-medium">{probe.question}</h3>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  n={total}
+                  {offExpected > 0 ? (
+                    <span className="ml-2 font-medium text-amber-600 dark:text-amber-400">
+                      {Math.round((offExpected / total) * 100)}% not as wanted
+                    </span>
+                  ) : null}
+                </span>
+              </div>
+              {options.map((o) => (
+                <div key={o.value} className="space-y-1">
+                  <div className="flex items-baseline gap-2 text-xs">
+                    <span className={cn(!o.expected && o.value !== "unsure" && "font-medium")}>
+                      {o.label}
+                    </span>
+                    {o.expected ? (
+                      <span className="text-[10px] text-muted-foreground">wanted</span>
+                    ) : null}
+                    <span className="ml-auto tabular-nums text-muted-foreground">{o.n}</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className={cn(
+                        "h-full rounded-full",
+                        o.expected
+                          ? "bg-emerald-500"
+                          : o.value === "unsure"
+                            ? "bg-muted-foreground/40"
+                            : "bg-amber-500",
+                      )}
+                      style={{ width: `${(o.n / total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+              {total < 3 ? (
+                <p className="text-[10px] text-amber-600 dark:text-amber-400">
+                  Low sample. Not enough answers to draw a conclusion.
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </section>
   );
 }

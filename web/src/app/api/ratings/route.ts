@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { insertRating, isPersisted, listRatings, type Rating } from "@/lib/ratings";
-import { TAGS_BY_ID } from "@/lib/taxonomy";
+import { ACCENT_PROBE, PROBES, TAGS_BY_ID } from "@/lib/taxonomy";
 
 export const dynamic = "force-dynamic";
 
@@ -23,10 +23,25 @@ function parseRating(body: unknown): Rating | { error: string } {
     .filter((t): t is string => typeof t === "string")
     .filter((t) => t in TAGS_BY_ID);
 
+  // Probe answers must name a declared probe AND a declared option for it; anything
+  // else is dropped rather than stored, so the aggregate can never contain a value
+  // the taxonomy does not define.
+  const allProbes = { ...PROBES, [ACCENT_PROBE.id]: ACCENT_PROBE };
+  const probes: Record<string, string> = {};
+  if (typeof b.probes === "object" && b.probes !== null) {
+    for (const [k, v] of Object.entries(b.probes as Record<string, unknown>)) {
+      const probe = allProbes[k];
+      if (probe && typeof v === "string" && probe.options.some((o) => o.value === v)) {
+        probes[k] = v;
+      }
+    }
+  }
+
   return {
     session_id,
     clip_id,
     overall,
+    probes,
     defect_tags,
     other_text:
       typeof b.other_text === "string" && b.other_text.trim()

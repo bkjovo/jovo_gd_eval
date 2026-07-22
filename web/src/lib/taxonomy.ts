@@ -90,6 +90,13 @@ export type DefectTag = {
   metricKeys: string[];
   /** Shown in the methodology table. */
   note: string;
+  /**
+   * Documented in the methodology, but NOT offered as a chip in the review UI because
+   * a dedicated probe now collects it with better resolution. Collecting the same
+   * signal twice would split it across two fields and double-count the clips where a
+   * reviewer ticked both.
+   */
+  probeOnly?: boolean;
 };
 
 export const DEFECT_TAGS: DefectTag[] = [
@@ -131,7 +138,8 @@ export const DEFECT_TAGS: DefectTag[] = [
     group: "naturalness",
     dimension: "nat",
     metricKeys: [],
-    note: "BLIND SPOT. No reference-free metric in the stack scores accent appropriateness. Human-only signal.",
+    probeOnly: true,
+    note: "BLIND SPOT. No reference-free metric in the stack scores accent appropriateness. Collected via the accent probe, which asks how it is wrong (wrong region vs. non-native), not just that it is.",
   },
   {
     id: "robotic",
@@ -187,14 +195,173 @@ export const TAGS_BY_ID: Record<string, DefectTag> = Object.fromEntries(
   DEFECT_TAGS.map((t) => [t.id, t]),
 );
 
+/** Chips offered to a reviewer. Excludes tags a dedicated probe already covers. */
 export function tagsInGroup(group: TagGroup): DefectTag[] {
-  return DEFECT_TAGS.filter((t) => t.group === group);
+  return DEFECT_TAGS.filter((t) => t.group === group && !t.probeOnly);
 }
 
 /** Tags with no objective counterpart, quoted directly in the methodology. */
 export const BLIND_SPOT_TAGS = DEFECT_TAGS.filter(
   (t) => t.id !== "other" && t.metricKeys.length === 0,
 );
+
+/**
+ * Targeted probes: the questions no reference-free metric can answer.
+ *
+ * WER is computed through an ASR round-trip, so it is blind to HOW something was
+ * vocalized: "A739K2" read character-by-character and read in chunks both transcribe
+ * back to the same string. Same for whether an acronym was spelled or said as a word,
+ * or whether an ALL-CAPS word was emphasized or spelled out letter by letter.
+ *
+ * Each clip already declares a `stress_category`, so the reviewer can be asked the
+ * one question that matters for that clip instead of a generic checklist. This is the
+ * human layer covering a declared blind spot, rather than duplicating what the
+ * automated stack already measures.
+ *
+ * `expected` marks the reading a production system would want; it is NOT shown to the
+ * reviewer (that would lead the answer) and is only used when summarising results.
+ */
+export type Probe = {
+  id: string;
+  question: string;
+  hint?: string;
+  options: { value: string; label: string; expected?: boolean }[];
+};
+
+export const PROBES: Record<string, Probe> = {
+  code_reading: {
+    id: "code_reading",
+    question: "How did it read the code?",
+    hint: "Word error rate cannot tell these apart; every reading transcribes the same.",
+    options: [
+      { value: "char_by_char", label: "Character by character", expected: true },
+      { value: "chunked", label: "Grouped into chunks (“seventy-three”)" },
+      { value: "as_word", label: "Ran it together as a word" },
+      { value: "wrong", label: "Got a character wrong" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  number_reading: {
+    id: "number_reading",
+    question: "How did it read the number?",
+    options: [
+      { value: "natural", label: "Naturally, the way a person would", expected: true },
+      { value: "digits", label: "Digit by digit" },
+      { value: "wrong_value", label: "Said the wrong value" },
+      { value: "wrong_unit", label: "Fumbled the unit or currency" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  acronym_reading: {
+    id: "acronym_reading",
+    question: "How did it read the acronym?",
+    options: [
+      { value: "letters", label: "Letter by letter", expected: true },
+      { value: "as_word", label: "As a word" },
+      { value: "expanded", label: "Expanded it into full words" },
+      { value: "wrong", label: "Got it wrong" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  url_reading: {
+    id: "url_reading",
+    question: "How did it read the web address?",
+    options: [
+      { value: "natural", label: "Clearly, dots and slashes spoken", expected: true },
+      { value: "ran_together", label: "Ran it together, hard to follow" },
+      { value: "skipped", label: "Skipped or garbled part of it" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  caps_reading: {
+    id: "caps_reading",
+    question: "The text had a word in CAPITALS. What did it do?",
+    hint: "Capitals are a common way to mark emphasis in product copy.",
+    options: [
+      { value: "emphasis", label: "Said it with emphasis", expected: true },
+      { value: "normal", label: "Read it normally, no emphasis" },
+      { value: "spelled", label: "Spelled it out letter by letter" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  name_reading: {
+    id: "name_reading",
+    question: "How did it handle the names?",
+    options: [
+      { value: "confident", label: "Pronounced them confidently and consistently", expected: true },
+      { value: "inconsistent", label: "Pronounced the same name differently each time" },
+      { value: "mangled", label: "Clearly mangled them" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  homograph_reading: {
+    id: "homograph_reading",
+    question: "One word here can be pronounced two ways. Did it pick the right one?",
+    hint: "This is the single hardest thing for a text-to-speech model to get right.",
+    options: [
+      { value: "correct", label: "Yes, correct for the context", expected: true },
+      { value: "wrong", label: "No, it used the other pronunciation" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+  loanword_reading: {
+    id: "loanword_reading",
+    question: "How did it pronounce the English words?",
+    options: [
+      { value: "native_en", label: "Like an English speaker would", expected: true },
+      { value: "localised", label: "Adapted to this language’s sounds" },
+      { value: "mangled", label: "Mangled them" },
+      { value: "unsure", label: "Couldn’t tell" },
+    ],
+  },
+};
+
+/**
+ * Which probe (if any) a clip's stress category earns. Categories not listed here get
+ * no targeted probe: the generic score and defect tags already cover them.
+ */
+export const PROBE_BY_STRESS: Record<string, string> = {
+  alphanumeric_code: "code_reading",
+  url_code: "code_reading",
+  digit_string: "code_reading",
+  phone_number: "code_reading",
+  currency_decimal: "number_reading",
+  numbers_units: "number_reading",
+  decimal_units: "number_reading",
+  percentage: "number_reading",
+  time_days: "number_reading",
+  acronym: "acronym_reading",
+  acronym_percentage: "acronym_reading",
+  url: "url_reading",
+  caps_emphasis: "caps_reading",
+  proper_noun: "name_reading",
+  date_time_proper_noun: "name_reading",
+  long_prosody_proper_noun: "name_reading",
+  homograph: "homograph_reading",
+  loanword_codeswitch: "loanword_reading",
+};
+
+export function probeFor(stressCategory: string): Probe | null {
+  const id = PROBE_BY_STRESS[stressCategory];
+  return id ? PROBES[id] ?? null : null;
+}
+
+/**
+ * Asked on every clip, from a reviewer who speaks the language. Accent is the other
+ * declared blind spot: nothing in the automated stack scores it at all.
+ */
+export const ACCENT_PROBE: Probe = {
+  id: "accent_probe",
+  question: "Does the accent sound right for this language?",
+  hint: "No automated metric in this stack scores accent. This answer is the only source.",
+  options: [
+    { value: "native", label: "Sounds native", expected: true },
+    { value: "slight", label: "Slightly off, but fine" },
+    { value: "wrong_region", label: "Wrong region for the language" },
+    { value: "non_native", label: "Sounds non-native" },
+    { value: "unsure", label: "Couldn’t tell" },
+  ],
+};
 
 export const LANGUAGE_NAMES: Record<string, string> = {
   en: "English",

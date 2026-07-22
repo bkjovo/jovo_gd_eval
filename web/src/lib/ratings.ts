@@ -25,6 +25,8 @@ export type Rating = {
   overall: number;
   defect_tags: string[];
   other_text?: string | null;
+  /** Targeted probe answers, {probe_id: option_value}. Covers what metrics cannot see. */
+  probes?: Record<string, string>;
   listened_ms: number;
   replays: number;
 };
@@ -103,6 +105,8 @@ export type ClipAggregate = {
   /** Share of reviewers scoring the clip below HUMAN_REJECT_BELOW. */
   reject_rate: number;
   tag_counts: Record<string, number>;
+  /** {probe_id: {option_value: count}} — the blind-spot answers, aggregated. */
+  probe_counts: Record<string, Record<string, number>>;
 };
 
 export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate> {
@@ -114,12 +118,16 @@ export function aggregateByClip(ratings: Rating[]): Record<string, ClipAggregate
       mean_overall: 0,
       reject_rate: 0,
       tag_counts: {},
+      probe_counts: {},
     });
     a.n += 1;
     a.mean_overall += r.overall;
     a.reject_rate += r.overall < HUMAN_REJECT_BELOW ? 1 : 0;
     for (const t of r.defect_tags ?? []) {
       a.tag_counts[t] = (a.tag_counts[t] ?? 0) + 1;
+    }
+    for (const [probe, answer] of Object.entries(r.probes ?? {})) {
+      (a.probe_counts[probe] ??= {})[answer] = (a.probe_counts[probe]?.[answer] ?? 0) + 1;
     }
   }
   for (const a of Object.values(out)) {

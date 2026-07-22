@@ -337,8 +337,17 @@ export default function MethodPage() {
               character or chunked, or whether{" "}
               <code className="font-mono text-xs">500 mg</code> became &ldquo;milligrams&rdquo;
               or &ldquo;em gee&rdquo;. Every one of those readings transcribes back to the
-              same string. This is a second named blind spot alongside accent, and it routes
-              to human review for the same reason: no reference-free metric can see it.
+              same string. This is a second named blind spot alongside accent.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Naming a blind spot is not the same as covering it, so the review flow{" "}
+              <span className="font-medium text-foreground">asks directly</span>. Every clip
+              declares a stress category, and that category selects one targeted question:
+              a clip containing a code is asked how the code was read, a clip with an
+              ALL-CAPS word is asked whether it was emphasized or spelled out, and every
+              clip is asked about accent. Those answers are the only record of these
+              dimensions anywhere in the system, and they surface on the deep dive sorted by
+              how often the reading was not what a production system would want.
             </p>
           </div>
         </div>
