@@ -138,10 +138,10 @@ export function GtmMarketing({ data }: { data: MarketingData }) {
             </div>
           </div>
           <div className="rounded-xl border bg-gradient-to-br from-muted/60 to-transparent p-5">
-            <div className="text-3xl font-semibold tracking-tight">1 credit</div>
-            <div className="mt-1 text-sm font-medium">per character</div>
+            <div className="text-3xl font-semibold tracking-tight">358 voices</div>
+            <div className="mt-1 text-sm font-medium">across {data.common.languages.length} languages</div>
             <div className="mt-0.5 text-xs text-muted-foreground">
-              ~45,000 characters is about an hour of audio.
+              Diverse in gender, region, age, and emotion.
             </div>
           </div>
           <div className="rounded-xl border bg-gradient-to-br from-muted/60 to-transparent p-5">
@@ -250,10 +250,6 @@ export function GtmMarketing({ data }: { data: MarketingData }) {
                   </div>
                   <p className="text-sm font-medium leading-relaxed">{ex.text}</p>
                   <audio src={ex.audioUrl} controls preload="none" className="mt-3 w-full" />
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    <span className="uppercase tracking-wide">Transcribed back as:</span>{" "}
-                    {ex.hypothesis}
-                  </p>
                 </div>
               ))}
             </div>

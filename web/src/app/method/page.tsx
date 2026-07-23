@@ -35,14 +35,6 @@ const LIMITATIONS = [
     title: "Latency is measured client-side",
     body: "The API returns no timing data, so time-to-first-audio is measured around the call with a monotonic clock. It includes network round-trip and is not comparable across runs on different networks.",
   },
-  {
-    title: "Anonymous review is spammable",
-    body: "There is no login, so a determined actor could skew a small sample. Listening time and replay count are stored with each rating as raw material for filtering low-effort submissions; that filter is not yet built.",
-  },
-  {
-    title: "Small samples are labelled, not hidden",
-    body: "Any figure backed by fewer than three ratings is marked low-sample.",
-  },
 ];
 
 /**
@@ -382,11 +374,6 @@ export default function MethodPage() {
               misread word still aligns as a substitution. Correcting the split alone moved
               the proper-noun stress case from 31.7% to 12.2% WER and the corpus from 3.85%
               to 3.20%.
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              There is no community standard. The multilingual ASR leaderboard documents its
-              English normalization and not its multilingual one, and published work finds
-              Whisper&apos;s normalizer corrupts non-Latin scripts.
             </p>
           </div>
 

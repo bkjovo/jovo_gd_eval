@@ -29,7 +29,7 @@ export const DIMENSIONS: Record<
   performance: {
     code: "D-PERF",
     label: "Performance",
-    blurb: "Did it respond quickly? Time-to-first-audio and real-time factor.",
+    blurb: "Time-to-first-audio and real-time factor.",
   },
   expressiveness: {
     code: "D-EXP",

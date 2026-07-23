@@ -9,7 +9,6 @@ import type { ClipAggregate } from "@/lib/ratings";
 import {
   DIMENSIONS,
   LANGUAGE_NAMES,
-  LUFS_SPREAD_WARN_LU,
   TAGS_BY_ID,
   THRESHOLDS,
   verdictFor,
@@ -17,6 +16,7 @@ import {
 import {
   ACCENT_OPTIONS,
   DELIVERY_ALL,
+  DELIVERY_PROBLEMS,
   PRONUNCIATION_KINDS,
   TONES,
   TONE_FIT,
@@ -550,16 +550,26 @@ function TopIssues({
       });
     }
 
-    const lufs = clips.map((c) => c.metrics.aud.lufs);
-    const spread = Math.max(...lufs) - Math.min(...lufs);
-    if (clips.length > 1 && spread > LUFS_SPREAD_WARN_LU) {
+    // Most-reported delivery problem from the rating flow (top-level categories only).
+    const delivery: Record<string, number> = {};
+    for (const c of clips) {
+      const a = aggregates[c.id];
+      if (!a) continue;
+      for (const [k, v] of Object.entries(a.delivery_counts)) delivery[k] = (delivery[k] ?? 0) + v;
+    }
+    const topLevel = new Set(DELIVERY_PROBLEMS.map((d) => d.id));
+    const topDelivery = Object.entries(delivery)
+      .filter(([k]) => topLevel.has(k))
+      .sort((a, b) => b[1] - a[1])[0];
+    if (topDelivery && topDelivery[1] >= 2) {
+      const label = DELIVERY_PROBLEMS.find((d) => d.id === topDelivery[0])?.label ?? topDelivery[0];
       out.push({
-        id: "lufs",
-        kind: "measured",
-        value: spread.toFixed(1),
-        unit: "LU spread",
-        title: "loudness varies across the corpus",
-        detail: `${Math.min(...lufs).toFixed(1)} to ${Math.max(...lufs).toFixed(1)} LUFS. A normalisation fix, not a model one.`,
+        id: "delivery",
+        kind: "reviewers",
+        value: String(topDelivery[1]),
+        unit: "flags",
+        title: `${label.toLowerCase()} is the most reported delivery problem`,
+        detail: "A prosodic issue reviewers hear that no reference-free metric localises.",
         tone: "warn",
       });
     }
