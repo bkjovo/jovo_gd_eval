@@ -1,4 +1,4 @@
-import { DEFECT_TAGS, DIMENSIONS, TAG_GROUPS, THRESHOLDS } from "@/lib/taxonomy";
+import { DIMENSIONS, THRESHOLDS } from "@/lib/taxonomy";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -37,11 +37,91 @@ const LIMITATIONS = [
   },
   {
     title: "Anonymous review is spammable",
-    body: "There is no login. Listening time and replay count are recorded with each rating so low-effort submissions can be filtered after the fact.",
+    body: "There is no login, so a determined actor could skew a small sample. Listening time and replay count are stored with each rating as raw material for filtering low-effort submissions; that filter is not yet built.",
   },
   {
     title: "Small samples are labelled, not hidden",
     body: "Any figure backed by fewer than three ratings is marked low-sample.",
+  },
+];
+
+/**
+ * The actual review flow, each question next to the metric meant to catch the same
+ * thing. Hand-authored rather than driven off DEFECT_TAGS: that taxonomy is the old
+ * clip-level tag set, which the rebuilt rater no longer collects. These rows are what
+ * the Annotate tab asks today.
+ */
+const MAPPING: {
+  report: string;
+  note: string;
+  dim: "int" | "nat" | "aud";
+  metric: string[];
+}[] = [
+  {
+    report: "A wrong or dropped word",
+    note: "Tap the exact word. Feeds word error rate as a substitution or deletion.",
+    dim: "int",
+    metric: ["int.wer_pct"],
+  },
+  {
+    report: "How a word was mispronounced",
+    note: "Acronym, number, code, name or homograph. WER registers that a word broke but not which one or why.",
+    dim: "int",
+    metric: [],
+  },
+  {
+    report: "The audio cut a word off",
+    note: "A human check on the truncation detector, which has flagged zero clips.",
+    dim: "int",
+    metric: ["int.truncated", "int.dur_expected_ratio"],
+  },
+  {
+    report: "Did not sound 100% human",
+    note: "The binary naturalness call UTMOS is trained to predict.",
+    dim: "nat",
+    metric: ["nat.utmos"],
+  },
+  {
+    report: "Stress or emphasis was off",
+    note: "Robotic, missed stress, or the wrong word stressed. Monotone shows as low pitch variation.",
+    dim: "nat",
+    metric: ["nat.f0_semitone_std"],
+  },
+  {
+    report: "Spacing was off",
+    note: "Too much pausing, choppy delivery, or words running together.",
+    dim: "nat",
+    metric: ["nat.n_pauses"],
+  },
+  {
+    report: "Speed was off",
+    note: "Too fast or too slow.",
+    dim: "nat",
+    metric: ["nat.speaking_rate_wps"],
+  },
+  {
+    report: "Tone did not fit the use case",
+    note: "Register. No reference-free metric scores it.",
+    dim: "nat",
+    metric: [],
+  },
+  {
+    report: "Accent sounded wrong",
+    note: "Whether the voice sounds native for its market.",
+    dim: "nat",
+    metric: [],
+  },
+  {
+    report: "An audio issue: buzzing or a glitch",
+    note: "Signal quality, independent of the words.",
+    dim: "aud",
+    metric: ["aud.dnsmos_ovrl"],
+  },
+  {
+    report: "Was the transcript wrong? (adjudication)",
+    note: "On disputed words only. Separates a model error from a recogniser error, turning raw WER into corrected WER.",
+    dim: "int",
+    metric: ["int.wer_pct"],
   },
 ];
 
@@ -125,11 +205,10 @@ export default function MethodPage() {
         <div>
           <h2 className="text-lg font-medium">Subjective judgement to objective metric</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Every defect a reviewer can report is declared alongside the metric meant to
-            catch it. The rating UI and the scoring harness read the same definition. The
-            small caps label is how the defect is grouped for a listener; Dimension is the
-            measurement family. They differ in one place: pronunciation failure sits under
-            Naturalness for a listener but is measured as Intelligibility.
+            Every question the review flow asks, next to the metric meant to catch the
+            same thing. The rating UI and the scoring harness read the same taxonomy. Where
+            the counterpart is blank, no reference-free metric covers it and the human
+            answer is the only source.
           </p>
         </div>
 
@@ -145,26 +224,21 @@ export default function MethodPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {DEFECT_TAGS.filter((t) => t.id !== "other").map((t) => (
-                    <TableRow key={t.id}>
+                  {MAPPING.map((m) => (
+                    <TableRow key={m.report}>
                       <TableCell>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-sm font-medium">{t.label}</span>
-                          <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                            {TAG_GROUPS[t.group].label}
-                          </span>
-                        </div>
-                        <div className="mt-0.5 text-xs text-muted-foreground">{t.note}</div>
+                        <div className="text-sm font-medium">{m.report}</div>
+                        <div className="mt-0.5 text-xs text-muted-foreground">{m.note}</div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-[10px] whitespace-nowrap">
-                          {t.dimension ? DIMENSIONS[t.dimension].label : "–"}
+                          {DIMENSIONS[m.dim].label}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {t.metricKeys.length ? (
+                        {m.metric.length ? (
                           <div className="space-y-0.5">
-                            {t.metricKeys.map((k) => (
+                            {m.metric.map((k) => (
                               <div key={k} className="font-mono text-xs">
                                 {k}
                               </div>
@@ -188,13 +262,15 @@ export default function MethodPage() {
         </Card>
 
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-          <h3 className="text-sm font-medium">The row that matters most is the empty one</h3>
+          <h3 className="text-sm font-medium">The rows that matter most are the empty ones</h3>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">Accent</span> has no objective
-            counterpart. Reviewers can hear whether a voice carries the right regional
-            accent for its market; nothing in the automated stack scores it. It is either a
-            gap needing a new detector or a permanent human check, but it should not be
-            assumed covered.
+            <span className="font-medium text-foreground">Tone</span> and{" "}
+            <span className="font-medium text-foreground">accent</span> have no objective
+            counterpart at all: nothing reference-free scores whether a read fits its use
+            case or whether a voice sounds native for its market. The pronunciation kind is
+            half-covered, WER sees that a word broke but not which one or why. These are the
+            rows where the human is the only instrument, and they should not be assumed
+            covered.
           </p>
         </div>
       </section>
@@ -327,8 +403,9 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Thresholds</h2>
         <p className="text-sm text-muted-foreground">
-          Verdicts and derived findings come from comparing measurements against these
-          values. Change the corpus and the findings change with it.
+          The pass, investigate, and action-required verdict on each metric comes from
+          comparing it against these values. Change the corpus and the verdicts change with
+          it.
         </p>
         <Card>
           <CardContent className="p-0">
