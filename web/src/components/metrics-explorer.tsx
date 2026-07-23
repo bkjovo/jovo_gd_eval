@@ -22,6 +22,7 @@ import {
   TONE_FIT,
 } from "@/lib/annotation";
 import { ALL, FilterSelect } from "@/components/filter-select";
+import { stressBucketLabel, stressBucketOf, stressBucketOptions } from "@/lib/stress-buckets";
 import { StatTile } from "@/components/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -57,7 +58,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
   const options = useMemo(
     () => ({
       langs: [...new Set(clips.map((c) => c.lang))].sort(),
-      stress: [...new Set(clips.map((c) => c.stress_category))].sort(),
+      stress: stressBucketOptions(clips.map((c) => c.stress_category)),
       useCases: [...new Set(clips.map((c) => c.use_case))].sort(),
     }),
     [clips],
@@ -68,7 +69,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
       clips.filter(
         (c) =>
           (lang === ALL || c.lang === lang) &&
-          (stress === ALL || c.stress_category === stress) &&
+          (stress === ALL || stressBucketOf(c.stress_category) === stress) &&
           (useCase === ALL || c.use_case === useCase),
       ),
     [clips, lang, stress, useCase],
@@ -92,7 +93,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
           value={stress}
           options={options.stress}
           onChange={setStress}
-          format={(v) => v.replace(/_/g, " ")}
+          format={stressBucketLabel}
         />
         <FilterSelect
           label="Use case"

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { byCorpusOrder, type Clip } from "@/lib/clips";
 import { LANGUAGE_NAMES, verdictFor } from "@/lib/taxonomy";
 import { ALL, FilterSelect } from "@/components/filter-select";
+import { stressBucketLabel, stressBucketOf, stressBucketOptions } from "@/lib/stress-buckets";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -97,7 +98,7 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
   const options = useMemo(
     () => ({
       langs: [...new Set(clips.map((c) => c.lang))].sort(),
-      stress: [...new Set(clips.map((c) => c.stress_category))].sort(),
+      stress: stressBucketOptions(clips.map((c) => c.stress_category)),
       useCases: [...new Set(clips.map((c) => c.use_case))].sort(),
     }),
     [clips],
@@ -109,7 +110,7 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
         .filter(
           (c) =>
             (lang === ALL || c.lang === lang) &&
-            (stress === ALL || c.stress_category === stress) &&
+            (stress === ALL || stressBucketOf(c.stress_category) === stress) &&
             (useCase === ALL || c.use_case === useCase) &&
             (!onlyMismatched || c.metrics.int.wer_pct > 0),
         )
@@ -133,7 +134,7 @@ export function SampleBrowser({ clips }: { clips: Clip[] }) {
           value={stress}
           options={options.stress}
           onChange={setStress}
-          format={(s) => s.replace(/_/g, " ")}
+          format={stressBucketLabel}
         />
         <FilterSelect
           label="Use case"
