@@ -322,7 +322,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
                             </TableRow>
                             {isOpen ? (
                               <TableRow className="hover:bg-transparent">
-                                <TableCell colSpan={5} className="bg-muted/30 p-4">
+                                <TableCell colSpan={5} className="bg-muted/30 p-4 whitespace-normal">
                                   <ClipDetail clip={c} agg={agg} />
                                 </TableCell>
                               </TableRow>
