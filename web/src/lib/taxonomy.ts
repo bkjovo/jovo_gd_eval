@@ -14,31 +14,35 @@
  * under naturalness for reviewers but measured as intelligibility.
  */
 
-export type Dimension = "int" | "nat" | "aud" | "lat";
+export type Dimension = "intelligibility" | "performance" | "expressiveness" | "naturalness";
 
 export const DIMENSIONS: Record<
   Dimension,
   { code: string; label: string; blurb: string }
 > = {
-  int: {
+  intelligibility: {
     code: "D-INT",
     label: "Intelligibility",
-    blurb: "Did it say the right words? ASR round-trip against the source text.",
+    blurb:
+      "Did it say the right words? WER and CER from an ASR round-trip against the source, plus the word-level flags and adjudication from review.",
   },
-  nat: {
+  performance: {
+    code: "D-PERF",
+    label: "Performance",
+    blurb:
+      "Did it run fast and clean? Time-to-first-audio and real-time factor for speed, DNSMOS and loudness for signal quality.",
+  },
+  expressiveness: {
+    code: "D-EXP",
+    label: "Expressiveness",
+    blurb:
+      "Did it vary the way a person would? Pitch range, pauses and pace, with reviewer calls on tone and stress.",
+  },
+  naturalness: {
     code: "D-NAT",
     label: "Naturalness",
-    blurb: "Does it sound like a person? Predicted MOS plus prosody statistics.",
-  },
-  aud: {
-    code: "D-AUD",
-    label: "Audio quality",
-    blurb: "Signal-level artifacts, level, and noise, independent of the words.",
-  },
-  lat: {
-    code: "D-LAT",
-    label: "Latency",
-    blurb: "Client-side time-to-first-audio and real-time factor.",
+    blurb:
+      "Did it sound like a real, native human? Predicted MOS, the human 100%-human judgement, and accent.",
   },
 };
 
@@ -104,7 +108,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "hallucination",
     label: "Hallucination",
     group: "robustness",
-    dimension: "int",
+    dimension: "intelligibility",
     metricKeys: ["int.ins"],
     note: "Model said something that is not in the source text. Surfaces as ASR insertions.",
   },
@@ -112,7 +116,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "number_grouping",
     label: "Number grouping",
     group: "robustness",
-    dimension: "int",
+    dimension: "intelligibility",
     metricKeys: ["int.sub"],
     note: "Digits read in the wrong grouping (\"fifteen\" vs \"one five\"). A substitution on numeric tokens.",
   },
@@ -120,7 +124,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "truncation",
     label: "Cut off / truncated",
     group: "robustness",
-    dimension: "int",
+    dimension: "intelligibility",
     metricKeys: ["int.trailing_del", "int.dur_expected_ratio"],
     note: "Audio ends before the text does. Trailing deletions plus a short duration-vs-expected ratio.",
   },
@@ -128,7 +132,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "pronunciation",
     label: "Pronunciation failure",
     group: "naturalness",
-    dimension: "int",
+    dimension: "intelligibility",
     metricKeys: ["int.sub", "int.cer_pct"],
     note: "Word said wrong. Surfaces as an ASR substitution or elevated character error rate.",
   },
@@ -136,7 +140,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "accent",
     label: "Accent",
     group: "naturalness",
-    dimension: "nat",
+    dimension: "naturalness",
     metricKeys: [],
     probeOnly: true,
     note: "BLIND SPOT. No reference-free metric in the stack scores accent appropriateness, and it is only partly covered by review. A reviewer can flag an individual code-switched word as carrying the wrong accent; whether the voice as a whole sounds native for its market is not collected, because a per-clip question answered identically fifty times produces agreement rather than information.",
@@ -145,7 +149,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "robotic",
     label: "Robotic tone",
     group: "naturalness",
-    dimension: "nat",
+    dimension: "naturalness",
     metricKeys: ["nat.utmos", "nat.f0_semitone_std"],
     note: "Flat, synthetic delivery. Low pitch variance is the objective correlate of monotone.",
   },
@@ -153,7 +157,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "unnatural",
     label: "Feels unnatural",
     group: "naturalness",
-    dimension: "nat",
+    dimension: "naturalness",
     metricKeys: ["nat.utmos"],
     note: "General naturalness. UTMOS is trained to predict exactly this judgement.",
   },
@@ -161,7 +165,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "pauses",
     label: "Pauses",
     group: "expressiveness",
-    dimension: "nat",
+    dimension: "naturalness",
     metricKeys: ["nat.n_pauses", "nat.speaking_rate_wps"],
     note: "Breaks in the wrong place, or absent where expected. Pause count and speaking rate.",
   },
@@ -169,7 +173,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "inflection",
     label: "Inflection",
     group: "expressiveness",
-    dimension: "nat",
+    dimension: "naturalness",
     metricKeys: ["nat.f0_semitone_std"],
     note: "Wrong intonation contour: statements rising, questions falling. Partially captured by F0 variance.",
   },
@@ -177,7 +181,7 @@ export const DEFECT_TAGS: DefectTag[] = [
     id: "audio_quality",
     label: "Audio quality",
     group: "technical",
-    dimension: "aud",
+    dimension: "performance",
     metricKeys: ["aud.dnsmos_ovrl", "aud.snr_db_est", "aud.clipping_pct"],
     note: "Artifacts, noise, distortion. DNSMOS P.835 plus signal-level checks.",
   },

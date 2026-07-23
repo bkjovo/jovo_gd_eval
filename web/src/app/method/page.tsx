@@ -1,4 +1,4 @@
-import { DIMENSIONS, THRESHOLDS } from "@/lib/taxonomy";
+import { DIMENSIONS } from "@/lib/taxonomy";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -54,73 +54,73 @@ const LIMITATIONS = [
 const MAPPING: {
   report: string;
   note: string;
-  dim: "int" | "nat" | "aud";
+  dim: "intelligibility" | "performance" | "expressiveness" | "naturalness";
   metric: string[];
 }[] = [
   {
     report: "A wrong or dropped word",
     note: "Tap the exact word. Feeds word error rate as a substitution or deletion.",
-    dim: "int",
+    dim: "intelligibility",
     metric: ["int.wer_pct"],
   },
   {
     report: "How a word was mispronounced",
     note: "Acronym, number, code, name or homograph. WER registers that a word broke but not which one or why.",
-    dim: "int",
+    dim: "intelligibility",
     metric: [],
   },
   {
     report: "The audio cut a word off",
     note: "A human check on the truncation detector, which has flagged zero clips.",
-    dim: "int",
+    dim: "intelligibility",
     metric: ["int.truncated", "int.dur_expected_ratio"],
   },
   {
     report: "Did not sound 100% human",
     note: "The binary naturalness call UTMOS is trained to predict.",
-    dim: "nat",
+    dim: "naturalness",
     metric: ["nat.utmos"],
   },
   {
     report: "Stress or emphasis was off",
     note: "Robotic, missed stress, or the wrong word stressed. Monotone shows as low pitch variation.",
-    dim: "nat",
+    dim: "expressiveness",
     metric: ["nat.f0_semitone_std"],
   },
   {
     report: "Spacing was off",
     note: "Too much pausing, choppy delivery, or words running together.",
-    dim: "nat",
+    dim: "expressiveness",
     metric: ["nat.n_pauses"],
   },
   {
     report: "Speed was off",
     note: "Too fast or too slow.",
-    dim: "nat",
+    dim: "expressiveness",
     metric: ["nat.speaking_rate_wps"],
   },
   {
     report: "Tone did not fit the use case",
     note: "Register. No reference-free metric scores it.",
-    dim: "nat",
+    dim: "expressiveness",
     metric: [],
   },
   {
     report: "Accent sounded wrong",
     note: "Whether the voice sounds native for its market.",
-    dim: "nat",
+    dim: "naturalness",
     metric: [],
   },
   {
     report: "An audio issue: buzzing or a glitch",
     note: "Signal quality, independent of the words.",
-    dim: "aud",
+    dim: "performance",
     metric: ["aud.dnsmos_ovrl"],
   },
   {
     report: "Was the transcript wrong? (adjudication)",
     note: "On disputed words only. Separates a model error from a recogniser error, turning raw WER into corrected WER.",
-    dim: "int",
+    dim: "intelligibility",
     metric: ["int.wer_pct"],
   },
 ];
@@ -159,16 +159,74 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">The problem</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          &ldquo;This sounds robotic.&rdquo; &ldquo;The accent feels off.&rdquo; Neither is
-          measurable as stated. The two standard answers are a human MOS panel, which is
-          slow and cannot be repeated per model version, or automated proxies, which
-          produce a clean number that may not track what users complain about.
+          We have a portfolio of objective metrics: WER, CER, TTFA, UTMOS, etc. Each is
+          limited (and problematic) in its own right. Even the combination &mdash; while
+          useful &mdash; fails to tell us when a TTS model generates robust, high-quality
+          output. To get a clearer picture on where our models fail, and where our team
+          should focus, we pair these metrics with subjective, human-generated annotations
+          on word-level and prosodic failures. Taken together, we can start to focus our
+          attention on the problems that are most important to our customers and users.
         </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          This tool runs both on the same clips and treats{" "}
-          <span className="font-medium text-foreground">the disagreement as the finding</span>
-          . A metric that passes a clip humans reject is a gap in coverage, and it locates
-          where the evaluation stack is blind.
+      </section>
+
+      {/* --- Pipeline --- */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-medium">How a clip gets here</h2>
+        <ol className="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <span className="font-medium text-foreground">1. Corpus.</span> A line enters a
+            manifest with its language, use case and stress category.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">2. Synthesis.</span> Two Gradium
+            API calls per clip: one buffered for a listenable file, one streamed and timed
+            for latency.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">3. Scoring.</span> Whisper for the
+            ASR round trip, UTMOS for predicted naturalness, DNSMOS P.835 for signal
+            quality, librosa and pyloudnorm for prosody and level.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">4. Publication.</span> An export
+            step joins metadata to metrics and writes one JSON file plus lossless audio. The
+            site reads that file and nothing else.
+          </li>
+          <li>
+            <span className="font-medium text-foreground">5. Review.</span> Humans annotate
+            blind; their input is aggregated and compared against what the metrics detected.
+          </li>
+        </ol>
+
+        <div className="rounded-lg border p-4">
+          <h3 className="text-sm font-medium">Why the test text looks the way it does</h3>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            The corpus is built to break the model on purpose, in the ways a real product
+            would. Each line belongs to a{" "}
+            <span className="font-medium text-foreground">use case</span> a Gradium customer
+            actually ships &mdash; healthcare, banking, customer service, gaming &mdash; and
+            carries a <span className="font-medium text-foreground">stress category</span>:
+            the specific hard thing it is designed to provoke. An account number, a currency
+            amount, a dosage, a URL, an acronym, a homograph, a code-switched loanword. These
+            are exactly the tokens that separate a demo from a deployment: a voice that reads
+            marketing copy beautifully can still butcher{" "}
+            <code className="font-mono text-xs">A739K2</code> or say{" "}
+            <span className="font-medium text-foreground">4.99</span> as four separate digits,
+            and a customer notices that on the first call.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Stratifying this way is what turns a corpus average into an action. &ldquo;WER is
+            3.2%&rdquo; tells a research team nothing to do; &ldquo;proper nouns and codes are
+            where it breaks, in these use cases&rdquo; points them at a fix. The lines were
+            drafted with Claude across the five supported languages, then reviewed by hand, so
+            each stress category is represented in each language and each use case rather than
+            sampled from generic news or novel text.
+          </p>
+        </div>
+
+        <p className="text-sm text-muted-foreground">
+          Audio is served losslessly. Reviewers judge audio quality directly, so compressing
+          it would mean humans and DNSMOS were scoring different signals.
         </p>
       </section>
 
@@ -261,32 +319,24 @@ export default function MethodPage() {
           </CardContent>
         </Card>
 
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4">
-          <h3 className="text-sm font-medium">The rows that matter most are the empty ones</h3>
-          <p className="mt-1.5 text-sm text-muted-foreground">
-            <span className="font-medium text-foreground">Tone</span> and{" "}
-            <span className="font-medium text-foreground">accent</span> have no objective
-            counterpart at all: nothing reference-free scores whether a read fits its use
-            case or whether a voice sounds native for its market. The pronunciation kind is
-            half-covered, WER sees that a word broke but not which one or why. These are the
-            rows where the human is the only instrument, and they should not be assumed
-            covered.
-          </p>
-        </div>
       </section>
 
-      {/* --- Blind protocol --- */}
+      {/* --- Rating flow --- */}
       <section className="space-y-3">
-        <h2 className="text-lg font-medium">Why review happens blind</h2>
+        <h2 className="text-lg font-medium">Rating Flow</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Reviewers never see a machine score, before or after submitting. A predicted MOS
-          shown first anchors the judgement; shown after, it calibrates the reviewer across
-          a session. Either way the agreement measured is an artifact of the interface.
-          Metrics are excluded from the payload sent to the review page rather than hidden
-          in the UI, and the transcript endpoint returns no quality scores.
-        </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Reviewers select the languages they understand and are served only those clips.
+          The flow is built on one principle: a reviewer&rsquo;s judgement is only worth
+          collecting if nothing has biased it first. Machine scores are never shown, before
+          or after submitting, because a predicted MOS of 4.5 anchors whatever a person
+          reports next; metrics are excluded from the payload the review page receives
+          rather than hidden in the UI. The clip is heard in two separate passes: first the
+          reviewer taps the exact words that came out wrong, then, on a fresh screen, judges
+          how it sounds as a whole, because analytic and holistic judgements contaminate
+          each other when they are asked together. The recogniser adjudication comes last
+          and only on the disputed words, so the metric&rsquo;s own verdict cannot colour
+          the score already given. Reviewers are served only the languages they read. The
+          flow is longer than it should be; the bet is that a few careful, well-structured
+          annotations are worth more than a thousand fast ones.
         </p>
       </section>
 
@@ -307,9 +357,9 @@ export default function MethodPage() {
         </div>
       </section>
 
-      {/* --- The measurement chain --- */}
+      {/* --- WER measurement approach --- */}
       <section className="space-y-3">
-        <h2 className="text-lg font-medium">The measurement chain</h2>
+        <h2 className="text-lg font-medium">WER measurement approach (and pitfalls)</h2>
         <p className="text-sm text-muted-foreground">
           Intelligibility is measured through a recogniser and a text normalizer, both part
           of the instrument. Three figures on this corpus that looked like model defects
@@ -403,78 +453,6 @@ export default function MethodPage() {
             </p>
           </div>
         </div>
-      </section>
-
-      {/* --- Thresholds --- */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-medium">Thresholds</h2>
-        <p className="text-sm text-muted-foreground">
-          The pass, investigate, and action-required verdict on each metric comes from
-          comparing it against these values. Change the corpus and the verdicts change with
-          it.
-        </p>
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Metric</TableHead>
-                    <TableHead className="text-right">Investigate</TableHead>
-                    <TableHead className="text-right">Action required</TableHead>
-                    <TableHead className="text-right">Direction</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Object.entries(THRESHOLDS).map(([key, t]) => (
-                    <TableRow key={key}>
-                      <TableCell className="font-mono text-xs">{key}</TableCell>
-                      <TableCell className="text-right tabular-nums text-sm">{t.warn}</TableCell>
-                      <TableCell className="text-right tabular-nums text-sm">{t.fail}</TableCell>
-                      <TableCell className="text-right text-xs text-muted-foreground">
-                        {t.higherIsWorse ? "lower is better" : "higher is better"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* --- Pipeline --- */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-medium">How a clip gets here</h2>
-        <ol className="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <span className="font-medium text-foreground">1. Corpus.</span> A line enters a
-            manifest with its language, difficulty, use case and stress category.
-          </li>
-          <li>
-            <span className="font-medium text-foreground">2. Synthesis.</span> Two Gradium
-            API calls per clip: one buffered for a listenable file, one streamed and timed
-            for latency.
-          </li>
-          <li>
-            <span className="font-medium text-foreground">3. Scoring.</span> Whisper for the
-            ASR round trip, UTMOS for predicted naturalness, DNSMOS P.835 for signal
-            quality, librosa and pyloudnorm for prosody and level.
-          </li>
-          <li>
-            <span className="font-medium text-foreground">4. Publication.</span> An export
-            step joins metadata to metrics and writes one JSON file plus lossless audio. The
-            site reads that file and nothing else.
-          </li>
-          <li>
-            <span className="font-medium text-foreground">5. Review.</span> Humans annotate
-            blind; their input is aggregated and compared against what the metrics detected.
-          </li>
-        </ol>
-        <p className="text-sm text-muted-foreground">
-          Audio is served losslessly. Reviewers judge audio quality directly, so compressing
-          it would mean humans and DNSMOS were scoring different signals.
-        </p>
       </section>
 
       {/* --- Limitations --- */}

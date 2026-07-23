@@ -118,7 +118,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
             <h2 className="text-sm font-medium">Objective metrics</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <StatTile
-                dimension={DIMENSIONS.int.label}
+                dimension={DIMENSIONS.intelligibility.label}
                 label="Word error rate"
                 value={microWer(filtered).wer.toFixed(2)}
                 unit="%"
@@ -126,28 +126,27 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
                 caption={`${microWer(filtered).errors} errors / ${microWer(filtered).words} words`}
               />
               <StatTile
-                dimension={DIMENSIONS.nat.label}
+                dimension={DIMENSIONS.performance.label}
+                label="Time-to-first-audio p90"
+                value={pooledTtfa(filtered, 90).value.toFixed(0)}
+                unit="ms"
+                verdict={verdictFor("ttfa_p90_ms", pooledTtfa(filtered, 90).value)}
+                caption={`DNSMOS ${mean(filtered.map((c) => c.metrics.aud.dnsmos_ovrl)).toFixed(2)} / 5 · ${mean(filtered.map((c) => c.metrics.aud.lufs)).toFixed(1)} LUFS`}
+              />
+              <StatTile
+                dimension={DIMENSIONS.expressiveness.label}
+                label="Pitch variation"
+                value={mean(filtered.map((c) => c.metrics.nat.f0_semitone_std)).toFixed(2)}
+                unit="st"
+                caption={`${mean(filtered.map((c) => c.metrics.nat.n_pauses)).toFixed(1)} pauses avg · F0 semitone std`}
+              />
+              <StatTile
+                dimension={DIMENSIONS.naturalness.label}
                 label="UTMOS"
                 value={mean(filtered.map((c) => c.metrics.nat.utmos)).toFixed(2)}
                 unit="/ 5"
                 verdict={verdictFor("utmos", mean(filtered.map((c) => c.metrics.nat.utmos)))}
-                caption={`F0 spread ${mean(filtered.map((c) => c.metrics.nat.f0_semitone_std)).toFixed(2)} st`}
-              />
-              <StatTile
-                dimension={DIMENSIONS.aud.label}
-                label="DNSMOS OVRL"
-                value={mean(filtered.map((c) => c.metrics.aud.dnsmos_ovrl)).toFixed(2)}
-                unit="/ 5"
-                verdict={verdictFor("dnsmos_ovrl", mean(filtered.map((c) => c.metrics.aud.dnsmos_ovrl)))}
-                caption={`${mean(filtered.map((c) => c.metrics.aud.lufs)).toFixed(1)} LUFS mean`}
-              />
-              <StatTile
-                dimension={DIMENSIONS.lat.label}
-                label="TTFA (p90)"
-                value={pooledTtfa(filtered, 90).value.toFixed(0)}
-                unit="ms"
-                verdict={verdictFor("ttfa_p90_ms", pooledTtfa(filtered, 90).value)}
-                caption={`Pooled across ${pooledTtfa(filtered, 90).nTrials} trials`}
+                caption="Predicted MOS, English-trained"
               />
             </div>
             {crossLanguage ? (
@@ -665,7 +664,7 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
         {/* Intelligibility is best explained by showing the round trip. */}
         <div className="space-y-2">
           <h3 className="text-xs font-medium text-muted-foreground">
-            {DIMENSIONS.int.label}: what was written vs. what the recogniser heard
+            {DIMENSIONS.intelligibility.label}: what was written vs. what the recogniser heard
           </h3>
           <div className="grid gap-2 sm:grid-cols-2">
             <div className="rounded-md border bg-muted/30 p-3">
@@ -695,10 +694,9 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">
-              {DIMENSIONS.nat.label}
+              {DIMENSIONS.expressiveness.label}
             </h3>
             <dl className="space-y-1 font-mono text-xs">
-              <div className="flex justify-between"><dt>UTMOS</dt><dd>{m.nat.utmos}</dd></div>
               <div className="flex justify-between"><dt>F0 std</dt><dd>{m.nat.f0_semitone_std} st</dd></div>
               <div className="flex justify-between"><dt>F0 mean</dt><dd>{m.nat.f0_mean_hz} Hz</dd></div>
               <div className="flex justify-between"><dt>pauses</dt><dd>{m.nat.n_pauses}</dd></div>
@@ -707,24 +705,29 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
                 <dd>{m.nat.speaking_rate_wps?.toFixed(2) ?? "–"} w/s</dd>
               </div>
             </dl>
+            <h3 className="mb-1.5 mt-4 text-xs font-medium text-muted-foreground">
+              {DIMENSIONS.naturalness.label}
+            </h3>
+            <dl className="space-y-1 font-mono text-xs">
+              <div className="flex justify-between"><dt>UTMOS</dt><dd>{m.nat.utmos}</dd></div>
+            </dl>
           </div>
           <div>
             <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">
-              {DIMENSIONS.aud.label}
+              {DIMENSIONS.performance.label}
             </h3>
             <dl className="space-y-1 font-mono text-xs">
-              <div className="flex justify-between"><dt>OVRL</dt><dd>{m.aud.dnsmos_ovrl}</dd></div>
-              <div className="flex justify-between"><dt>SIG</dt><dd>{m.aud.dnsmos_sig}</dd></div>
-              <div className="flex justify-between"><dt>BAK</dt><dd>{m.aud.dnsmos_bak}</dd></div>
+              <div className="flex justify-between"><dt>DNSMOS OVRL</dt><dd>{m.aud.dnsmos_ovrl}</dd></div>
+              <div className="flex justify-between"><dt>DNSMOS SIG</dt><dd>{m.aud.dnsmos_sig}</dd></div>
+              <div className="flex justify-between"><dt>DNSMOS BAK</dt><dd>{m.aud.dnsmos_bak}</dd></div>
               <div className="flex justify-between"><dt>LUFS</dt><dd>{m.aud.lufs}</dd></div>
-              <div className="flex justify-between"><dt>peak</dt><dd>{m.aud.peak_dbfs} dBFS</dd></div>
               <div className="flex justify-between"><dt>clipping</dt><dd>{m.aud.clipping_pct}%</dd></div>
               <div className="flex justify-between"><dt>SNR</dt><dd>{m.aud.snr_db_est} dB</dd></div>
             </dl>
           </div>
           <div>
             <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">
-              {DIMENSIONS.lat.label}
+              {DIMENSIONS.performance.label}: latency
             </h3>
             <dl className="space-y-1 font-mono text-xs">
               <div className="flex justify-between"><dt>TTFA p90</dt><dd>{m.lat.ttfa_p90_ms} ms</dd></div>

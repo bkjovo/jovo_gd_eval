@@ -105,7 +105,7 @@ export default async function ExecutiveSummaryPage() {
         <h2 className="text-sm font-medium text-muted-foreground">Model performance</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <StatTile
-            dimension={DIMENSIONS.int.label}
+            dimension={DIMENSIONS.intelligibility.label}
             label="Word error rate"
             value={corpusWer.wer.toFixed(2)}
             unit="%"
@@ -113,7 +113,7 @@ export default async function ExecutiveSummaryPage() {
             caption={`Micro-averaged: ${corpusWer.errors} errors / ${corpusWer.words} words · worst clip ${worstWer.toFixed(1)}%`}
           />
           <StatTile
-            dimension={DIMENSIONS.nat.label}
+            dimension={DIMENSIONS.naturalness.label}
             label="Mean UTMOS"
             value={meanUtmos.toFixed(2)}
             unit="/ 5"
@@ -121,7 +121,7 @@ export default async function ExecutiveSummaryPage() {
             caption="Predicted naturalness, English-trained"
           />
           <StatTile
-            dimension={DIMENSIONS.aud.label}
+            dimension={DIMENSIONS.performance.label}
             label="Mean DNSMOS OVRL"
             value={meanDnsmos.toFixed(2)}
             unit="/ 5"
@@ -129,7 +129,7 @@ export default async function ExecutiveSummaryPage() {
             caption="Signal quality, independent of wording"
           />
           <StatTile
-            dimension={DIMENSIONS.lat.label}
+            dimension={DIMENSIONS.performance.label}
             label="p90 time-to-first-audio"
             value={ttfa.value.toFixed(0)}
             unit="ms"
