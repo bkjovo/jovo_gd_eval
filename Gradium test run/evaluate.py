@@ -204,6 +204,48 @@ def _split_alnum_tokens(tokens):
     return out
 
 
+def reconcile_splits(ref_tokens, hyp_tokens, max_join=3):
+    """Reconcile split/join transcription artifacts between the two token lists.
+
+    The mirror image of _split_alnum_tokens. That rule fixes the recogniser JOINING
+    what the source spelled apart ('A, 7, 3, 9, K, 2' -> 'A739K2'); this fixes the
+    recogniser SPLITTING what the source wrote joined. Observed on this corpus, in all
+    five languages (the tell that it is transcription, not speech):
+
+        proper nouns:  'Eldergrove' -> 'Elder Grove'   (game-01-*, +2 word errors each)
+        emphasis caps: 'PAS'        -> 'P. A. S.'       (game-04-fr, +3 word errors)
+        compounds:     'Betrugshotline' <-> 'Betrugs Hotline'  (bank-04-de)
+
+    Adjacent tokens on one side are merged when their concatenation exactly equals a
+    single token on the other side. Symmetric and exact-match only, so it can never
+    turn a genuine substitution into a hit: if the model actually said different words,
+    the characters will not concatenate to match. The guard skips a merge when a
+    sub-token already aligns on its own, so common short words are never fused.
+
+    It does NOT touch homophones ('Thorne' vs 'Thorn') or misheard domains: those are
+    real recogniser limitations that the human adjudication pass exists to resolve, and
+    normalising them away would hide exactly what the tool is built to surface.
+    """
+    def merge(a, others):
+        out, i, n = [], 0, len(a)
+        while i < n:
+            hit, kk = None, 1
+            for k in range(min(max_join, n - i), 1, -1):
+                cand = "".join(a[i:i + k])
+                if cand in others and not any(a[i + x] in others for x in range(k)):
+                    hit, kk = cand, k
+                    break
+            if hit is not None:
+                out.append(hit)
+                i += kk
+            else:
+                out.append(a[i])
+                i += 1
+        return out
+
+    return merge(ref_tokens, set(hyp_tokens)), merge(hyp_tokens, set(ref_tokens))
+
+
 # --- base layer: OpenAI's Whisper text normalizers -------------------------
 #
 # These are the normalizers used to report WER in the Whisper paper, written by the
@@ -289,10 +331,13 @@ def intelligibility(path, reference_text, model, language=None):
     # Raw: kept and reported so the size of the normalization effect stays visible.
     raw = jiwer.process_words(ref, hypothesis, reference_transform=norm, hypothesis_transform=norm)
 
-    # Normalized: the headline figure, aligned on comparable text.
+    # Normalized: the headline figure, aligned on comparable text. Tokenise both sides,
+    # reconcile split/join transcription artifacts, then align.
     lang = (language or "en").lower()[:2]
-    out = jiwer.process_words(normalize_for_wer(ref, lang),
-                              normalize_for_wer(hypothesis, lang),
+    ref_toks = (norm(normalize_for_wer(ref, lang)) or [[]])[0]
+    hyp_toks = (norm(normalize_for_wer(hypothesis, lang)) or [[]])[0]
+    ref_toks, hyp_toks = reconcile_splits(ref_toks, hyp_toks)
+    out = jiwer.process_words(" ".join(ref_toks), " ".join(hyp_toks),
                               reference_transform=norm, hypothesis_transform=norm)
     cer = jiwer.cer(ref.lower(), hypothesis.lower())
 

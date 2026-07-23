@@ -1049,12 +1049,12 @@
       "audio_s": 5.76,
       "metrics": {
         "int": {
-          "wer_pct": 11.76,
+          "wer_pct": 0.0,
           "cer_pct": 3.45,
-          "ref_words": 17,
-          "sub": 1,
+          "ref_words": 16,
+          "sub": 0,
           "ins": 0,
-          "del": 1,
+          "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 0.847,
           "truncated": false,
@@ -5339,11 +5339,11 @@
       "audio_s": 3.84,
       "metrics": {
         "int": {
-          "wer_pct": 37.5,
+          "wer_pct": 12.5,
           "cer_pct": 6.52,
           "ref_words": 8,
-          "sub": 2,
-          "ins": 1,
+          "sub": 1,
+          "ins": 0,
           "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 1.2,
@@ -5394,11 +5394,11 @@
       "audio_s": 3.84,
       "metrics": {
         "int": {
-          "wer_pct": 33.33,
+          "wer_pct": 11.11,
           "cer_pct": 3.57,
           "ref_words": 9,
-          "sub": 2,
-          "ins": 1,
+          "sub": 1,
+          "ins": 0,
           "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 1.067,
@@ -5449,11 +5449,11 @@
       "audio_s": 3.84,
       "metrics": {
         "int": {
-          "wer_pct": 37.5,
+          "wer_pct": 12.5,
           "cer_pct": 3.92,
           "ref_words": 8,
-          "sub": 2,
-          "ins": 1,
+          "sub": 1,
+          "ins": 0,
           "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 1.2,
@@ -5504,11 +5504,11 @@
       "audio_s": 3.92,
       "metrics": {
         "int": {
-          "wer_pct": 37.5,
+          "wer_pct": 12.5,
           "cer_pct": 3.92,
           "ref_words": 8,
-          "sub": 2,
-          "ins": 1,
+          "sub": 1,
+          "ins": 0,
           "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 1.225,
@@ -6219,11 +6219,11 @@
       "audio_s": 2.72,
       "metrics": {
         "int": {
-          "wer_pct": 37.5,
+          "wer_pct": 0.0,
           "cer_pct": 12.5,
           "ref_words": 8,
-          "sub": 1,
-          "ins": 2,
+          "sub": 0,
+          "ins": 0,
           "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 0.85,
@@ -7594,12 +7594,12 @@
       "audio_s": 13.6,
       "metrics": {
         "int": {
-          "wer_pct": 8.7,
+          "wer_pct": 4.44,
           "cer_pct": 5.58,
-          "ref_words": 46,
-          "sub": 3,
+          "ref_words": 45,
+          "sub": 2,
           "ins": 0,
-          "del": 1,
+          "del": 0,
           "trailing_del": 0,
           "dur_expected_ratio": 0.739,
           "truncated": false,

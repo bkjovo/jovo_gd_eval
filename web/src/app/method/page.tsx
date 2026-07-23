@@ -340,13 +340,19 @@ export default function MethodPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               Text is normalized before alignment with OpenAI&apos;s Whisper normalizers:{" "}
               <code className="font-mono text-xs">EnglishTextNormalizer</code> for English,{" "}
-              <code className="font-mono text-xs">BasicTextNormalizer</code> otherwise. One
-              rule is added on top, splitting digit-bearing alphanumeric tokens into
-              characters, because Whisper returns{" "}
+              <code className="font-mono text-xs">BasicTextNormalizer</code> otherwise. Two
+              rules are added on top. The first splits digit-bearing alphanumeric tokens
+              into characters, because Whisper returns{" "}
               <code className="font-mono text-xs">A739K2</code> as one token in French and
               German but as <code className="font-mono text-xs">A 739 K2</code> in English,
-              Spanish and Portuguese for identical input. Raw and normalized are both
-              published so the size of the correction stays visible.
+              Spanish and Portuguese for identical input. The second reconciles the mirror
+              artifact: the recogniser splitting a token the source wrote joined, so{" "}
+              <code className="font-mono text-xs">Eldergrove</code> transcribed as{" "}
+              <code className="font-mono text-xs">Elder Grove</code> is not charged as two
+              errors. Both rules are exact-character-match and symmetric, so a genuinely
+              misread word still aligns as a substitution. Correcting the split alone moved
+              the proper-noun stress case from 31.7% to 12.2% WER and the corpus from 3.85%
+              to 3.20%.
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               There is no community standard. The multilingual ASR leaderboard documents its
