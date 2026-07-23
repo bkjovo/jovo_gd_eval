@@ -29,7 +29,8 @@ export const WORD_ISSUES: { id: WordIssue; label: string }[] = [
 /** Shown only after the reviewer picks "Pronunciation" on a word. */
 export const PRONUNCIATION_KINDS: { id: string; label: string }[] = [
   { id: "acronym", label: "Acronym problem" },
-  { id: "number", label: "Number, date, currency problem" },
+  { id: "number", label: "Number or date" },
+  { id: "currency", label: "Currency / money" },
   { id: "code", label: "Code mispronounced" },
   { id: "proper_noun", label: "Mispronounced name or place" },
   { id: "homograph", label: "Homograph (read vs read)" },

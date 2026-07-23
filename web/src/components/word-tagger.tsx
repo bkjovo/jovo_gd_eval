@@ -62,15 +62,18 @@ export function WordTagger({
                 setPronOpen(false);
               }}
               className={cn(
+                // Every word carries a visible border and a faint fill so it reads as a
+                // tappable chip, not prose. Before this they were borderless until hover,
+                // and reviewers did not realise the words themselves were the control.
                 "rounded-md border px-2.5 py-1.5 text-base leading-tight transition-colors",
                 f
                   ? "border-amber-500 bg-amber-500/15 font-medium"
                   : isOpen
                     ? "border-foreground bg-muted"
-                    : "border-transparent hover:border-border hover:bg-muted",
+                    : "border-border bg-muted/40 hover:border-foreground hover:bg-muted",
                 // Recogniser disagreement is a hint, never a verdict: the reviewer is
                 // judging the audio, and the transcript is our instrument, not truth.
-                !f && disputedIndices?.includes(i) && "border-dashed border-muted-foreground/40",
+                !f && disputedIndices?.includes(i) && "border-dashed border-muted-foreground/50",
               )}
             >
               {w}

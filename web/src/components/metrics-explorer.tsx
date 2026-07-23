@@ -564,7 +564,22 @@ function TopIssues({
       });
     }
 
-    return { highlights: out.slice(0, 5), reviewsInScope };
+    // Interleave reviewer and measured findings so the section is never all-WER. Each
+    // list keeps its own priority order; we alternate between them, leading with the
+    // reviewer side because those are the findings the automated stack cannot produce.
+    // Without this the three WER cuts (stress, language, use case) crowd out tone and
+    // word-level failures, and the panel reads as a WER report rather than a comparison.
+    const reviewer = out.filter((h) => h.kind === "reviewers");
+    const measured = out.filter((h) => h.kind === "measured");
+    const ordered: Highlight[] = [];
+    let ri = 0;
+    let mi = 0;
+    while (ordered.length < 5 && (ri < reviewer.length || mi < measured.length)) {
+      if (ri < reviewer.length) ordered.push(reviewer[ri++]);
+      if (ordered.length < 5 && mi < measured.length) ordered.push(measured[mi++]);
+    }
+
+    return { highlights: ordered, reviewsInScope };
   }, [clips, aggregates, showLanguage]);
 
   if (highlights.length === 0) return null;

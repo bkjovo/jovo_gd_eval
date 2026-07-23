@@ -5,7 +5,7 @@ import { MetricsExplorer } from "@/components/metrics-explorer";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Metrics Deep Dive",
+  title: "Performance",
 };
 
 export default async function MetricsPage() {
@@ -23,10 +23,10 @@ export default async function MetricsPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Metrics Deep Dive
+          Performance
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Every objective measurement, cut by language, difficulty, and use case,
+          Every objective measurement, cut by language, stress case, and use case,
           alongside what human reviewers flagged on the same clips.
         </p>
       </div>

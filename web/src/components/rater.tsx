@@ -49,7 +49,6 @@ import { cn } from "@/lib/utils";
 
 const SESSION_KEY = "soundcheck.session_id";
 const LANGS_KEY = "soundcheck.langs";
-const SET_SIZE = 10;
 
 function getSessionId(): string {
   if (typeof window === "undefined") return "";
@@ -72,7 +71,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const [langs, setLangs] = useState<string[]>([]);
   const [queue, setQueue] = useState<RaterClip[]>([]);
   const [index, setIndex] = useState(0);
-  const [setStart, setSetStart] = useState(0);
 
   // pass 1
   const [wordFlags, setWordFlags] = useState<WordFlag[]>([]);
@@ -151,14 +149,11 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     window.localStorage.setItem(LANGS_KEY, JSON.stringify(langs));
     setQueue(ordered);
     setIndex(0);
-    setSetStart(0);
     resetClipState();
     setPhase(ordered.length ? "accuracy" : "setdone");
   }, [clips, langs, resetClipState]);
 
   const current = queue[index];
-  const inSet = index - setStart;
-  const setTotal = Math.min(SET_SIZE, Math.max(1, queue.length - setStart));
 
   const togglePlay = useCallback(() => {
     const el = audioRef.current;
@@ -320,14 +315,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     void submitAll({});
   }, [current, submitAll]);
 
-  const continueSet = useCallback(() => {
-    if (index + 1 >= queue.length) return;
-    setSetStart(index + 1);
-    setIndex(index + 1);
-    resetClipState();
-    setPhase("accuracy");
-  }, [index, queue.length, resetClipState]);
-
   // Space plays on the two listening passes; digits score on pass 2 only.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -381,10 +368,11 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
           <p className="font-medium text-foreground">How it works</p>
           <p className="mt-1">
-            {SET_SIZE} clips per set. For each one you listen twice: first tapping any words
-            that came out wrong, then judging how it sounds overall. You are not shown what
-            the machine scored. That comparison is the finding, and seeing it mid-set would
-            train you toward it. Your answers and the metrics meet on the dashboard.
+            For each clip you listen twice: first tapping any words that came out wrong,
+            then judging how it sounds overall. Review as many as you like and stop whenever
+            you want. You are not shown what the machine scored. That comparison is the
+            finding, and seeing it would train you toward it. Your answers and the metrics
+            meet on the dashboard.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -399,21 +387,21 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     );
   }
 
-  // ---------- End of set ----------
+  // ---------- Done: every eligible clip reviewed ----------
   if (phase === "setdone") {
-    const remaining = Math.max(0, queue.length - index - 1);
     return (
       <div className="mx-auto max-w-xl space-y-6 text-center">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {submittedCount > 0 ? "Set complete" : "Nothing to review"}
+            {submittedCount > 0 ? "That's everything, thank you" : "Nothing to review"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {submittedCount > 0 ? (
               <>
                 You reviewed {submittedCount} clip{submittedCount === 1 ? "" : "s"}
-                {skipped > 0 ? ` and skipped ${skipped}` : ""}. The word-level flags and
-                tone answers are the only record of things no metric here can measure.
+                {skipped > 0 ? ` and skipped ${skipped}` : ""}, every one in the languages
+                you picked. The word-level flags and tone answers are the only record of
+                things no metric here can measure.
               </>
             ) : (
               <>No clips matched the languages you selected.</>
@@ -421,11 +409,6 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-3">
-          {remaining > 0 ? (
-            <Button size="lg" onClick={continueSet}>
-              Review {Math.min(SET_SIZE, remaining)} more
-            </Button>
-          ) : null}
           <Button variant="outline" onClick={() => setPhase("gate")}>
             Change languages
           </Button>
@@ -446,7 +429,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     <div className="space-y-2" ref={topRef}>
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs text-muted-foreground">
         <span>
-          Clip {inSet + 1} of {setTotal}
+          Clip {index + 1}
           <span className="ml-2 opacity-60">({submittedCount} done)</span>
         </span>
         <div className="flex items-center gap-3">
@@ -469,7 +452,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           </button>
         </div>
       </div>
-      <Progress value={(inSet / setTotal) * 100} className="h-1" />
+      <Progress value={(index / queue.length) * 100} className="h-1" />
     </div>
   );
 
@@ -724,29 +707,49 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
             <div>
               <h2 className="text-sm font-medium">One last thing: was the metric right?</h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                A second machine (speech-to-text, not the voice you just heard) wrote
-                down this clip differently from the source text, which counted as an
-                error. That machine makes its own mistakes, so your ear is the tiebreaker.
-                This is asked last, on purpose, so it could not influence the score you
-                just gave.
+                To score the audio we transcribed it back to text with a speech-to-text
+                model, then compared that transcript to the script. They differ on the
+                highlighted words. But speech-to-text makes its own mistakes, so the
+                mismatch might be the voice or might be the transcriber. Listen, and tell us
+                which. Asked last, on purpose, so it could not sway the score you just gave.
               </p>
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2">
-              <div className="rounded-md border bg-background p-3">
-                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Text it was asked to read
+              <div className="rounded-md border border-emerald-600/30 bg-emerald-500/5 p-3">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                    The script
+                  </span>
+                  <span className="rounded bg-emerald-500/15 px-1 text-[9px] font-medium uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                    correct by definition
+                  </span>
+                </div>
+                <div className="mb-1.5 text-[10px] text-muted-foreground">
+                  What the voice was asked to say.
                 </div>
                 <MarkedText words={src} marks={srcMarks} />
               </div>
-              <div className="rounded-md border bg-background p-3">
-                <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  What the machine wrote
+              <div className="rounded-md border border-amber-600/30 bg-amber-500/10 p-3">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                    The transcript
+                  </span>
+                  <span className="rounded bg-amber-500/20 px-1 text-[9px] font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                    may be wrong
+                  </span>
+                </div>
+                <div className="mb-1.5 text-[10px] text-muted-foreground">
+                  What our speech-to-text model heard.
                 </div>
                 <MarkedText words={hyp} marks={hypMarks} />
               </div>
             </div>
 
+            <div className="text-[11px] text-muted-foreground">
+              Play the clip and judge by ear against{" "}
+              <span className="font-medium text-emerald-700 dark:text-emerald-400">the script</span>.
+            </div>
             <audio src={current.audio_url} controls preload="auto" className="w-full" />
 
             <div className="space-y-3">
