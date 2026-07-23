@@ -47,11 +47,12 @@ export default function WelcomePage() {
     <div className="mx-auto max-w-3xl space-y-10">
       <div className="space-y-3">
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-          Welcome to Joe Vosburgh&rsquo;s voice eval webtool.
+          Welcome to Joe Vosburgh&rsquo;s voice eval webtool!
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          My goal was to build an evaluation tool for Gradium&rsquo;s TTS model. I hope the
-          remainder of the product is self-explanatory (and that its value is self-evident).
+          My goal was to build an evaluation tool for Gradium&rsquo;s TTS model. This site
+          allows for human rating, metric evaluation and light product marketing. I&rsquo;ve
+          also included pages for viewing samples and understanding my methodology.
         </p>
       </div>
 
@@ -64,7 +65,7 @@ export default function WelcomePage() {
         </Item>
         <Item term="Queries">
           I used Claude Opus to generate queries in Gradium&rsquo;s five supported languages
-          related to marketed use cases (healthcare, banking, customer service, gaming).
+          related to industry use cases (healthcare, banking, customer service, gaming).
           This felt more useful than{" "}
           <A href="https://artificialanalysis.ai/text-to-speech/arena">
             Artificial Analytics&rsquo;
@@ -100,17 +101,23 @@ export default function WelcomePage() {
       </Section>
 
       <Section heading="The product has (many) limitations">
-        <Item term="Standalone vs Relative">
+        <Item term="Queries">
+          These were all generated using an LLM: they&rsquo;re too clean, too short, too
+          self-contained. This is too generous of a test set. Realistically, I&rsquo;d look
+          for real transcripts or audio to test more difficult situations.
+        </Item>
+        <Item term="ASR Normalization">
+          The first time I ran WER, I got ~40% error rate. Switching to{" "}
+          <A href="https://huggingface.co/openai/whisper-large-v3">whisper large-v3</A>{" "}
+          helped, but not much (I wanted to use a 3P transcription tool for this). I
+          attempted to normalize the ASR outputs but I&rsquo;m not entirely sure about my
+          logic.
+        </Item>
+        <Item term="Relative Evaluation">
           One of the practical values of an eval flow is gating model releases (and
           preventing quality regression). I couldn&rsquo;t access a prior model version via
           the API. Realistically, I&rsquo;d like to evaluate metrics A/B and create some sort
           of head-to-head (&agrave; la CMOS).
-        </Item>
-        <Item term="ASR Normalization">
-          The first time I ran WER, I got ~40% error rate. I attempted to normalize the ASR
-          outputs but wasn&rsquo;t sure about my logic. Eventually, I just ran{" "}
-          <A href="https://huggingface.co/openai/whisper-large-v3">whisper large-v3</A> and
-          called it a day.
         </Item>
         <Item term="Rater Flow">
           The annotation flow is too long and cumbersome, I am aware! I was trying to show
@@ -119,23 +126,30 @@ export default function WelcomePage() {
       </Section>
 
       <Section heading="I made a few observations">
-        <Item term="Voice">
-          I chose a single voice for each language to create some consistency. After building
-          the rating flow, I regretted this decision; I found the choice voices to be boring
-          as a rater.
+        <Item term="Stress &amp; Meter">
+          The rating flow I built is pretty bad for solving this. 100k perfect reviews
+          through my flow wouldn&rsquo;t teach the model much. I think a more advanced
+          annotation tool (think: using{" "}
+          <A href="https://www.britannica.com/topic/scansion">scansion</A>) would be
+          required.
         </Item>
-        <Item term="WER is worse than I thought">
+        <Item term="Voice">
+          I chose a single voice for each language to reduce rater and UTMOS bias. After
+          building the rating flow, I regretted this decision; I found the choice voices to
+          be boring as a rater and mismatched to use cases.
+        </Item>
+        <Item term="WER is Worse Than I Thought">
           and I&rsquo;m not sure how to fix it. It seems like a powerful way to market a
-          product to customers and the Type 1 error is concerning. Gradium&rsquo;s model was
+          product to customers but the Type 1 error is concerning. Gradium&rsquo;s model was
           nearly-perfect (technically) and WER was ill-equipped to demonstrate that.
         </Item>
         <Item term="Subjective Rating">
-          In my own listening, they did little to warn me that a voice clip would completely
-          butcher a currency or proper noun. A few high-quality annotations struck me as more
-          valuable than 1000 runs of{" "}
-          <A href="https://github.com/sarulab-speech/UTMOS22">UTMOS</A>.
+          In my own listening, the &ldquo;objective&rdquo; metrics for prosody (UTMOS, etc)
+          did little to warn me that a voice clip would completely butcher a currency or
+          proper noun. A few high-quality annotations struck me as more valuable than 1000
+          runs of <A href="https://github.com/sarulab-speech/UTMOS22">UTMOS</A>.
         </Item>
-        <Item term="Rating is difficult">
+        <Item term="Rating Is Difficult">
           I was over-generous with my prosodic ratings early-on. It took 15-20 ratings before
           I started to become picky with timing, accent and stress. It&rsquo;s obvious now
           that the work requires a highly fluent and trained cohort.
@@ -150,15 +164,17 @@ export default function WelcomePage() {
         <Item>
           I believe that labeling is the best way to develop intuition. Given the limited
           time, my own labeling mostly just highlighted my own intuitive limitations. I
-          clearly have much to learn in the field of voice.
+          clearly have much to learn in the field.
         </Item>
         <Item>
-          I had a lot of fun doing this. I spent more than 6 hours (but fewer than 10, I
-          promise!). It was a pleasure getting to marinate myself in a new space.
+          I had a lot of fun doing this. Between Claude Code and Gradium&rsquo;s API, this
+          was fairly easy to develop and launch, which gave me lots of opportunity to think
+          and iterate.
         </Item>
         <Item>
           As always, building something requires and reveals so much more nuance than
-          discussion can alone.
+          discussion can alone. I think I&rsquo;d do this differently the second time but
+          I&rsquo;m pleased (enough) with the result.
         </Item>
       </Section>
     </div>
