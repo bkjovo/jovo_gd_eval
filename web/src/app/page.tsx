@@ -75,7 +75,7 @@ export default function WelcomePage() {
         <Item term="Metrics">
           I calculated a handful of objective metrics (WER, Latency, UTMOS, DNSMOS) for
           speech samples. These appear nearly industry-standard. Only WER &amp; TTFA felt
-          truly useful. F0 spread was somewhat informative, if under-contextulized.
+          truly useful. F0 spread was somewhat informative, if under-contextualized.
         </Item>
         <Item term="Objective vs Rater-Derived">
           I focused a majority of my time on understanding how to solicit feedback through
@@ -83,7 +83,7 @@ export default function WelcomePage() {
           approaches (<A href="https://arxiv.org/abs/2010.15258">xMOS</A>,{" "}
           <A href="https://arxiv.org/pdf/2506.19441">TTSDS</A>,{" "}
           <A href="https://arxiv.org/abs/2005.07143">ECAPA-TDNN</A>, etc), I got the
-          (n&auml;ive) impression that these are not especially consistent (or useful)
+          (na&iuml;ve) impression that these are not especially consistent (or useful)
           proxies.
         </Item>
         <Item term="Rating Flow">
@@ -93,7 +93,7 @@ export default function WelcomePage() {
           generative.
         </Item>
         <Item term="WER Correction">
-          In the rating flow, you&rsquo;ll see the first screen compares the audio against
+          In the rating flow, you&rsquo;ll see the last screen compares the audio against
           the ASR transcript. The purpose was to create labels with which to fine tune the
           ASR models.
         </Item>
