@@ -97,11 +97,16 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
   const replaysRef = useRef(0);
   const topRef = useRef<HTMLDivElement | null>(null);
 
+  // Restore the language selection persisted from a previous session. This must run
+  // after mount: reading localStorage in a lazy useState initializer would make the
+  // client's first render differ from the server's and fail hydration. One setState,
+  // once, on mount — not the cascading-render case the lint rule exists to catch.
   useEffect(() => {
     const saved = window.localStorage.getItem(LANGS_KEY);
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as string[];
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         if (Array.isArray(parsed) && parsed.length) setLangs(parsed);
       } catch {
         /* ignore malformed cache */

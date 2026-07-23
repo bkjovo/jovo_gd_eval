@@ -287,8 +287,8 @@ def write_outputs(out_dir, merged, manifest_order):
 
 async def main():
     ap = argparse.ArgumentParser(description="Batch reference-free TTS eval (incremental)")
-    ap.add_argument("--manifest", default="manifest.jsonl")
-    ap.add_argument("--out-dir", default="outputs")
+    ap.add_argument("--manifest", default="corpus/manifest_125.jsonl")
+    ap.add_argument("--out-dir", default="corpus/outputs")
     ap.add_argument("--trials", type=int, default=5, help="timed latency trials per item")
     ap.add_argument("--warmup-per-voice", type=int, default=1,
                     help="discarded warmup calls per DISTINCT VOICE at the start of the run "

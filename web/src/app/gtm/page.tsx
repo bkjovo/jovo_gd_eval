@@ -108,7 +108,6 @@ export default function GtmPage() {
           lang: c.lang,
           stress: c.stress_category,
           text: c.text,
-          hypothesis: c.metrics.int.hypothesis || c.text,
           audioUrl: c.audio_url,
         })),
     };
@@ -120,7 +119,6 @@ export default function GtmPage() {
       languages: [...new Set(clips.map((c) => c.lang))].sort(
         (x, y) => LANG_ORDER.indexOf(x) - LANG_ORDER.indexOf(y),
       ),
-      voiceCount: new Set(clips.map((c) => c.voice_id)).size,
       clipCount: clips.length,
     },
     useCases,

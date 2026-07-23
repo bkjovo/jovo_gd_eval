@@ -8,7 +8,6 @@ export type Example = {
   lang: string;
   stress: string;
   text: string;
-  hypothesis: string;
   audioUrl: string;
 };
 
@@ -26,7 +25,6 @@ export type UseCase = {
 export type MarketingData = {
   common: {
     languages: string[];
-    voiceCount: number;
     clipCount: number;
   };
   useCases: UseCase[];

@@ -1012,8 +1012,11 @@ function HumanFindings({
               <h3 className="text-sm font-medium">Reported by ear</h3>
               <p className="text-xs text-muted-foreground">
                 {roll.cutOff} said the audio cut off words; {roll.audioIssue} heard buzzing,
-                garbling or glitches. The truncation detector has flagged 0 clips, so these
-                answers are the only check on it.
+                garbling or glitches. The truncation detector has flagged{" "}
+                {`${clips.filter((c) => c.metrics.int.truncated).length} clip${
+                  clips.filter((c) => c.metrics.int.truncated).length === 1 ? "" : "s"
+                }`}{" "}
+                in this cut, so these answers are the only check on it.
               </p>
             </CardContent>
           </Card>
