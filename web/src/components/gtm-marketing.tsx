@@ -138,8 +138,8 @@ export function GtmMarketing({ data }: { data: MarketingData }) {
             </div>
           </div>
           <div className="rounded-xl border bg-gradient-to-br from-muted/60 to-transparent p-5">
-            <div className="text-3xl font-semibold tracking-tight">386 voices</div>
-            <div className="mt-1 text-sm font-medium">across {data.common.languages.length} languages</div>
+            <div className="text-3xl font-semibold tracking-tight">Hundreds</div>
+            <div className="mt-1 text-sm font-medium">of voices across {data.common.languages.length} languages</div>
             <div className="mt-0.5 text-xs text-muted-foreground">
               Diverse in gender, region, age, and emotion.
             </div>
