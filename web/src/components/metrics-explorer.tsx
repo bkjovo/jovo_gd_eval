@@ -131,7 +131,7 @@ export function MetricsExplorer({ clips, aggregates, totalRatings, coverage }: P
                 value={pooledTtfa(filtered, 90).value.toFixed(0)}
                 unit="ms"
                 verdict={verdictFor("ttfa_p90_ms", pooledTtfa(filtered, 90).value)}
-                caption={`DNSMOS ${mean(filtered.map((c) => c.metrics.aud.dnsmos_ovrl)).toFixed(2)} / 5 · ${mean(filtered.map((c) => c.metrics.aud.lufs)).toFixed(1)} LUFS`}
+                caption={`Pooled across ${pooledTtfa(filtered, 90).nTrials} trials`}
               />
               <StatTile
                 dimension={DIMENSIONS.expressiveness.label}
@@ -714,7 +714,7 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
           </div>
           <div>
             <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">
-              {DIMENSIONS.performance.label}
+              Audio quality
             </h3>
             <dl className="space-y-1 font-mono text-xs">
               <div className="flex justify-between"><dt>DNSMOS OVRL</dt><dd>{m.aud.dnsmos_ovrl}</dd></div>
@@ -727,7 +727,7 @@ function ClipDetail({ clip, agg }: { clip: Clip; agg?: ClipAggregate }) {
           </div>
           <div>
             <h3 className="mb-1.5 text-xs font-medium text-muted-foreground">
-              {DIMENSIONS.performance.label}: latency
+              {DIMENSIONS.performance.label}
             </h3>
             <dl className="space-y-1 font-mono text-xs">
               <div className="flex justify-between"><dt>TTFA p90</dt><dd>{m.lat.ttfa_p90_ms} ms</dd></div>

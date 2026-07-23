@@ -30,7 +30,7 @@ export const DIMENSIONS: Record<
     code: "D-PERF",
     label: "Performance",
     blurb:
-      "Did it run fast and clean? Time-to-first-audio and real-time factor for speed, DNSMOS and loudness for signal quality.",
+      "Did it respond quickly? Time-to-first-audio and real-time factor. Signal quality (DNSMOS, loudness) is tracked per clip but not headlined.",
   },
   expressiveness: {
     code: "D-EXP",
