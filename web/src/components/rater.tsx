@@ -279,6 +279,19 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
     );
   }, []);
 
+  /**
+   * Pass 2 is a stack of short questions. Answering a single-select one scrolls the
+   * next into view, so the reviewer is carried down the page rather than hunting for
+   * what is left. It only shortens the *feeling* of the pass: nothing is skipped or
+   * defaulted, so no answer is nudged. Multi-selects (delivery) do not auto-advance,
+   * since there is no single tap that means "done".
+   */
+  const scrollToId = useCallback((id: string) => {
+    requestAnimationFrame(() =>
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "center" }),
+    );
+  }, []);
+
   /** Pass 1 -> 2. Scrolling to the top is the deliberate cognitive reset. */
   const toImpression = useCallback(() => {
     setPhase("impression");
@@ -546,7 +559,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           {current.text}
         </blockquote>
 
-        <div className="space-y-2">
+        <div id="q-human" className="space-y-2">
           <h2 className="text-sm font-medium">Did this sound 100% human?</h2>
           <div className="flex gap-2">
             {[
@@ -557,7 +570,14 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                 key={String(o.v)}
                 type="button"
                 aria-pressed={soundedHuman === o.v}
-                onClick={() => chooseSoundedHuman(o.v)}
+                onClick={() => {
+                  const next = soundedHuman === o.v ? null : o.v;
+                  chooseSoundedHuman(o.v);
+                  // "No" opens the delivery follow-up; "Yes" skips it. Carry the eye to
+                  // whichever comes next.
+                  if (next === false) scrollToId("q-delivery");
+                  else if (next === true) scrollToId("q-tone");
+                }}
                 className={cn(
                   "h-12 flex-1 rounded-md border text-sm font-medium transition-colors",
                   soundedHuman === o.v
@@ -572,7 +592,7 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
         </div>
 
         {soundedHuman === false ? (
-          <div className="space-y-3">
+          <div id="q-delivery" className="scroll-mt-4 space-y-3">
             <h2 className="text-sm font-medium">What made it sound off?</h2>
             <div className="space-y-3">
               {DELIVERY_PROBLEMS.map((d) => {
@@ -629,22 +649,32 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           </div>
         ) : null}
 
-        <ChipGroup
-          title="What tone did you hear?"
-          options={TONES}
-          value={tone}
-          onChange={setTone}
-        />
+        <div id="q-tone" className="scroll-mt-4">
+          <ChipGroup
+            title="What tone did you hear?"
+            options={TONES}
+            value={tone}
+            onChange={(v) => {
+              setTone(v);
+              if (v) scrollToId("q-accent");
+            }}
+          />
+        </div>
 
-        <ChipGroup
-          title="Does the accent sound right for this language?"
-          hint="No automated metric scores accent. This answer is the only source."
-          options={ACCENT_OPTIONS}
-          value={accent}
-          onChange={setAccent}
-        />
+        <div id="q-accent" className="scroll-mt-4">
+          <ChipGroup
+            title="Does the accent sound right for this language?"
+            hint="No automated metric scores accent. This answer is the only source."
+            options={ACCENT_OPTIONS}
+            value={accent}
+            onChange={(v) => {
+              setAccent(v);
+              if (v) scrollToId("q-audio");
+            }}
+          />
+        </div>
 
-        <div className="space-y-2">
+        <div id="q-audio" className="scroll-mt-4 space-y-2">
           <h2 className="text-sm font-medium">Were there any audio issues?</h2>
           <div className="flex gap-2">
             {[
@@ -655,7 +685,11 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
                 key={String(o.v)}
                 type="button"
                 aria-pressed={audioIssue === o.v}
-                onClick={() => setAudioIssue(audioIssue === o.v ? null : o.v)}
+                onClick={() => {
+                  const next = audioIssue === o.v ? null : o.v;
+                  setAudioIssue(next);
+                  if (next !== null) scrollToId("q-submit");
+                }}
                 className={cn(
                   "h-11 flex-1 rounded-md border px-2 text-sm font-medium transition-colors",
                   audioIssue === o.v
@@ -676,7 +710,12 @@ export function Rater({ clips }: { clips: RaterClip[] }) {
           </Alert>
         ) : null}
 
-        <div className="flex items-center gap-3">
+        {/* Sticky so the finish line is always in reach: the reviewer can submit the
+            moment the two required answers are in, without scrolling to find the button. */}
+        <div
+          id="q-submit"
+          className="sticky bottom-0 -mx-4 flex scroll-mt-4 items-center gap-3 border-t bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6"
+        >
           <Button
             size="lg"
             onClick={() => void afterImpression()}
