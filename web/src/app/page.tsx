@@ -51,16 +51,16 @@ export default function WelcomePage() {
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
           My goal was to build an evaluation tool for Gradium&rsquo;s TTS model. I hope the
-          remainder of the product is self-explanatory.
+          remainder of the product is self-explanatory (and that its value is self-evident).
         </p>
       </div>
 
       <Section heading="In building this site, I made a few decisions">
         <Item term="Model Choice">
-          I like that TTS has a handful of objective evaluation metrics (WER, latency),
-          while largely remaining unsolved on subjective evaluation (stress, tone, cadence).
-          I was excited by the opportunity to explore a range of inputs and outputs &hellip;
-          (also, it doesn&rsquo;t hurt that the job description calls out TTS by name)
+          I chose to evaluate TTS. This is because TTS has a handful of objective evaluation
+          metrics (WER, latency), while largely remaining unsolved on subjective evaluation
+          (stress, tone, cadence). This felt like a worthy challenge (also, it
+          doesn&rsquo;t hurt that the job description called out TTS by name).
         </Item>
         <Item term="Queries">
           I used Claude Opus to generate queries in Gradium&rsquo;s five supported languages
@@ -70,24 +70,21 @@ export default function WelcomePage() {
             Artificial Analytics&rsquo;
           </A>{" "}
           novel/news-based approach, which tells an end-customer very little about
-          performance relevant to their product.
+          performance related to their product.
         </Item>
         <Item term="Metrics">
           I calculated a handful of objective metrics (WER, Latency, UTMOS, DNSMOS) for
-          speech samples. These appear nearly industry-standard. Only WER, TTFA felt truly
-          useful. F0 spread wasn&rsquo;t totally useless.
+          speech samples. These appear nearly industry-standard. Only WER &amp; TTFA felt
+          truly useful. F0 spread was somewhat informative, if under-contextulized.
         </Item>
         <Item term="Objective vs Rater-Derived">
           I focused a majority of my time on understanding how to solicit feedback through
           rating flows. While various researchers attempt to create embedding- or NN-based
           approaches (<A href="https://arxiv.org/abs/2010.15258">xMOS</A>,{" "}
           <A href="https://arxiv.org/pdf/2506.19441">TTSDS</A>,{" "}
-          <A href="https://arxiv.org/abs/2005.07143">ECAPA-TDNN</A>, etc), I didn&rsquo;t get
-          the (na&iuml;ve) impression that these were especially consistent (or useful)
-          approaches. In my own listening, they did little to warn me that a voice clip
-          would completely butcher an employee code, currency or proper noun. A few
-          high-quality annotations struck me as more valuable than 1000 runs of{" "}
-          <A href="https://github.com/sarulab-speech/UTMOS22">UTMOS</A>.
+          <A href="https://arxiv.org/abs/2005.07143">ECAPA-TDNN</A>, etc), I got the
+          (n&auml;ive) impression that these are not especially consistent (or useful)
+          proxies.
         </Item>
         <Item term="Rating Flow">
           I iterated a few times on question type, order and format. This was largely
@@ -96,19 +93,18 @@ export default function WelcomePage() {
           generative.
         </Item>
         <Item term="WER Correction">
-          In the rating flow, you&rsquo;ll see I create a screen to adjudicate
-          Whisper&rsquo;s ASR outputs. I&rsquo;m not sure this is necessary; it felt spiteful
-          during development.
+          In the rating flow, you&rsquo;ll see the first screen compares the audio against
+          the ASR transcript. The purpose was to create labels with which to fine tune the
+          ASR models.
         </Item>
       </Section>
 
-      <Section heading="This output also has (many) limitations, including">
+      <Section heading="The product has (many) limitations">
         <Item term="Standalone vs Relative">
           One of the practical values of an eval flow is gating model releases (and
-          preventing quality regression). I couldn&rsquo;t find access to a prior model
-          version via the API, so this evaluates whatever the API produced singularly.
-          Realistically, I&rsquo;d like to evaluate metrics A/B and create some sort of
-          head-to-head (&agrave; la CMOS).
+          preventing quality regression). I couldn&rsquo;t access a prior model version via
+          the API. Realistically, I&rsquo;d like to evaluate metrics A/B and create some sort
+          of head-to-head (&agrave; la CMOS).
         </Item>
         <Item term="ASR Normalization">
           The first time I ran WER, I got ~40% error rate. I attempted to normalize the ASR
@@ -119,10 +115,6 @@ export default function WelcomePage() {
         <Item term="Rater Flow">
           The annotation flow is too long and cumbersome, I am aware! I was trying to show
           off a little.
-        </Item>
-        <Item term="GTM">
-          I would&rsquo;ve liked to run ElevenLabs&rsquo; flash 2.5 and Cartesia&rsquo;s
-          Sonic 3.5 models as benchmarks for the GTM. I ran out of time.
         </Item>
       </Section>
 
@@ -137,10 +129,20 @@ export default function WelcomePage() {
           product to customers and the Type 1 error is concerning. Gradium&rsquo;s model was
           nearly-perfect (technically) and WER was ill-equipped to demonstrate that.
         </Item>
+        <Item term="Subjective Rating">
+          In my own listening, they did little to warn me that a voice clip would completely
+          butcher a currency or proper noun. A few high-quality annotations struck me as more
+          valuable than 1000 runs of{" "}
+          <A href="https://github.com/sarulab-speech/UTMOS22">UTMOS</A>.
+        </Item>
         <Item term="Rating is difficult">
           I was over-generous with my prosodic ratings early-on. It took 15-20 ratings before
           I started to become picky with timing, accent and stress. It&rsquo;s obvious now
           that the work requires a highly fluent and trained cohort.
+        </Item>
+        <Item term="Latency seems low">
+          I tried to calculate client latency instead of server latency, and included warm-up
+          runs, but this was my result!
         </Item>
       </Section>
 
