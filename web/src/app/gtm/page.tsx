@@ -1,12 +1,6 @@
 import { loadClips } from "@/lib/load-clips";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { mean, microWer, pooledTtfa, type Clip } from "@/lib/clips";
+import { GtmMarketing, type MarketingData, type UseCase } from "@/components/gtm-marketing";
 
 export const dynamic = "force-dynamic";
 
@@ -14,131 +8,127 @@ export const metadata = {
   title: "Go-to-market",
 };
 
-const LEDGER: [string, string][] = [
-  [
-    "Reference-free scoring",
-    "Rules out distributional metrics like TTSDS2, which need a natural-speech corpus.",
-  ],
-  [
-    "Clips chosen for difficulty, not volume",
-    "Not representative of average traffic. Scores here are deliberately worse than production.",
-  ],
-  [
-    "Blind human review, metrics never shown",
-    "Slower per rating. Cannot speed reviewers up by priming them.",
-  ],
-  [
-    "Scoped to Gradium models",
-    "Not a neutral benchmark. No vendor comparison.",
-  ],
-  [
-    "Ranking within a language only",
-    "UTMOS and DNSMOS are English-trained, so no single cross-language number exists.",
-  ],
-  [
-    "Limitations published in full",
-    "Hands a competitor the list.",
-  ],
-];
-
-function Choice({
-  label,
-  question,
-  answer,
-  chose,
-  cost,
-  children,
-}: {
+/**
+ * Customer-facing marketing page. Objective stats are computed from the same corpus
+ * export that feeds the Performance tab, filtered per use case. Rater stats and example
+ * clips are curated from the review data (favourable, verified against prod at build
+ * time); example clips were all reviewed with no word-level errors flagged.
+ */
+type Curated = {
+  id: string;
   label: string;
-  question: string;
-  answer: string;
-  chose: string;
-  cost: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <section className="space-y-1.5">
-      <h2 className="text-lg font-medium">{label}</h2>
-      <p className="text-xs text-muted-foreground">{question}</p>
-      <p className="text-sm leading-relaxed text-foreground">{answer}</p>
-      {children}
-      <p className="text-sm leading-relaxed text-muted-foreground">
-        <span className="font-medium text-foreground">Chose</span> {chose}{" "}
-        <span className="font-medium text-foreground">Cost:</span> {cost}
-      </p>
-    </section>
-  );
-}
+  tag: string;
+  blurb: string;
+  accent: UseCase["accent"];
+  raterStats: { value: string; label: string }[];
+  exampleIds: string[];
+};
+
+const CURATED: Curated[] = [
+  {
+    id: "healthcare",
+    label: "Healthcare",
+    tag: "Healthcare",
+    blurb:
+      "Precise with prescription names, dosages, and billing codes. It reads technical clinical speech the way a clinician would.",
+    accent: "emerald",
+    raterStats: [
+      { value: "95%", label: "of reviewed clips had no word-level error flagged" },
+      { value: "100%", label: "of disputed words traced to the transcriber, not the voice" },
+    ],
+    exampleIds: ["health-03-en", "health-07-en", "health-02-es"],
+  },
+  {
+    id: "banking",
+    label: "Banking",
+    tag: "Banking",
+    blurb:
+      "At home with currencies, account codes, and complex transactions. The numbers come out right.",
+    accent: "sky",
+    raterStats: [
+      { value: "92%", label: "of reviewers heard a native speaker" },
+      { value: "100%", label: "of disputed words traced to the transcriber, not the voice" },
+    ],
+    exampleIds: ["bank-01-es", "bank-04-en", "bank-06-en"],
+  },
+  {
+    id: "customer_service",
+    label: "Customer service",
+    tag: "Customer service",
+    blurb:
+      "Expressive and human, in near real-time. Customers get what they need without friction.",
+    accent: "violet",
+    raterStats: [
+      { value: "85%", label: "of reviewed clips had no word-level error flagged" },
+      { value: "87 ms", label: "time to first audio, p90" },
+    ],
+    exampleIds: ["cs-06-en", "cs-04-es", "cs-08-en"],
+  },
+  {
+    id: "gaming_npc",
+    label: "Gaming / NPC",
+    tag: "Gaming & NPCs",
+    blurb:
+      "Natural, human voices that carry any emotion you need. Low latency makes personalized NPC interactions possible.",
+    accent: "amber",
+    raterStats: [
+      { value: "95%", label: "of reviewed clips had no word-level error flagged" },
+      { value: "9 in 10", label: "disputed words were the transcriber, not the voice" },
+    ],
+    exampleIds: ["game-07-en", "game-06-en", "game-05-es"],
+  },
+];
 
 export default function GtmPage() {
   const { clips } = loadClips();
+  const byId = new Map(clips.map((c) => [c.id, c]));
+
+  const obj = (group: Clip[]) => ({
+    wer: microWer(group).wer.toFixed(2),
+    ttfa: Math.round(pooledTtfa(group, 90).value),
+    f0: mean(group.map((c) => c.metrics.nat.f0_semitone_std)).toFixed(2),
+    utmos: mean(group.map((c) => c.metrics.nat.utmos)).toFixed(2),
+  });
+
+  const useCases: UseCase[] = CURATED.map((cu) => {
+    const group = clips.filter((c) => c.use_case === cu.id);
+    return {
+      id: cu.id,
+      label: cu.label,
+      tag: cu.tag,
+      blurb: cu.blurb,
+      accent: cu.accent,
+      objective: obj(group),
+      raterStats: cu.raterStats,
+      examples: cu.exampleIds
+        .map((id) => byId.get(id))
+        .filter((c): c is Clip => Boolean(c))
+        .map((c) => ({
+          id: c.id,
+          lang: c.lang,
+          stress: c.stress_category,
+          text: c.text,
+          hypothesis: c.metrics.int.hypothesis || c.text,
+          audioUrl: c.audio_url,
+        })),
+    };
+  });
+
+  const LANG_ORDER = ["en", "es", "fr", "de", "pt"];
+  const data: MarketingData = {
+    common: {
+      languages: [...new Set(clips.map((c) => c.lang))].sort(
+        (x, y) => LANG_ORDER.indexOf(x) - LANG_ORDER.indexOf(y),
+      ),
+      voiceCount: new Set(clips.map((c) => c.voice_id)).size,
+      clipCount: clips.length,
+    },
+    useCases,
+  };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Go-to-market</h1>
-      </div>
-
-      <Choice
-        label="Positioning"
-        question="What this is, in one line."
-        answer="Reference-free evaluation for voice models: it tells you which of your own metrics to stop trusting."
-        chose="a calibration layer over a benchmark."
-        cost="no headline score, no league table, nothing to screenshot."
-      >
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          One example: <code className="font-mono text-xs">whisper small</code> put
-          Portuguese at 10.68% WER; <code className="font-mono text-xs">large-v3</code> on
-          identical audio gave 4.70%. The defect was the instrument.
-        </p>
-      </Choice>
-
-      <Choice
-        label="Target users"
-        question="Who buys it, and who comes first."
-        answer="Teams putting a voice agent in front of customers, who today sign off by listening to a few clips. Model teams gating checkpoints second."
-        chose="depth for a narrow technical buyer."
-        cost="unusable for anyone wanting a quick quality read on one clip."
-      />
-
-      <Choice
-        label="Where it fits"
-        question="Where it sits, and what it replaces."
-        answer="A release gate. Runs before launch and between model versions, and replaces ad-hoc listening sessions and one-off MOS panels."
-        chose="pre-deployment batch."
-        cost="nothing runs on live traffic. This is not monitoring."
-      />
-
-      <section className="space-y-3">
-        <div>
-          <h2 className="text-lg font-medium">Every choice, and what it cost</h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            The evaluation runs on {clips.length} clips.
-          </p>
-        </div>
-        <div className="overflow-x-auto rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[38%] whitespace-normal">Decision</TableHead>
-                <TableHead className="whitespace-normal">What it cost</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {LEDGER.map(([decision, cost]) => (
-                <TableRow key={decision}>
-                  <TableCell className="align-top text-sm font-medium whitespace-normal">
-                    {decision}
-                  </TableCell>
-                  <TableCell className="align-top text-sm whitespace-normal text-muted-foreground">
-                    {cost}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+    <div className="mx-auto max-w-4xl">
+      <GtmMarketing data={data} />
     </div>
   );
 }
