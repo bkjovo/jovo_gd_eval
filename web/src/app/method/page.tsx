@@ -270,16 +270,16 @@ export default function MethodPage() {
                 <TableBody>
                   {MAPPING.map((m) => (
                     <TableRow key={m.report}>
-                      <TableCell>
+                      <TableCell className="w-1/2 align-top whitespace-normal">
                         <div className="text-sm font-medium">{m.report}</div>
                         <div className="mt-0.5 text-xs text-muted-foreground">{m.note}</div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="align-top">
                         <Badge variant="outline" className="text-[10px] whitespace-nowrap">
                           {m.dim}
                         </Badge>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="align-top">
                         {m.metric.length ? (
                           <div className="space-y-0.5">
                             {m.metric.map((k) => (
