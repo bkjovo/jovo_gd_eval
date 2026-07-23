@@ -29,8 +29,7 @@ export const DIMENSIONS: Record<
   performance: {
     code: "D-PERF",
     label: "Performance",
-    blurb:
-      "Did it respond quickly? Time-to-first-audio and real-time factor. Signal quality (DNSMOS, loudness) is tracked per clip but not headlined.",
+    blurb: "Did it respond quickly? Time-to-first-audio and real-time factor.",
   },
   expressiveness: {
     code: "D-EXP",

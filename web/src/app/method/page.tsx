@@ -54,73 +54,73 @@ const LIMITATIONS = [
 const MAPPING: {
   report: string;
   note: string;
-  dim: "intelligibility" | "performance" | "expressiveness" | "naturalness";
+  dim: string;
   metric: string[];
 }[] = [
   {
     report: "A wrong or dropped word",
     note: "Tap the exact word. Feeds word error rate as a substitution or deletion.",
-    dim: "intelligibility",
+    dim: "Intelligibility",
     metric: ["int.wer_pct"],
   },
   {
     report: "How a word was mispronounced",
     note: "Acronym, number, code, name or homograph. WER registers that a word broke but not which one or why.",
-    dim: "intelligibility",
+    dim: "Intelligibility",
     metric: [],
   },
   {
     report: "The audio cut a word off",
     note: "A human check on the truncation detector, which has flagged zero clips.",
-    dim: "intelligibility",
+    dim: "Intelligibility",
     metric: ["int.truncated", "int.dur_expected_ratio"],
   },
   {
     report: "Did not sound 100% human",
     note: "The binary naturalness call UTMOS is trained to predict.",
-    dim: "naturalness",
+    dim: "Naturalness",
     metric: ["nat.utmos"],
   },
   {
     report: "Stress or emphasis was off",
     note: "Robotic, missed stress, or the wrong word stressed. Monotone shows as low pitch variation.",
-    dim: "expressiveness",
+    dim: "Expressiveness",
     metric: ["nat.f0_semitone_std"],
   },
   {
     report: "Spacing was off",
     note: "Too much pausing, choppy delivery, or words running together.",
-    dim: "expressiveness",
+    dim: "Expressiveness",
     metric: ["nat.n_pauses"],
   },
   {
     report: "Speed was off",
     note: "Too fast or too slow.",
-    dim: "expressiveness",
+    dim: "Expressiveness",
     metric: ["nat.speaking_rate_wps"],
   },
   {
     report: "Tone did not fit the use case",
     note: "Register. No reference-free metric scores it.",
-    dim: "expressiveness",
+    dim: "Expressiveness",
     metric: [],
   },
   {
     report: "Accent sounded wrong",
     note: "Whether the voice sounds native for its market.",
-    dim: "naturalness",
+    dim: "Naturalness",
     metric: [],
   },
   {
     report: "An audio issue: buzzing or a glitch",
     note: "Signal quality, independent of the words.",
-    dim: "performance",
+    dim: "Audio quality",
     metric: ["aud.dnsmos_ovrl"],
   },
   {
     report: "Was the transcript wrong? (adjudication)",
     note: "On disputed words only. Separates a model error from a recogniser error, turning raw WER into corrected WER.",
-    dim: "intelligibility",
+    dim: "Intelligibility",
     metric: ["int.wer_pct"],
   },
 ];
@@ -160,8 +160,8 @@ export default function MethodPage() {
         <h2 className="text-lg font-medium">The problem</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           We have a portfolio of objective metrics: WER, CER, TTFA, UTMOS, etc. Each is
-          limited (and problematic) in its own right. Even the combination &mdash; while
-          useful &mdash; fails to tell us when a TTS model generates robust, high-quality
+          limited (and problematic) in its own right. Even the combination, while
+          useful, fails to tell us when a TTS model generates robust, high-quality
           output. To get a clearer picture on where our models fail, and where our team
           should focus, we pair these metrics with subjective, human-generated annotations
           on word-level and prosodic failures. Taken together, we can start to focus our
@@ -201,26 +201,13 @@ export default function MethodPage() {
         <div className="rounded-lg border p-4">
           <h3 className="text-sm font-medium">Why the test text looks the way it does</h3>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            The corpus is built to break the model on purpose, in the ways a real product
-            would. Each line belongs to a{" "}
-            <span className="font-medium text-foreground">use case</span> a Gradium customer
-            actually ships &mdash; healthcare, banking, customer service, gaming &mdash; and
-            carries a <span className="font-medium text-foreground">stress category</span>:
-            the specific hard thing it is designed to provoke. An account number, a currency
-            amount, a dosage, a URL, an acronym, a homograph, a code-switched loanword. These
-            are exactly the tokens that separate a demo from a deployment: a voice that reads
-            marketing copy beautifully can still butcher{" "}
-            <code className="font-mono text-xs">A739K2</code> or say{" "}
-            <span className="font-medium text-foreground">4.99</span> as four separate digits,
-            and a customer notices that on the first call.
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Stratifying this way is what turns a corpus average into an action. &ldquo;WER is
-            3.2%&rdquo; tells a research team nothing to do; &ldquo;proper nouns and codes are
-            where it breaks, in these use cases&rdquo; points them at a fix. The lines were
-            drafted with Claude across the five supported languages, then reviewed by hand, so
-            each stress category is represented in each language and each use case rather than
-            sampled from generic news or novel text.
+            Each line is assigned a use case (healthcare, banking, customer service, gaming)
+            and a stress category: the token type it is built to test. Account numbers,
+            currency, dates, URLs, acronyms, homographs, code-switched loanwords. Stratifying
+            by stress category localizes a failure to a token type rather than reporting a
+            single corpus average. Lines were generated with Claude across the five supported
+            languages and reviewed by hand, with each stress category present in each language
+            and each use case.
           </p>
         </div>
 
@@ -235,8 +222,7 @@ export default function MethodPage() {
         <div>
           <h2 className="text-lg font-medium">The defect taxonomy</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Four dimensions, measured independently. A clip can be perfectly intelligible
-            and still unusable.
+            Four dimensions, measured independently.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -290,7 +276,7 @@ export default function MethodPage() {
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className="text-[10px] whitespace-nowrap">
-                          {DIMENSIONS[m.dim].label}
+                          {m.dim}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -325,18 +311,11 @@ export default function MethodPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-medium">Rating Flow</h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          The flow is built on one principle: a reviewer&rsquo;s judgement is only worth
-          collecting if nothing has biased it first. Machine scores are never shown, before
-          or after submitting, because a predicted MOS of 4.5 anchors whatever a person
-          reports next; metrics are excluded from the payload the review page receives
-          rather than hidden in the UI. The clip is heard in two separate passes: first the
-          reviewer taps the exact words that came out wrong, then, on a fresh screen, judges
-          how it sounds as a whole, because analytic and holistic judgements contaminate
-          each other when they are asked together. The recogniser adjudication comes last
-          and only on the disputed words, so the metric&rsquo;s own verdict cannot colour
-          the score already given. Reviewers are served only the languages they read. The
-          flow is longer than it should be; the bet is that a few careful, well-structured
-          annotations are worth more than a thousand fast ones.
+          Machine scores are never shown to reviewers; metrics are excluded from the payload
+          the review page receives. Each clip is rated in two passes on separate screens:
+          word-level errors first, overall impression second. ASR adjudication of the
+          disputed words is asked last, after the impression score. Reviewers rate only the
+          languages they select.
         </p>
       </section>
 
@@ -460,7 +439,7 @@ export default function MethodPage() {
         <div>
           <h2 className="text-lg font-medium">Known limitations</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            An evaluation tool that hides its own error bars is not an evaluation tool.
+            Constraints of the current setup, stated directly.
           </p>
         </div>
         <div className="space-y-3">
