@@ -16,7 +16,8 @@ cp .env.example .env   # add your GRADIUM_API_KEY
 | `corpus/build_corpus.py` | Writes `corpus/manifest_125.jsonl` — the corpus definition ([design notes](corpus/README.md)) |
 | `run_batch.py` | Synthesis + scoring per clip, incremental; writes `corpus/outputs/` |
 | `evaluate.py` | Metric implementations: WER/CER with normalization, UTMOS, DNSMOS, prosody, truncation |
-| `gradium_ttfa.py` | Streamed time-to-first-audio measurement |
+| `gradium_ttfa.py` | Streamed time-to-first-audio measurement (excludes the WAV-header preamble) |
+| `retime_latency.py` | Re-times the shipped corpus latency in place; audio and quality metrics untouched |
 | `export_site.py` | Joins manifest + results into `web/public/data/clips.json`, copies audio |
 
 ```bash

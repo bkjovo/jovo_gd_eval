@@ -60,7 +60,7 @@ const CURATED: Curated[] = [
     accent: "violet",
     raterStats: [
       { value: "85%", label: "of reviewed clips had no word-level error flagged" },
-      { value: "87 ms", label: "time to first audio, p90" },
+      { value: "__TTFA__", label: "time to first audio, p90" },
     ],
     exampleIds: ["cs-06-en", "cs-04-es", "cs-08-en"],
   },
@@ -92,14 +92,19 @@ export default function GtmPage() {
 
   const useCases: UseCase[] = CURATED.map((cu) => {
     const group = clips.filter((c) => c.use_case === cu.id);
+    const o = obj(group);
     return {
       id: cu.id,
       label: cu.label,
       tag: cu.tag,
       blurb: cu.blurb,
       accent: cu.accent,
-      objective: obj(group),
-      raterStats: cu.raterStats,
+      objective: o,
+      // "__TTFA__" resolves to the measured figure so marketing copy cannot drift
+      // from the data it cites.
+      raterStats: cu.raterStats.map((s) =>
+        s.value === "__TTFA__" ? { ...s, value: `${o.ttfa} ms` } : s,
+      ),
       examples: cu.exampleIds
         .map((id) => byId.get(id))
         .filter((c): c is Clip => Boolean(c))

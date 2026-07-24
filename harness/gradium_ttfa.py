@@ -8,8 +8,11 @@ queueing — it under-counts real delay. So every number here is measured at the
 client, from just before the request until bytes actually arrive.
 
 Metrics:
-  TTFA   time-to-first-audio: request start -> first audio chunk. The
-         responsiveness number a user feels. Requires the streaming path.
+  TTFA   time-to-first-audio: request start -> first PCM chunk. The WAV header
+         the server sends on request-accept is a preamble, not audio, and is
+         excluded (timing it measures the network round trip, ~80ms, not the
+         model, ~190ms server-side). The responsiveness number a user feels.
+         Requires the streaming path.
   total  request start -> last audio byte received.
   RTF    real-time factor = total / audio_duration. <1 = faster than real time.
 
@@ -46,10 +49,20 @@ async def trial_stream(client, setup, text):
     t0 = time.perf_counter()
     stream = await client.tts_stream(setup=setup, text=text)
     ttfa = None
+    ttfa_header = None
     chunks = []
     async for chunk in stream.iter_bytes():
         if ttfa is None:
-            ttfa = time.perf_counter() - t0
+            # The server sends the 44-byte WAV header ("RIFF....") immediately on
+            # accepting the request, BEFORE any audio has been synthesized. Timing
+            # that chunk measures one network round trip, not the model: measured
+            # 2026-07-23, the header arrived at ~76-92ms while the first PCM chunk
+            # (7,680 B) arrived at ~254ms, against a server-reported first-buffer
+            # time of ~190ms. TTFA starts at the first chunk that is actual audio.
+            if chunk[:4] == b"RIFF" and len(chunk) <= 100:
+                ttfa_header = time.perf_counter() - t0
+            else:
+                ttfa = time.perf_counter() - t0
         chunks.append(chunk)
     total = time.perf_counter() - t0
     raw = b"".join(chunks)
@@ -57,6 +70,9 @@ async def trial_stream(client, setup, text):
     audio_s = audio_duration_s(raw, sr)
     return {
         "ttfa": ttfa,
+        # Header arrival ≈ one network round trip. Kept for diagnostics: this is the
+        # quantity the pre-2026-07-23 harness mistakenly reported as TTFA.
+        "ttfa_header": ttfa_header,
         "total": total,
         "audio_s": audio_s,
         "rtf": total / audio_s if audio_s else float("nan"),

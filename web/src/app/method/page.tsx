@@ -421,6 +421,34 @@ export default function MethodPage() {
         </div>
       </section>
 
+      {/* --- TTFA measurement approach --- */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-medium">TTFA measurement approach (and a pitfall)</h2>
+        <p className="text-sm text-muted-foreground">
+          Time-to-first-audio is measured client-side with a monotonic clock around a
+          streamed API call: request start to the first PCM chunk received. Connections are
+          warmed per voice before any timed trial, so no measurement pays cold-start. Each
+          clip is timed in 3 trials; the corpus p90 is computed over all 435 trials pooled.
+        </p>
+        <div className="rounded-lg border p-4">
+          <h3 className="text-sm font-medium">The first chunk is not audio</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            The server sends a 44-byte WAV header the moment it accepts a request, before
+            any audio exists. The original harness stopped its clock on that header and
+            reported 70&ndash;96ms TTFA, which is the network round trip, not the model.
+            Three observations exposed it: the reported figure matched the round trip to
+            the EU endpoint, Gradium&apos;s own dashboard reported ~190ms server-side to
+            first audio buffer, and a client cannot observe a buffer earlier than the
+            server emits it. A per-chunk probe confirmed the header arrives at ~80ms and
+            the first 7,680-byte PCM chunk at ~254ms. The corrected stopwatch skips the
+            header preamble and starts at the first PCM chunk. Re-measured across the full
+            corpus: p50 260ms, p90 348ms, consistent with the server&apos;s ~190ms plus
+            transatlantic delivery. The header time is retained in the harness output as a
+            network-latency diagnostic.
+          </p>
+        </div>
+      </section>
+
       {/* --- Limitations --- */}
       <section className="space-y-4">
         <div>
