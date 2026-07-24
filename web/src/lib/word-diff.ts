@@ -56,9 +56,3 @@ export function diffWords(source: string, hypothesis: string): WordDiff {
 
   return { src, hyp, srcMarks, hypMarks };
 }
-
-/** Indices of source words the recogniser disagreed about. */
-export function disputedIndices(source: string, hypothesis: string): number[] {
-  const { srcMarks } = diffWords(source, hypothesis);
-  return srcMarks.flatMap((m, i) => (m ? [i] : []));
-}

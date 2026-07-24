@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 
 // Short labels keep the full nav visible on narrow screens instead of clipping the
 // last item off the edge.
-// The executive summary is archived: still served at /summary, no longer linked.
 const LINKS = [
   { href: "/", label: "Welcome", short: "Welcome" },
   { href: "/rate", label: "Annotate!", short: "Annotate!" },

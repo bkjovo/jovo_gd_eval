@@ -17,8 +17,10 @@ __pycache__/
 node_modules/
 .next/
 
-# Machine-local Claude Code permissions, not useful to anyone else.
-.claude/settings.local.json
+# Machine-local editor/agent tooling, not useful to anyone else.
+.claude/
+web/CLAUDE.md
+web/AGENTS.md
 
 # macOS
 .DS_Store

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { byCorpusOrder, type Clip } from "@/lib/clips";
+import { diffWords } from "@/lib/word-diff";
 import { LANGUAGE_NAMES, verdictFor } from "@/lib/taxonomy";
 import { ALL, FilterSelect } from "@/components/filter-select";
 import { stressBucketLabel, stressBucketOf, stressBucketOptions } from "@/lib/stress-buckets";
@@ -17,48 +18,6 @@ import { cn } from "@/lib/utils";
  * error from a recogniser error. Unlike the review flow, metrics are shown here
  * deliberately; this page is for inspection, not for collecting blind judgements.
  */
-
-/** Word-level diff so a reader can see exactly where the transcript diverged. */
-function diffWords(source: string, hypothesis: string) {
-  const norm = (w: string) =>
-    w.toLowerCase().replace(/[.,!?;:¿¡"“”'’()]/g, "");
-  const src = source.split(/\s+/).filter(Boolean);
-  const hyp = hypothesis.split(/\s+/).filter(Boolean);
-
-  // Standard LCS table; the corpus lines are short enough that this is free.
-  const n = src.length;
-  const m = hyp.length;
-  const lcs: number[][] = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
-  for (let i = n - 1; i >= 0; i--) {
-    for (let j = m - 1; j >= 0; j--) {
-      lcs[i][j] =
-        norm(src[i]) === norm(hyp[j])
-          ? lcs[i + 1][j + 1] + 1
-          : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
-    }
-  }
-
-  const srcMarks: boolean[] = new Array(n).fill(false);
-  const hypMarks: boolean[] = new Array(m).fill(false);
-  let i = 0;
-  let j = 0;
-  while (i < n && j < m) {
-    if (norm(src[i]) === norm(hyp[j])) {
-      i++;
-      j++;
-    } else if (lcs[i + 1][j] >= lcs[i][j + 1]) {
-      srcMarks[i] = true;
-      i++;
-    } else {
-      hypMarks[j] = true;
-      j++;
-    }
-  }
-  while (i < n) srcMarks[i++] = true;
-  while (j < m) hypMarks[j++] = true;
-
-  return { src, hyp, srcMarks, hypMarks };
-}
 
 function DiffText({
   words,

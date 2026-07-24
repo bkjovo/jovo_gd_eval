@@ -21,13 +21,10 @@ export function WordTagger({
   text,
   flags,
   onChange,
-  disputedIndices,
 }: {
   text: string;
   flags: WordFlag[];
   onChange: (flags: WordFlag[]) => void;
-  /** Optional: words the recogniser disagreed about, shown as a subtle hint only. */
-  disputedIndices?: number[];
 }) {
   const words = text.split(/\s+/).filter(Boolean);
   const [open, setOpen] = useState<number | null>(null);
@@ -71,9 +68,6 @@ export function WordTagger({
                   : isOpen
                     ? "border-foreground bg-muted"
                     : "border-border bg-muted/40 hover:border-foreground hover:bg-muted",
-                // Recogniser disagreement is a hint, never a verdict: the reviewer is
-                // judging the audio, and the transcript is our instrument, not truth.
-                !f && disputedIndices?.includes(i) && "border-dashed border-muted-foreground/50",
               )}
             >
               {w}

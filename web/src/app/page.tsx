@@ -6,8 +6,7 @@ export const metadata = {
 
 /**
  * The front door. Joe's own note on what this is, what he chose, and what it does not
- * do yet. Rendered verbatim; the voice is the point. The executive summary that used to
- * live at / is archived at /summary.
+ * do yet. Rendered verbatim; the voice is the point.
  */
 
 function A({ href, children }: { href: string; children: ReactNode }) {

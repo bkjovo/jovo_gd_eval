@@ -62,30 +62,6 @@ export function probesDropped(): boolean {
   return probesColumnMissing;
 }
 
-/**
- * Ask the database directly whether the `probes` column exists.
- *
- * The flag above only knows about writes this particular process handled, which on
- * serverless means a page render usually cannot see it. This asks once per process and
- * caches, so the banner is trustworthy no matter which instance renders the page.
- * Returns true when unknown, so a transient network failure never produces a false alarm.
- */
-let probesColumnKnown: boolean | null = null;
-
-export async function probesColumnAvailable(): Promise<boolean> {
-  if (!isPersisted()) return true;
-  if (probesColumnKnown !== null) return probesColumnKnown;
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/ratings?select=probes&limit=1`, {
-      headers: headers(),
-      cache: "no-store",
-    });
-    probesColumnKnown = res.ok;
-  } catch {
-    probesColumnKnown = true; // unknown: do not cry wolf
-  }
-  return probesColumnKnown;
-}
 
 function headers() {
   return {
