@@ -153,9 +153,10 @@ export default function WelcomePage() {
           I started to become picky with timing, accent and stress. It&rsquo;s obvious now
           that the work requires a highly fluent and trained cohort.
         </Item>
-        <Item term="Latency seems low">
-          I tried to calculate client latency instead of server latency, and included warm-up
-          runs, but this was my result!
+        <Item term="Calculating Latency">
+          My latency numbers were spookily low (~90ms). It took a while to debug; it turns
+          out that I was timing the WAV header arriving, not the actual TTFA. The second
+          run put me over my token budget (ugh) but the results look more credible.
         </Item>
       </Section>
 
