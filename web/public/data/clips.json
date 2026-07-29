@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T05:18:43+00:00",
+  "generated_at": "2026-07-29T04:27:13+00:00",
   "n_clips": 145,
   "languages": [
     "de",
@@ -1092,7 +1092,7 @@
           "ins": 0,
           "del": 0,
           "trailing_del": 0,
-          "dur_expected_ratio": 0.847,
+          "dur_expected_ratio": 0.9,
           "truncated": false,
           "detected_lang": "de",
           "hypothesis": "Rufen Sie sofort unsere Betrugshotline an 0800 45 77 90."
@@ -1102,7 +1102,7 @@
           "f0_semitone_std": 2.759,
           "f0_mean_hz": 171.3,
           "n_pauses": 1,
-          "speaking_rate_wps": 3.991
+          "speaking_rate_wps": 3.756
         },
         "aud": {
           "dnsmos_ovrl": 3.359,
@@ -7875,7 +7875,7 @@
           "ins": 0,
           "del": 0,
           "trailing_del": 0,
-          "dur_expected_ratio": 0.739,
+          "dur_expected_ratio": 0.756,
           "truncated": false,
           "detected_lang": "fr",
           "hypothesis": "J'ai examiné votre dossier et voici ce que je peux faire.  Je rembourse le dernier paiement, je prolonge votre garantie de 6 mois gratuitement  et j'envoie un remplacement qui devrait arriver sous 3 jours ouvrés.  Vous recevrez un email de confirmation sous peu."
@@ -7885,7 +7885,7 @@
           "f0_semitone_std": 3.306,
           "f0_mean_hz": 161.0,
           "n_pauses": 5,
-          "speaking_rate_wps": 4.628
+          "speaking_rate_wps": 4.527
         },
         "aud": {
           "dnsmos_ovrl": 3.332,
