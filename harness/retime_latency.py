@@ -3,8 +3,9 @@ retime_latency.py — re-measure latency for the shipped corpus, without touchin
 
 Exists because the original run timed the WAV header, not the audio (see
 trial_stream in gradium_ttfa.py). This re-times every clip with the corrected
-stopwatch and patches ONLY the lat block in web/public/data/clips.json; the audio,
-transcripts and quality metrics are untouched, so existing reviews stay valid.
+stopwatch and patches ONLY the latency fields — in corpus/outputs/results.json
+(the export_site.py input) and web/public/data/clips.json; the audio, transcripts
+and quality metrics are untouched, so existing reviews stay valid.
 
 Runs are resumable: each measured clip is appended to a progress file, and the
 clips.json patch is a separate explicit step.
@@ -28,6 +29,7 @@ import gradium
 from gradium_ttfa import trial_stream, summarize
 
 CLIPS = os.path.join(os.path.dirname(__file__), "..", "web", "public", "data", "clips.json")
+RESULTS = os.path.join(os.path.dirname(__file__), "corpus", "outputs", "results.json")
 PROGRESS = os.path.join(os.path.dirname(__file__), "retime_progress.json")
 
 
@@ -78,8 +80,29 @@ async def measure(clips, trials, warmup_per_voice):
     print(f"done in {time.time()-t_start:.0f}s; progress -> {PROGRESS}")
 
 
+def _measured(entry):
+    rows = [r for r in entry["trials"] if r.get("ttfa") is not None]
+    if not rows:
+        return None, None
+    return rows, {
+        "ttfa": summarize([r["ttfa"] for r in rows]),
+        "total": summarize([r["total"] for r in rows]),
+        "rtf": summarize([r["rtf"] for r in rows]),
+    }
+
+
+def _rewrite(path, data):
+    backup = path + ".bak"
+    os.replace(path, backup)
+    with open(path, "w") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.write("\n")
+    return backup
+
+
 def apply_progress():
     progress = load_progress()
+
     with open(CLIPS) as f:
         data = json.load(f)
     patched = 0
@@ -87,28 +110,46 @@ def apply_progress():
         entry = progress.get(c["id"])
         if not entry:
             continue
-        rows = [r for r in entry["trials"] if r.get("ttfa") is not None]
+        rows, s = _measured(entry)
         if not rows:
             continue
-        ttfa = summarize([r["ttfa"] for r in rows])
-        total = summarize([r["total"] for r in rows])
-        rtf = summarize([r["rtf"] for r in rows])
         c["metrics"]["lat"] = {
-            "ttfa_p50_ms": round(ttfa["p50"] * 1000, 1),
-            "ttfa_p90_ms": round(ttfa["p90"] * 1000, 1),
-            "ttfa_iqr_ms": round(ttfa["iqr"] * 1000, 1),
-            "total_p50_ms": round(total["p50"] * 1000, 1),
-            "rtf_p50": round(rtf["p50"], 3),
+            "ttfa_p50_ms": round(s["ttfa"]["p50"] * 1000, 1),
+            "ttfa_p90_ms": round(s["ttfa"]["p90"] * 1000, 1),
+            "ttfa_iqr_ms": round(s["ttfa"]["iqr"] * 1000, 1),
+            "total_p50_ms": round(s["total"]["p50"] * 1000, 1),
+            "rtf_p50": round(s["rtf"]["p50"], 3),
             "n_trials": len(rows),
             "ttfa_trials_ms": [round(r["ttfa"] * 1000, 1) for r in rows],
         }
         patched += 1
-    backup = CLIPS + ".bak"
-    os.replace(CLIPS, backup)
-    with open(CLIPS, "w") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-        f.write("\n")
+    backup = _rewrite(CLIPS, data)
     print(f"patched {patched}/{len(data['clips'])} clips; backup at {backup}")
+
+    # results.json is what export_site.py reads: patch it too, so a plain re-export
+    # reproduces the shipped latency without needing this script again.
+    with open(RESULTS) as f:
+        results = json.load(f)
+    patched = 0
+    for row in results:
+        entry = progress.get(row["id"])
+        if not entry:
+            continue
+        rows, s = _measured(entry)
+        if not rows:
+            continue
+        row.update({
+            "ttfa_p50_ms": round(s["ttfa"]["p50"] * 1000, 1),
+            "ttfa_p90_ms": round(s["ttfa"]["p90"] * 1000, 1),
+            "ttfa_iqr_ms": round(s["ttfa"]["iqr"] * 1000, 1),
+            "total_p50_ms": round(s["total"]["p50"] * 1000, 1),
+            "rtf_p50": round(s["rtf"]["p50"], 3),
+            "_latency_trials": rows,
+            "_ttfa": s["ttfa"], "_total": s["total"], "_rtf": s["rtf"],
+        })
+        patched += 1
+    backup = _rewrite(RESULTS, results)
+    print(f"patched {patched}/{len(results)} result rows; backup at {backup}")
 
 
 def main():
@@ -118,7 +159,8 @@ def main():
     ap.add_argument("--skip-done", action="store_true", help="skip clips already in the progress file")
     ap.add_argument("--trials", type=int, default=3)
     ap.add_argument("--warmup", type=int, default=2)
-    ap.add_argument("--apply", action="store_true", help="patch clips.json from the progress file")
+    ap.add_argument("--apply", action="store_true",
+                    help="patch clips.json and results.json from the progress file")
     args = ap.parse_args()
 
     if args.apply:
