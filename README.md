@@ -28,7 +28,9 @@ per-vertical reporting, and the gap between the two.
    blind (no machine scores shown to raters) and stored in Supabase.
 
 The scored outputs are committed (`harness/corpus/outputs/`), so scoring and the
-export can be re-run against the committed audio without an API key.
+export can be re-run against the committed audio without an API key. Latency was
+re-measured 2026-07-23 with the corrected stopwatch (`harness/gradium_ttfa.py`);
+the raw trials are committed in `harness/retime_progress.json`.
 
 Commands and environment variables: [`harness/README.md`](harness/README.md) and
 [`web/README.md`](web/README.md).
